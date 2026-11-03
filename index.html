@@ -208,6 +208,7 @@ footer{text-align:center;color:#eaf6ff;font-size:.78rem;padding:6px}
 .riskbox{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0;text-align:center}.riskbox>div{background:#fff7e6;border:3px solid #f0c64a;border-radius:14px;padding:8px;font-size:.92rem}
 @media(max-width:600px){.riskbox{grid-template-columns:1fr}}
 button.risky{background:linear-gradient(#ff6a3d,#d9381e);box-shadow:0 5px 0 #9a2412}
+.vt td{padding:4px 8px;font-size:.95rem}.vb{background:#fff;color:var(--ink);border:3px solid #cbd6dc;box-shadow:none;padding:4px 18px;border-radius:10px}.vb.on{background:#2a6fd6;color:#fff;border-color:#2a6fd6}
 .news .nh{display:inline-block;background:#22313a;color:#fff;border-radius:999px;padding:2px 16px;font-weight:800;letter-spacing:.1em}
 .news table{margin-top:8px}.news td,.news th{text-align:left;font-size:.92rem}
 .center>.up{text-align:center;background:rgba(255,255,255,.85);border-radius:24px;padding:10px 26px;border:5px solid #d49a00;box-shadow:0 8px 0 rgba(0,0,0,.2)}
@@ -382,15 +383,15 @@ TQ.forEach((q,i)=>ERAS[i].qs=q);
 
 /* ===== 毎年のニュース（班全体に影響） ===== */
 const NEWS_BAD=[
- {t:'大雨で洪水が起きた',i:'🌊',cats:['crop'],m:2,wx:1,fx:'rain',from:2,note:'堤防や排水路、水田の水の管理で、被害を減らしてきた。'},
- {t:'台風が上陸した',i:'🌀',cats:['crop','fish'],m:2,wx:1,fx:'storm',from:2,note:'防風ネットや、いけすを海中に沈めて守る技術がある。'},
- {t:'雨が降らず、日照りが続いた（干ばつ）',i:'☀️',cats:['crop','animal'],m:1,wx:1,fx:'heat',from:1,note:'ため池や用水路などのかんがい施設で備えてきた。'},
- {t:'害虫が大発生した',i:'🦗',cats:['crop'],m:1,fx:'bug',from:1,note:'天敵の利用、防虫ネット、農薬の適正な使用で防ぐ。'},
- {t:'冷夏で作物が育たない（冷害）',i:'❄️',cats:['crop'],m:2,wx:1,fx:'cold',from:2,note:'寒さに強い品種の開発や、田の水を深くする管理で守る。'},
+ {t:'大雨で洪水が起きた',i:'🌊',cats:['crop'],m:2,wx:1,fx:'rain',from:0,note:'堤防や排水路、水田の水の管理で、被害を減らしてきた。'},
+ {t:'台風が上陸した',i:'🌀',cats:['crop','fish'],m:2,wx:1,fx:'storm',from:0,note:'防風ネットや、いけすを海中に沈めて守る技術がある。'},
+ {t:'雨が降らず、日照りが続いた（干ばつ）',i:'☀️',cats:['crop','animal'],m:1,wx:1,fx:'heat',from:0,note:'ため池や用水路などのかんがい施設で備えてきた。'},
+ {t:'害虫が大発生した',i:'🦗',cats:['crop'],m:1,fx:'bug',from:0,note:'天敵の利用、防虫ネット、農薬の適正な使用で防ぐ。'},
+ {t:'冷夏で作物が育たない（冷害）',i:'❄️',cats:['crop'],m:2,wx:1,fx:'cold',from:1,note:'寒さに強い品種の開発や、田の水を深くする管理で守る。'},
  {t:'家畜の伝染病が広がった',i:'🦠',cats:['animal'],m:2,fx:'germ',from:2,note:'消毒、ワクチン、人や車の出入りの管理（防疫）で防ぐ。'},
- {t:'赤潮が発生した',i:'🔴',cats:['fish'],m:2,fx:'germ',from:2,note:'プランクトンの観測や、いけすの移動、えさの量の調整で被害を減らす。'},
- {t:'記録的な猛暑（地球温暖化）',i:'🌡️',cats:['crop','animal','fish'],m:1,wx:1,fx:'heat',from:1,note:'暑さに強い品種、畜舎の換気や細霧、遮光などで適応する。'},
- {t:'えさや肥料、燃料が値上がりした',i:'💸',cats:['animal','crop'],m:1,fx:'warn',from:1,note:'国産の飼料の利用や、肥料を必要な分だけ使う技術で対応する。'}];
+ {t:'赤潮が発生した',i:'🔴',cats:['fish'],m:2,fx:'germ',from:4,note:'プランクトンの観測や、いけすの移動、えさの量の調整で被害を減らす。'},
+ {t:'記録的な猛暑（地球温暖化）',i:'🌡️',cats:['crop','animal','fish'],m:1,wx:1,fx:'heat',from:5,note:'暑さに強い品種、畜舎の換気や細霧、遮光などで適応する。'},
+ {t:'えさや肥料、燃料が値上がりした',i:'💸',cats:['animal','crop'],m:1,fx:'warn',from:5,note:'国産の飼料の利用や、肥料を必要な分だけ使う技術で対応する。'}];
 const NEWS_GOOD=[
  {t:'天候にめぐまれ、豊作の年になった',i:'🌾',cats:['crop'],m:2,from:0},
  {t:'大漁が続いた',i:'🐟',cats:['fish'],m:2,from:0},
@@ -505,6 +506,9 @@ const E=()=>ERAS[G.era];
 const devPct=()=>Math.min(100,Math.round(G.dev/G.devMax*100));
 const assets=p=>p.money+p.props.reduce((a,x)=>a+x.price,0)+p.mates*MATE;
 const pInc=p=>p.props.reduce((a,x)=>a+x.inc,0);
+function combo(p){const s=new Set(p.props.map(x=>x.cat));if(s.size>=3)return{m:1.5,n:'農・畜・水そろい（×1.5）',i:'🌈'};if(s.has('crop')&&s.has('animal'))return{m:1.3,n:'循環型農業（×1.3）',i:'♻️'};if(s.size===2)return{m:1.2,n:'組み合わせ（×1.2）',i:'🤝'};return{m:1,n:'',i:''};}
+const spurt=()=>G.year>G.years-2?2:1;
+const incOf=p=>Math.round((E().base+pInc(p)*combo(p).m)*spurt());
 function cardsUpTo(){const L=[];ERAS.forEach((e,ei)=>{if(ei<=G.era)e.cards.forEach(c=>{for(let k=0;k<(ei===G.era?4:1);k++)L.push({...c,era:ei});});});return L;}
 function quizPool(){const L=[];ERAS.forEach((e,ei)=>{if(ei<=G.era)e.qs.forEach(q=>{for(let k=0;k<(ei===G.era?2:1);k++)L.push(q);});});return L;}
 
@@ -524,6 +528,8 @@ function renderSetup(){
   <li>🏗️ <b>施設マス</b>では、その時代の施設を買うチャンス！ <b>3問中2問正解</b>で買えます。<b>大規模</b>にすると収入2.5倍、でも災害の被害も2倍！</li>
   <li>🎲 <b>大勝負マス</b>：安全にいくか、大きく勝負するか。ハイリスク・ハイリターン！</li>
   <li>📰 1年ごとに<b>ニュース</b>が起き、班の全員に影響します。洪水や台風は農地・漁場に被害、豊作や関税の緩和はプラスに！</li>
+  <li>🗳️ 2年ごとに<b>村の会議</b>。全員で多数決をして、村の進め方を決めます。</li>
+  <li>🤝 ちがう種類の施設を組み合わせると<b>収入アップ</b>（農地＋畜産＝循環型農業）。🔥 <b>最後の2年は収入2倍</b>！</li>
   <li>📈 施設を買ったりクイズに正解したりすると<b>班の「発展度」</b>が上がり、<b>時代が進みます</b>。</li>
   <li>😊いいこと　😣ピンチ　❓生物育成クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）。キャラクターは、<b>すれちがった人にうつります</b>。</li>
   <li>決めた年数が終わったら表彰式。個人の総資産の順位と、<b>班の得点（どの時代まで発展できたか）</b>を確かめよう。</li></ul></div>`;
@@ -535,7 +541,7 @@ function renderSetup(){
 /* ===== ゲーム ===== */
 async function startGame(){
  G={P:setup.pl.slice(0,setup.n).map((p,i)=>({name:p.name||`プレイヤー${i+1}`,color:COLORS[i],node:0,money:START,props:[],cards:[],mates:0,spin2:false,laps:0})),
-  cur:0,era:0,dev:0,devMax:setup.n*setup.years*2.3,chars:[],busy:false,year:1,years:setup.years,ended:false};
+  cur:0,era:0,dev:0,shield:0,devMax:setup.n*setup.years*2.3,chars:[],busy:false,year:1,years:setup.years,ended:false};
  G.P.forEach(p=>p.cards.push(pick(ERAS[0].cards)));
  applyEra();renderGame();
  await eraModal(true);await turnStart();}
@@ -571,7 +577,7 @@ function renderHud(){if(!$('hud'))return;const pct=devPct(),e=E();
  <div class="mbar"><i style="width:${pct}%"></i>${ETH.slice(1).map(x=>`<span style="left:${x}%"></span>`).join('')}</div></div>`;}
 function renderSide(newCard){const p=CP(),e=E();
  $('side').innerHTML=`<div class="turn" style="border-color:${p.color}"><div class="tname"><span class="dot" style="background:${p.color}">${G.cur+1}</span>${e.veh} ${esc(p.name)}さんの番</div>
- <div class="money ${p.money<0?'neg':''}" id="pmoney">💰 ${fmt(p.money)}</div><div class="tsub">施設 ${p.props.map(x=>x.i+(x.big?'<sup>大</sup>':'')).join('')||'なし'} ・ 収穫祭の収入 ${fmt(e.base+pInc(p))}</div>
+ <div class="money ${p.money<0?'neg':''}" id="pmoney">💰 ${fmt(p.money)}</div><div class="tsub">施設 ${p.props.map(x=>x.i+(x.big?'<sup>大</sup>':'')).join('')||'なし'} ・ 収穫祭 ${fmt(incOf(p))}${combo(p).n?`<br><b style="color:#1a8a4d">${combo(p).i} ${combo(p).n}</b>`:''}${spurt()>1?'<br><b style="color:#c0392b">🔥 ラストスパート：収入2倍</b>':''}</div>
  <div id="act">${G.busy?'':`<button id="spin">🎡 ルーレットを回す${p.spin2?'（2回）':''}</button>`}</div>
  <div class="hand"><b>🃏 技術カード（${p.cards.length}/${HAND}）</b>${p.cards.map((c,i)=>`<button class="cardc ${newCard&&i===p.cards.length-1?'new':''}" data-c="${i}"><span>${c.i}</span>${c.n}</button>`).join('')||'<div class="small">まだありません</div>'}</div></div>
  <div class="plist">${G.P.map((q,i)=>`<div class="pr ${i===G.cur?'now':''}"><span class="dot" style="background:${q.color}">${i+1}</span><span class="pn">${esc(q.name)}</span><span class="pm ${q.money<0?'neg':''}">${fmt(q.money)}</span><span>🏗️${q.props.length} 👤${q.mates}</span><span>${G.chars.filter(c=>c.h===i).map(c=>CHARS[c.k].i).join('')}</span></div>`).join('')}</div>
@@ -633,13 +639,13 @@ async function swapFx(c,to){renderPawns(G.cur);renderHud();renderSide();sfx('bos
 /* ===== マスの出来事 ===== */
 async function land(p,nd){const t=nd.t;
  if(t==='S')return harvest(p,false);if(t==='H')return market(p);if(t==='G')return good(p);if(t==='B')return bad(p);if(t==='Q')return quizSq(p);if(t==='K')return getCard(p,'技術カードを手に入れた！','🃏');if(t==='C')return charSq(p);if(t==='P')return chance(p);if(t==='R')return risk(p);}
-async function harvest(p,pass){const e=E(),bonus=pass?0:e.base,inc=e.base+pInc(p)+bonus;p.money+=inc;sfx('coin');renderSide();floatMoney(inc);
+async function harvest(p,pass){const e=E(),bonus=pass?0:e.base*spurt(),cb=combo(p),inc=incOf(p)+bonus;p.money+=inc;sfx('coin');renderSide();floatMoney(inc);
  particles({kind:'rise',e:['🌾','💰','✨'],n:14,d:1.5,fs:30});tint('rgba(255,210,80,.25)',1000);
- if(pass)await banner(`🎉 収穫祭！ +${fmt(inc)}`,'スタートを通ると、施設の収入が入ります','#d49a00',1200);
- else await modal({icon:'🎉',cls:'gold',title:`収穫祭にぴったり止まった！ +${fmt(inc)}`,body:`${e.n}の基本収入 ${fmt(e.base)}＋施設の収入 ${fmt(pInc(p))}＋ぴったりボーナス ${fmt(bonus)}<p class="memo">時代が進むと技術が発達し、同じ広さからとれる量がふえていきます。</p>`,buttons:[OK]});
+ if(pass)await banner(`🎉 収穫祭！ +${fmt(inc)}`,`${spurt()>1?'🔥ラストスパートで2倍！ ':''}${cb.n?cb.i+cb.n:'スタートを通ると、施設の収入が入ります'}`,'#d49a00',1300);
+ else await modal({icon:'🎉',cls:'gold',title:`収穫祭にぴったり止まった！ +${fmt(inc)}`,body:`${e.n}の基本収入 ${fmt(e.base)}＋施設の収入 ${fmt(pInc(p))}${cb.n?`（${cb.i}${cb.n}）`:''}＋ぴったりボーナス${spurt()>1?'<br>🔥ラストスパート：収入2倍！':''}<p class="memo">時代が進むと技術が発達し、同じ広さからとれる量がふえていきます。</p>`,buttons:[OK]});
  await addDev(2);}
-async function market(p){const e=E(),g=Math.round(e.base+pInc(p)*.5);p.money+=g;sfx('coin');renderSide();floatMoney(g);
- await modal({icon:'🛒',cls:'gold',title:`市場の日！ +${fmt(g)}`,body:`育てた物を市場で売った！（基本 ${fmt(e.base)}＋施設の収入の半分）<p class="memo">生産した物は、運んで売ることで初めて収入になる。保存や輸送の技術も大切。</p>`,buttons:[OK]});}
+async function market(p){const e=E(),g=Math.round((e.base+pInc(p)*combo(p).m*.5)*spurt());p.money+=g;sfx('coin');renderSide();floatMoney(g);
+ await modal({icon:'🛒',cls:'gold',title:`市場の日！ +${fmt(g)}`,body:`育てた物を市場で売った！（基本＋施設の収入の半分${spurt()>1?'・ラストスパート2倍':''}）<p class="memo">生産した物は、運んで売ることで初めて収入になる。保存や輸送の技術も大切。</p>`,buttons:[OK]});}
 async function good(p){const e=E(),ev=pick(e.good);p.money+=ev.v;if(ev.mate)p.mates+=ev.mate;sfx('good');renderSide();renderPawns();floatMoney(ev.v);
  particles({kind:'burst',e:['✨','🌟','😊'],n:16,d:1.2,fs:30});tint('rgba(80,220,140,.22)',1100);
  await modal({icon:'😊',cls:'good',title:ev.t,body:`<b class="okc" style="font-size:1.3rem">+${fmt(ev.v)}</b>${ev.mate?'<br>👤 仲間が1人ふえた！（最後に1人300万円）':''}${ev.dev?'<br>📈 班の発展度アップ！':''}<p class="small">${e.i} ${e.n}のできごと</p>`,buttons:[OK]});
@@ -656,13 +662,15 @@ async function chance(p){const e=E(),opts=e.props;
  const list=opts.map(x=>`<div class="pcard"><span class="pi">${x.i}</span><div><b>${x.n}</b> <span class="small">${CATN[x.cat]}${x.noWx?'・天候の被害なし':''}</span><br>通常：${fmt(x.price)}・収入 +${fmt(x.inc)} ／ <b style="color:#c0392b">大規模：${fmt(x.price*BIG.price)}・収入 +${fmt(Math.round(x.inc*BIG.inc))}</b><br><span class="small">${x.m}</span></div></div>`).join('');
  const btns=[];opts.forEach((x,i)=>{btns.push({label:`${x.i} ${x.n}（${fmt(x.price)}）`,v:{i,big:false},dis:p.money<x.price*.9});btns.push({label:`🔥 ${x.n}を大規模に（${fmt(x.price*BIG.price)}）`,v:{i,big:true},cls:'risky',dis:p.money<x.price*BIG.price*.9});});
  btns.push({label:'今回は見送る',v:0,cls:'sub'});
- const v=await modal({icon:'🏗️',cls:'gold',title:`施設マス！ ${e.n}の施設を手に入れよう`,body:`${list}<b>テスト（3問中2問正解）に合格すると買えます。全問正解なら1割引！</b><br><span class="small">🔥大規模：収入2.5倍。でも、災害のニュースの被害も2倍になります。</span>`,buttons:btns});
+ const v=await modal({icon:'🏗️',cls:'gold',title:`施設マス！ ${e.n}の施設を手に入れよう`,body:`${list}<b>テスト（3問中2問正解）に合格すると買えます。全問正解なら1割引！</b><br><span class="small">🔥大規模：収入2.5倍。でも、災害のニュースの被害も2倍になります。<br>🤝 ちがう種類の施設を組み合わせると収入アップ（農地＋畜産＝循環型農業×1.3、3種類そろうと×1.5）</span>`,buttons:btns});
  if(!v)return;const x=opts[v.i];
  const n=await test3(shuffle(e.qs).slice(0,3),`${e.n}の技術テスト`);
  if(n>=2){const perfect=n===3,price=Math.round(x.price*(v.big?BIG.price:1)*(perfect?.9:1));p.money-=price;
   p.props.push({...x,era:G.era,big:v.big,price:x.price*(v.big?BIG.price:1),inc:Math.round(x.inc*(v.big?BIG.inc:1))});
   sfx('fan');fireworks(3);confetti(50);renderSide();floatMoney(-price);
   await modal({icon:x.i,cls:'gold',title:`合格！「${x.n}」${v.big?'を大規模に':''}手に入れた！`,body:`${n}問正解${perfect?'（全問正解で1割引！）':''}<br>支払い <b>${fmt(price)}</b><p class="memo">${x.m}<br>収穫祭のたびに +${fmt(Math.round(x.inc*(v.big?BIG.inc:1)))} の収入があります。</p>`,buttons:[OK]});
+  const before=combo({props:p.props.slice(0,-1)}),after=combo(p);
+  if(after.m>before.m){sfx('fan');confetti(40);await modal({icon:after.i,cls:'good',title:`組み合わせボーナス！ ${after.n}`,body:after.m===1.3?'家畜のふんを堆肥にして畑に使い、畑でとれた作物の一部を家畜のえさにする。資源がめぐる「循環型農業」で、収入がアップ！':after.m===1.5?'農業・畜産・水産の3つをそろえた！ 技術や資源をつなげて、収入が大きくアップ！':'ちがう種類の生物を育てると、リスクが分散され、収入もアップ！',buttons:[OK]});}
   await addDev(perfect?14:10,`${esc(p.name)}さんが「${x.n}」をつくり、産業が発展した！`);}
  else{sfx('bad');await modal({icon:'📚',title:`不合格…（${n}問正解）`,body:'今回は手に入りませんでした。解説を思い出して、次のチャンスで挑戦しよう！',buttons:[OK]});}}
 async function risk(p){const e=E(),r=pick(RISKS),win=e.base*6,lose=e.base*4,safe=e.base;
@@ -679,22 +687,52 @@ async function risk(p){const e=E(),r=pick(RISKS),win=e.base*6,lose=e.base*4,safe
 
 /* ===== 毎年のニュース（班全体） ===== */
 async function yearNews(){const e=E(),goodNews=Math.random()<.5;
- const pool=(goodNews?NEWS_GOOD:NEWS_BAD).filter(x=>x.from<=G.era),ev=pick(pool);
+ const pool=(goodNews?NEWS_GOOD:NEWS_BAD).filter(x=>x.from<=G.era),ev=pick(pool.length?pool:(goodNews?NEWS_GOOD:NEWS_BAD).slice(0,1));
  const rows=G.P.map(p=>{const hit=ev.cats?p.props.filter(x=>ev.cats.includes(x.cat)&&!(ev.wx&&x.noWx)):[];
   let amt=hit.reduce((a,x)=>a+Math.round(x.inc*(ev.m||1)*(x.big&&!goodNews?BIG.dmg/BIG.inc:1)),0)+(ev.all?e.base*ev.all:0);
   return{p,hit,amt,note:''};});
  const any=rows.some(r=>r.amt>0);
  if(!any)rows.forEach(r=>{r.amt=goodNews?e.base:Math.round(e.base*.5);r.note=goodNews?'地域全体が少しうるおった':'地域全体の暮らしに影響';});
  if(!goodNews)rows.forEach(r=>{const gi=r.p.cards.findIndex(c=>c.t==='guard');if(r.amt>=e.base&&gi>=0){const g=r.p.cards.splice(gi,1)[0];r.note=`${g.i}${g.n}で守った！`;r.amt=0;}});
+ let sh='';if(!goodNews&&G.shield>0){G.shield--;rows.forEach(r=>r.amt=Math.round(r.amt/2));sh='🛡️ 村のみんなで備えていたので、被害が半分になった！';}
  rows.forEach(r=>r.p.money+=goodNews?r.amt:-r.amt);
  if(goodNews){sfx('fan');tint('rgba(80,220,140,.25)',1400);particles({kind:'fall',e:[ev.i,'✨','💰'],n:24,d:2.2,fs:30});}else await eventFx(ev.fx);
  renderSide();
  await modal({cls:goodNews?'good':'warn',raw:`<div class="news"><div class="nh">📰 ${G.year}年目のニュース</div><div class="micon">${ev.i}</div><h2>${ev.t}</h2>
   <p>${ev.cats?`影響する施設：<b>${ev.cats.map(c=>CATN[c]).join('・')}</b>${ev.wx&&!goodNews&&G.era>=6?'（植物工場は影響なし）':''}${!goodNews?'　🔥大規模の施設は被害も大きい':''}`:'班の全員に影響！'}</p>
   <table><tr><th>プレイヤー</th><th>影響した施設</th><th>${goodNews?'収入':'被害'}</th></tr>${rows.map(r=>`<tr><td><span class="dot" style="background:${r.p.color}">${G.P.indexOf(r.p)+1}</span> ${esc(r.p.name)}</td><td>${r.hit.map(x=>x.i+(x.big?'<sup>大</sup>':'')).join('')||'—'} <span class="small">${r.note}</span></td><td class="${goodNews?'okc':'ng'}">${r.amt?(goodNews?'+':'−')+fmt(r.amt):'0円'}</td></tr>`).join('')}</table>
-  ${ev.note?`<p class="memo">🔧 ${ev.note}</p>`:''}</div>`,buttons:[{label:'次の年へ ▶',v:1}]});
+  ${sh?`<p class="okc">${sh}</p>`:''}${ev.note?`<p class="memo">🔧 ${ev.note}</p>`:''}</div>`,buttons:[{label:'次へ ▶',v:1}]});
  if(ev.dev)await addDev(ev.dev,`「${ev.t}」で技術が進んだ！`);
  renderSide();}
+
+/* ===== 村の会議（班全員の多数決） ===== */
+const VOTES=[
+ {t:'新しい農具を、村のみんなでそろえる？',i:'⛏️',a:{l:'そろえる',m:-1,dev:6,d:'全員 −基本収入、発展度アップ'},b:{l:'今はやめておく',m:.5,d:'全員 +基本収入の半分'}},
+ {t:'みんなで用水路や堤防をつくり、災害に備える？',i:'🌊',a:{l:'備える',m:-1,shield:1,d:'全員 −基本収入、次の災害の被害が半分'},b:{l:'つくらない',m:.5,d:'全員 +基本収入の半分'}},
+ {t:'若い人に技術を教えて、育てる？',i:'🧑‍🌾',a:{l:'育てる',m:-1,mate:1,d:'全員 −基本収入、全員の仲間+1'},b:{l:'自分たちだけでやる',m:.5,d:'全員 +基本収入の半分'}},
+ {t:'育てる作物や生物の種類をふやす（多角化）？',i:'🌈',a:{l:'ふやす',m:-.5,shield:1,dev:3,d:'全員 −基本収入の半分、次の災害の被害が半分、発展度アップ'},b:{l:'今のままでいく',m:.5,d:'全員 +基本収入の半分'}},
+ {t:'村の産物をまとめて遠くへ出荷する（共同出荷）？',i:'🚚',a:{l:'共同出荷する',gamble:1,d:'ルーレット6以上で全員 +基本収入×3、5以下で全員 −基本収入'},b:{l:'近くで売る',m:1,d:'全員 +基本収入'}},
+ {t:'新しい品種を、村の田畑で試してみる？',i:'🌱',a:{l:'試す',gamble:1,dev:4,d:'ルーレット6以上で全員 +基本収入×3（発展度アップ）、5以下で全員 −基本収入'},b:{l:'これまでの品種でいく',m:.5,d:'全員 +基本収入の半分'}}];
+function voteModal(v){return new Promise(res=>{const ov=$('modal'),sel={};
+ const draw=()=>{const a=Object.values(sel).filter(x=>x==='a').length,b=Object.values(sel).filter(x=>x==='b').length,all=Object.keys(sel).length===G.P.length;
+  $('mwrap').innerHTML=`<div class="mbox gold"><div class="nh" style="display:inline-block;background:#22313a;color:#fff;border-radius:999px;padding:2px 16px;font-weight:800">🗳️ 村の会議（全員で多数決）</div><div class="micon">${v.i}</div><h2>${v.t}</h2><p class="small">いまの時代の基本収入＝${fmt(E().base)}</p>
+  <div class="riskbox" style="grid-template-columns:1fr 1fr"><div><b>Ａ：${v.a.l}</b><br><span class="small">${v.a.d}</span></div><div><b>Ｂ：${v.b.l}</b><br><span class="small">${v.b.d}</span></div></div>
+  <table class="vt">${G.P.map((p,i)=>`<tr><td><span class="dot" style="background:${p.color}">${i+1}</span> ${esc(p.name)}</td><td><button class="vb ${sel[i]==='a'?'on':''}" data-p="${i}" data-v="a">Ａ</button> <button class="vb ${sel[i]==='b'?'on':''}" data-p="${i}" data-v="b">Ｂ</button></td></tr>`).join('')}</table>
+  <p><b>Ａ ${a}票 ／ Ｂ ${b}票</b>${all?'':'　<span class="small">（全員が選ぶと決定できます）</span>'}</p>
+  <div class="mbtns"><button id="vdone" ${all?'':'disabled'}>決定する ▶</button></div></div>`;
+  $('mwrap').querySelectorAll('.vb').forEach(el=>el.onclick=()=>{sel[el.dataset.p]=el.dataset.v;sfx('tick');draw();});
+  $('vdone').onclick=()=>{ov.classList.add('hidden');res({a,b});};};
+ draw();ov.classList.remove('hidden');});}
+async function villageVote(){const e=E(),v=pick(VOTES);sfx('card');
+ const r=await voteModal(v);let win=r.a>r.b?'a':r.b>r.a?'b':null;
+ if(!win){await banner('同じ票数！ ルーレットで決めよう','偶数ならＡ、奇数ならＢ','#2a6fd6',1200);const n=await spinWheel();win=n%2===0?'a':'b';}
+ const o=v[win];let m=o.m||0,msg='';
+ if(o.gamble){const n=await spinWheel();if(n>=6){m=3;msg=`ルーレット ${n}：大成功！`;}else{m=-1;msg=`ルーレット ${n}：うまくいかなかった…`;}}
+ const amt=Math.round(e.base*m);G.P.forEach(p=>{p.money+=amt;if(o.mate)p.mates+=o.mate;});if(o.shield)G.shield+=o.shield;
+ sfx(amt>=0?'fan':'bad');if(amt>0)confetti(40);renderSide();renderPawns();
+ await modal({icon:v.i,cls:amt>=0?'good':'warn',title:`村の会議の結果：${win==='a'?'Ａ':'Ｂ'}「${o.l}」に決定！`,body:`Ａ ${r.a}票 ／ Ｂ ${r.b}票<br>${msg?`<b>${msg}</b><br>`:''}全員 <b class="${amt>=0?'okc':'ng'}">${amt>=0?'+':'−'}${fmt(Math.abs(amt))}</b>${o.mate?'<br>👤 全員の仲間が1人ふえた！':''}${o.shield?'<br>🛡️ 次の災害のニュースで、被害が半分になる！':''}<p class="memo">村の人々は、話し合って用水路をつくったり、技術を伝えたりしてきた。生物育成は、地域の協力で支えられている。</p>`,buttons:[OK]});
+ if(o.dev&&(!o.gamble||m>0))await addDev(o.dev,'村のみんなで決めたことで、技術が進んだ！');
+ renderSide();renderHud();}
 
 /* ===== キャラクター ===== */
 async function charSq(p){const ks=Object.keys(CHARS).filter(k=>CHARS[k].from<=G.era&&!G.chars.some(c=>c.k===k));
@@ -735,7 +773,9 @@ async function endTurn(){G.busy=false;if(G.ended)return;
   if(G.year>G.years){G.year=G.years;return finish();}
   setDeco(false);renderHud();focus(CP().node);
   await banner(`📅 ${G.year}年目`,G.year===G.years?'いよいよ最後の年！':`のこり${G.years-G.year+1}年`,'#2a6fd6',1200);
-  await yearNews();}
+  if(G.year===G.years-1){sfx('fan');fireworks(3);renderSide();await modal({icon:'🔥',cls:'gold',title:'ラストスパート！ のこり2年',body:'ここから最後まで、<b>収穫祭と市場の日の収入が2倍</b>！ まだまだ逆転できる！',buttons:[{label:'いくぞ！ ▶',v:1}]});}
+  await yearNews();
+  if(G.year%2===0)await villageVote();}
  await turnStart();}
 
 /* ===== 結果 ===== */
