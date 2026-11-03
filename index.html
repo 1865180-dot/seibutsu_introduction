@@ -205,7 +205,17 @@ footer{text-align:center;color:#eaf6ff;font-size:.78rem;padding:6px}
 @keyframes charout{0%{transform:none}30%{transform:translateY(10px) scale(.9)}100%{transform:translate(60vw,-60vh) rotate(720deg) scale(.2);opacity:0}}
 @keyframes warp{0%{opacity:0;transform:scale(.2)}40%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(2.4)}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+.riskbox{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0;text-align:center}.riskbox>div{background:#fff7e6;border:3px solid #f0c64a;border-radius:14px;padding:8px;font-size:.92rem}
+@media(max-width:600px){.riskbox{grid-template-columns:1fr}}
+button.risky{background:linear-gradient(#ff6a3d,#d9381e);box-shadow:0 5px 0 #9a2412}
+.news .nh{display:inline-block;background:#22313a;color:#fff;border-radius:999px;padding:2px 16px;font-weight:800;letter-spacing:.1em}
+.news table{margin-top:8px}.news td,.news th{text-align:left;font-size:.92rem}
+.center>.up{text-align:center;background:rgba(255,255,255,.85);border-radius:24px;padding:10px 26px;border:5px solid #d49a00;box-shadow:0 8px 0 rgba(0,0,0,.2)}
+.center .ci{font-size:70px;line-height:1.1}.center .cn{font-size:30px;font-weight:800;color:#5a3d00}.center .cy{font-size:18px;font-weight:700;color:#5a6b74}
+.sq.R{background:linear-gradient(135deg,#ff6a3d,#c2185b)}.sq.S{width:96px;height:80px}
+sup{font-size:.6em;color:#c0392b;font-weight:800}
 </style>
+
 </head>
 <body>
 <header><h1>⏳ いのちの1万年すごろく 〜縄文から令和へ〜</h1><button class="hbtn" id="snd" type="button">🔇 効果音オフ</button></header>
@@ -312,6 +322,89 @@ const ERAS=[
    {q:'近畿大学が2002年に世界で初めて成功した、クロマグロの養殖は？',a:['完全養殖','天然養殖','放流'],k:0,m:'天然の稚魚をとらずにすみ、海の資源を守ることにつながる。'},
    {q:'家畜の健康や快適さに配慮した飼い方の考え方は？',a:['アニマルウェルフェア','スマート農業','地産地消'],k:0,m:'国も、アニマルウェルフェアに関する指針を示している。'},
    {q:'生物がもともと持つ遺伝子の決まった場所を変えて、品種をつくる技術は？',a:['ゲノム編集','二毛作','接ぎ木'],k:0,m:'食べられる部分が多いマダイなどが生まれている。'}]}];
+
+
+/* ===== 施設（cat：crop＝農地・animal＝畜産・fish＝水産） ===== */
+const CATN={crop:'🌾農地',animal:'🐄畜産',fish:'🐟水産'};
+const PROPS=[
+ [{n:'クリ林の管理',i:'🌰',cat:'crop',price:200,inc:40,m:'集落のまわりでクリの木を管理し、実を食料にした（青森県の三内丸山遺跡など）。'},{n:'貝の採集場',i:'🐚',cat:'fish',price:150,inc:30,m:'海辺で貝をとった。食べた貝殻が積み重なった跡が「貝塚」として残っている。'},{n:'狩り場',i:'🦌',cat:'animal',price:250,inc:45,m:'弓矢や落とし穴で、シカやイノシシをとった。'}],
+ [{n:'水田',i:'🌾',cat:'crop',price:500,inc:90,m:'大陸から伝わった水田での稲作が広がった。'},{n:'高床倉庫',i:'🏚️',cat:'crop',price:400,inc:70,m:'ネズミや湿気から稲を守るため、床を高くした倉庫に保存した。'},{n:'川の漁場',i:'🐟',cat:'fish',price:450,inc:80,m:'川や湖で、網やわなを使って魚をとった。'}],
+ [{n:'ため池と用水路',i:'💧',cat:'crop',price:800,inc:130,m:'ため池や用水路で田に水を引いた（かんがい）。'},{n:'国の牧（まき）',i:'🐎',cat:'animal',price:700,inc:110,m:'国が牧を設けて、馬や牛を育てた。'},{n:'新しく開墾した田',i:'🌾',cat:'crop',price:600,inc:100,m:'743年の墾田永年私財法で、開墾した土地を自分のものにできるようになった。'}],
+ [{n:'二毛作の田',i:'🌾',cat:'crop',price:1000,inc:170,m:'同じ田で、米のあとに麦をつくる二毛作が広がった。'},{n:'牛馬を使う農家',i:'🐂',cat:'animal',price:900,inc:150,m:'牛や馬に犂を引かせて、田を深く広く耕した。'},{n:'網漁の漁村',i:'🎣',cat:'fish',price:850,inc:145,m:'大きな網を使う漁が広がり、とれた魚が市で売られた。'}],
+ [{n:'新田',i:'🌾',cat:'crop',price:1300,inc:230,m:'幕府や藩が新田開発を進め、田の面積が大きく広がった。'},{n:'いわし漁と干鰯づくり',i:'🐟',cat:'fish',price:1200,inc:210,m:'いわしを干した肥料（干鰯）は、全国の畑で使われた。'},{n:'カキの養殖場',i:'🦪',cat:'fish',price:1100,inc:200,m:'広島などで、海に立てた竹（ひび）にカキをつけて育てる養殖が行われた。'}],
+ [{n:'酪農牧場',i:'🐄',cat:'animal',price:1800,inc:330,m:'明治時代の北海道の開拓で、西洋式の農業や酪農が取り入れられた。'},{n:'ビニールハウス',i:'🏠',cat:'crop',price:2000,inc:360,m:'昭和の中ごろからビニールハウスが広がり、季節に関係なく野菜をつくれるようになった。'},{n:'養殖いけす',i:'🐟',cat:'fish',price:2200,inc:390,m:'昭和になって、ハマチやマダイの養殖が本格的に始まった。'}],
+ [{n:'植物工場',i:'🏭',cat:'crop',noWx:1,price:3000,inc:500,m:'LEDの光と温度・養分を管理し、天候に関係なく野菜を育てる。大雨や猛暑の被害を受けない。'},{n:'スマート畜産',i:'🤖',cat:'animal',price:2800,inc:510,m:'搾乳ロボットやセンサーで、牛の健康を見守りながら育てる。'},{n:'完全養殖の養殖場',i:'🐟',cat:'fish',price:3200,inc:570,m:'卵から育てた親が卵を産む完全養殖。近畿大学は2002年にクロマグロの完全養殖に成功した。'}]];
+PROPS.forEach((p,i)=>ERAS[i].props=p);
+
+/* ===== 生物育成の技術クイズ（時代ごと、正解はk） ===== */
+const TQ=[
+ [{q:'植物が育つのに必要な環境の要因の組み合わせは？',a:['光・温度・水・空気・養分','音・色・風','形・大きさ・におい'],k:0,m:'生物育成では、これらの環境を調節して、生物がよく育つようにする。'},
+  {q:'種子が発芽するのに必要な3つの条件は？',a:['水・空気・適当な温度','光・肥料・土','水・肥料・光'],k:0,m:'発芽には光や肥料は必ずしも必要ない。種子の中の養分を使って芽を出す。'},
+  {q:'クリやカキのように、何年も同じ木から実を収穫する作物を何という？',a:['果樹','野菜','花き'],k:0,m:'作物は、食用作物・野菜・果樹・花き・工芸作物などに分けられる。'},
+  {q:'土器で木の実を煮ることの効果として正しいものは？',a:['あく（苦み）をぬき、食べられる物がふえる','実の数がふえる','木がよく育つ'],k:0,m:'収穫した物を加工する技術で、利用できる食べ物がふえた。'},
+  {q:'食べ物を長く保存するための方法として正しいものは？',a:['乾燥させて水分を減らす','湿った暖かい場所に置く','水につけたままにする'],k:0,m:'水分を減らすと、カビや細菌がふえにくくなる。'},
+  {q:'生物育成の技術の3つの分野の組み合わせは？',a:['作物の栽培・動物の飼育・水産生物の栽培','狩猟・採集・漁業','料理・保存・運搬'],k:0,m:'技術の授業では、この3つの分野を学ぶ。'}],
+ [{q:'水田で稲を育てるよい点は？',a:['水が雑草をおさえ、毎年つくっても連作障害が起きにくい','虫が一匹もいなくなる','日光がいらなくなる'],k:0,m:'水田の水は、温度を保つはたらきもある。'},
+  {q:'苗を別の場所で育ててから、田や畑に植えかえることを何という？',a:['移植（田植え）','直まき','間引き'],k:0,m:'苗を育てることを「育苗」という。苗のうちに丈夫に育てることができる。'},
+  {q:'塩水に種もみを入れ、しずんだ重い種もみを選ぶ方法は？',a:['塩水選','接ぎ木','摘芯'],k:0,m:'中身がつまった種もみを選ぶと、そろった丈夫な苗が育つ。'},
+  {q:'収穫した米を乾燥させてから保存する理由は？',a:['カビや腐敗を防ぐため','重くするため','甘くするため'],k:0,m:'もみの水分を減らして保存性を高める。'},
+  {q:'稲の穂から実（もみ）を取り外す作業を何という？',a:['脱穀','代かき','中耕'],k:0,m:'今はコンバインが、刈り取りと脱穀を同時に行う。'},
+  {q:'田植えの前に、田に水を入れて土を細かくし、平らにする作業は？',a:['代かき','間引き','土寄せ'],k:0,m:'田の水もちがよくなり、苗が植えやすくなる。'}],
+ [{q:'田畑に人工的に水を引いて、作物に水をあたえることを何という？',a:['かんがい','排水','追肥'],k:0,m:'ため池や用水路は、かんがいのための施設。'},
+  {q:'鉄の農具で土を深く耕すと、どうなる？',a:['土がやわらかくなり、根が深くのびる','土がかたくなる','雨が降らなくなる'],k:0,m:'耕すと土に空気が入り、水はけもよくなる。'},
+  {q:'ウシやウマのように、人が飼育して利用する動物を何という？',a:['家畜','野生動物','害獣'],k:0,m:'家畜は、食料のほか、農作業や運搬にも使われてきた。'},
+  {q:'家畜の健康を保つために、毎日することは？',a:['えさ・水・体調・小屋の清潔さを観察し管理する','えさを1週間分まとめてあたえる','小屋を閉めきって換気しない'],k:0,m:'動物の飼育では、毎日の観察と管理が欠かせない。'},
+  {q:'作物の育ちをじゃまする雑草を取り除く作業は？',a:['除草','摘果','誘引'],k:0,m:'雑草は、作物の養分や水、光をうばってしまう。'},
+  {q:'家畜のふんなどを発酵させてつくる肥料は？',a:['堆肥（たいひ）','化学肥料','石灰'],k:0,m:'堆肥は土の中の生物をふやし、土をよくする。'}],
+ [{q:'二毛作とは、どのような栽培方法？',a:['同じ田畑で1年に2種類の作物をつくる','1つの株から2回収穫する','2つの品種をまぜてつくる'],k:0,m:'土地を有効に使い、収穫量をふやせる。'},
+  {q:'草木灰に多くふくまれ、根や茎を丈夫にする養分は？',a:['カリウム（カリ）','窒素','リン酸'],k:0,m:'肥料の3要素の1つ。'},
+  {q:'堆肥などの有機物を土に入れると、土はどうなる？',a:['団粒構造になり、水はけと水もちがよくなる','かたい単粒構造になる','水を通さなくなる'],k:0,m:'団粒構造の土は、すき間に空気と水をたくわえられる。'},
+  {q:'同じ場所で同じ作物を続けてつくると、育ちが悪くなることを何という？',a:['連作障害','冷害','塩害'],k:0,m:'土の養分のかたよりや、病原菌・害虫の増加が原因。'},
+  {q:'連作障害を防ぐため、ちがう種類の作物を順番につくることを何という？',a:['輪作','連作','混植'],k:0,m:'ナス科のトマトのあとは、ちがう科の作物をつくるなど工夫する。'},
+  {q:'牛や馬に犂（すき）を引かせて耕すよい点は？',a:['少ない人手で広い田畑を耕せる','肥料がいらなくなる','収穫が早くなる'],k:0,m:'動物の力を利用して、作業の効率を上げた。'}],
+ [{q:'肥料の3要素は？',a:['窒素・リン酸・カリウム','炭素・水素・酸素','鉄・カルシウム・塩分'],k:0,m:'作物が多く必要とし、土の中で不足しやすい養分。'},
+  {q:'肥料の3要素のうち、窒素のおもなはたらきは？',a:['葉や茎の成長を助ける','花や実のつきをよくする','根だけをのばす'],k:0,m:'窒素が多すぎると、葉ばかりしげって実がつきにくくなる。'},
+  {q:'肥料の3要素のうち、リン酸のおもなはたらきは？',a:['花や実のつきをよくする','葉の色を薄くする','病気を完全に防ぐ'],k:0,m:'実を収穫する作物では、特に大切な養分。'},
+  {q:'千歯こきのような道具で、効率が大きく上がった作業は？',a:['脱穀','田植え','代かき'],k:0,m:'道具の改良で、作業時間が短くなった。'},
+  {q:'よい性質をもつ個体を選んで育て、品種をよくしていく方法は？',a:['選抜（品種改良）','接ぎ木','摘芯'],k:0,m:'よく実る、病気に強いなどの性質をもつものを選び続ける。'},
+  {q:'カキの養殖のように、えさをあたえず海の栄養で育てる養殖は？',a:['無給餌養殖','給餌養殖','完全養殖'],k:0,m:'ホタテやノリも、えさをあたえない養殖。'}],
+ [{q:'ビニールハウスなどを使い、ふつうより早い時期に収穫・出荷する栽培は？',a:['促成栽培','抑制栽培','露地栽培'],k:0,m:'時期をおくらせる栽培は「抑制栽培」という。'},
+  {q:'化学肥料の特徴として正しいものは？',a:['養分の量がはっきりしていて、効き目が早い','土を団粒構造にするはたらきが大きい','使いすぎの心配がまったくない'],k:0,m:'使いすぎると、作物の生育や環境に悪い影響が出る。'},
+  {q:'ちがう品種をかけ合わせて、新しい品種をつくる方法は？',a:['交配（交雑）','遺伝子組換え','ゲノム編集'],k:0,m:'コシヒカリも、交配によって生まれた品種。'},
+  {q:'ハマチやマダイのように、人がえさをあたえて育てる養殖は？',a:['給餌養殖','無給餌養殖','栽培漁業'],k:0,m:'えさの量や水質を管理して、効率よく育てる。'},
+  {q:'卵からふ化させて育てた稚魚を海に放流し、大きくなってからとる漁業は？',a:['栽培漁業','養殖','遠洋漁業'],k:0,m:'海の資源をふやし、守ることにつながる。'},
+  {q:'農薬を使うときに大切なことは？',a:['決められた量・回数・時期を守る','多いほどよく効くので、たくさん使う','収穫の直前に必ず使う'],k:0,m:'ルールを守って使うことで、安全性と環境を守る。'}],
+ [{q:'ロボットやAI、ICT（情報通信技術）を活用する農業を何という？',a:['スマート農業','焼畑農業','有機農業'],k:0,m:'人手不足を補い、作業を効率よくする。'},
+  {q:'土を使わず、養分を溶かした水で作物を育てる方法は？',a:['水耕栽培','露地栽培','有機栽培'],k:0,m:'植物工場で多く使われている。'},
+  {q:'卵から育てた親魚が産んだ卵をふ化させ、また育てる養殖は？',a:['完全養殖','無給餌養殖','栽培漁業'],k:0,m:'天然の稚魚をとらずにすみ、資源を守ることにつながる。'},
+  {q:'ゲノム編集の説明として正しいものは？',a:['生物がもつ遺伝子の決まった場所を変える技術','ほかの生物の遺伝子を組み込む技術','2つの品種をかけ合わせる技術'],k:0,m:'ほかの生物の遺伝子を組み込むのは「遺伝子組換え」。'},
+  {q:'アニマルウェルフェアの説明として正しいものは？',a:['家畜が快適に、健康に暮らせるよう配慮した飼い方','家畜をできるだけせまい所で飼う方法','家畜を野生にもどす方法'],k:0,m:'平飼いなど、家畜が本来の行動をとれる飼い方も広がっている。'},
+  {q:'天敵の昆虫などを利用して、害虫を減らす方法を何という？',a:['生物的防除','化学的防除','物理的防除'],k:0,m:'農薬は化学的防除、防虫ネットは物理的防除。'}]];
+TQ.forEach((q,i)=>ERAS[i].qs=q);
+
+/* ===== 毎年のニュース（班全体に影響） ===== */
+const NEWS_BAD=[
+ {t:'大雨で洪水が起きた',i:'🌊',cats:['crop'],m:2,wx:1,fx:'rain',from:2,note:'堤防や排水路、水田の水の管理で、被害を減らしてきた。'},
+ {t:'台風が上陸した',i:'🌀',cats:['crop','fish'],m:2,wx:1,fx:'storm',from:2,note:'防風ネットや、いけすを海中に沈めて守る技術がある。'},
+ {t:'雨が降らず、日照りが続いた（干ばつ）',i:'☀️',cats:['crop','animal'],m:1,wx:1,fx:'heat',from:1,note:'ため池や用水路などのかんがい施設で備えてきた。'},
+ {t:'害虫が大発生した',i:'🦗',cats:['crop'],m:1,fx:'bug',from:1,note:'天敵の利用、防虫ネット、農薬の適正な使用で防ぐ。'},
+ {t:'冷夏で作物が育たない（冷害）',i:'❄️',cats:['crop'],m:2,wx:1,fx:'cold',from:2,note:'寒さに強い品種の開発や、田の水を深くする管理で守る。'},
+ {t:'家畜の伝染病が広がった',i:'🦠',cats:['animal'],m:2,fx:'germ',from:2,note:'消毒、ワクチン、人や車の出入りの管理（防疫）で防ぐ。'},
+ {t:'赤潮が発生した',i:'🔴',cats:['fish'],m:2,fx:'germ',from:2,note:'プランクトンの観測や、いけすの移動、えさの量の調整で被害を減らす。'},
+ {t:'記録的な猛暑（地球温暖化）',i:'🌡️',cats:['crop','animal','fish'],m:1,wx:1,fx:'heat',from:1,note:'暑さに強い品種、畜舎の換気や細霧、遮光などで適応する。'},
+ {t:'えさや肥料、燃料が値上がりした',i:'💸',cats:['animal','crop'],m:1,fx:'warn',from:1,note:'国産の飼料の利用や、肥料を必要な分だけ使う技術で対応する。'}];
+const NEWS_GOOD=[
+ {t:'天候にめぐまれ、豊作の年になった',i:'🌾',cats:['crop'],m:2,from:0},
+ {t:'大漁が続いた',i:'🐟',cats:['fish'],m:2,from:0},
+ {t:'新しい田畑の開発がすすめられた',i:'🏞️',all:2,dev:4,from:2},
+ {t:'市がにぎわい、作物が高く売れた',i:'🏮',cats:['crop','fish'],m:2,from:3},
+ {t:'農書が広まり、全国に技術が伝わった',i:'📕',all:1,dev:6,from:4},
+ {t:'牛乳や卵、肉の人気が高まった',i:'🥛',cats:['animal'],m:3,from:5},
+ {t:'関税が緩和され、海外への輸出がふえた',i:'🚢',cats:['crop','animal','fish'],m:2,from:5},
+ {t:'政府が補助金で生産者を支援した',i:'🏛️',all:3,from:5},
+ {t:'地産地消のブームで、地元の産物が人気に',i:'🏪',cats:['crop','animal','fish'],m:2,from:6}];
+const RISKS=[{t:'新しい品種を一気に広げる？',i:'🌱'},{t:'遠くの大きな市場へ、大量に出荷する？',i:'🚚'},{t:'新しい技術に大きく投資する？',i:'💡'},{t:'天気を読んで、早めに種をまく？',i:'🌤️'},{t:'育てる数を2倍にふやす？',i:'📈'}];
+
 const ETH=[0,12,26,40,55,70,85];
 const CHARS={gaichu:{n:'ガイチュウ',i:'👾',from:0,say:'葉っぱも実も、いただき〜！',m:'害虫は作物の汁を吸ったり、葉や実を食べたりする。昔はイナゴやウンカの大発生で、ききんになることもあった。'},
  juugai:{n:'ジュウガイ',i:'🐗',from:0,say:'ブヒッ！畑はごちそうだ〜！',m:'イノシシやシカなどによる被害（獣害）は、縄文時代から今まで続く課題。今は電気柵などで防ぐ。'},
@@ -322,27 +415,6 @@ const WARM=[{q:'夏の高温で品質が下がるのを防ぐため、開発が�
  {q:'地元でとれたものを地元で食べる「地産地消」が温暖化対策になる理由は？',a:['運ぶ距離が短く、燃料が少なくてすむ','必ず値段が高くなる','冷蔵しなくてよい'],k:0,m:'輸送で出る二酸化炭素を減らせる。'},
  {q:'暑さから家畜を守る技術は？',a:['換気扇やミスト（細霧）','暖房','照明を消す'],k:0,m:'風と細かい霧で、家畜の体温を下げる。'},
  {q:'海水温が上がると、養殖で心配されることは？',a:['赤潮や病気がふえる','魚が太りすぎる','海が凍る'],k:0,m:'水温の変化に合わせた管理が進められている。'}];
-const TYPE={S:['🚩','スタート'],E:['🏆','ゴール'],G:['😊','いいこと'],B:['😣','ピンチ'],Q:['❓','クイズ'],K:['🃏','カード'],C:['👾','キャラ'],H:['🌾','収穫日'],P:['🛑','チャンス']};
-const COLORS=['#e74c3c','#2e86de','#27ae60','#f39c12','#8e44ad','#16a085','#d35400'];
-const HAND=3,START=300,MATE=300;
-
-/* ===== 盤面（1本道＋分かれ道） ===== */
-const NODES=[],NX=[];
-function nd(x,y,t){NODES.push({x,y,t,i:NODES.length});NX.push([]);return NODES.length-1;}
-const X0=210,ST=(1610-210)/10,cx=c=>X0+c*ST,R=[160,430,720,990];
-const MT='S G Q B G H K C G P B Q G H K B G B Q B H G K C G P Q B G H K B Q C G H B Q G B C B Q B P H G E'.split(' ');
-const ALT='G H K G Q G K'.split(' ');
-const MAIN=[];let mi=0;const mk=(x,y)=>{const id=nd(x,y,MT[mi++]);MAIN.push(id);return id;};
-for(let c=0;c<=10;c++)mk(cx(c),R[0]);mk(1745,295);
-const r1=[];for(let c=10;c>=0;c--)r1.push(mk(cx(c),R[1]));mk(70,575);
-for(let c=0;c<=10;c++)mk(cx(c),R[2]);mk(1745,855);
-const r3=[];for(let c=10;c>=0;c--)r3.push(mk(cx(c),R[3]));mk(70,1135);
-for(let k=0;k<MAIN.length-1;k++)NX[MAIN[k]].push(MAIN[k+1]);
-const FORKS=[];
-function alt(from,to,y){const a=NODES[from],b=NODES[to],ids=[];for(let j=1;j<=7;j++){const t=j/8;ids.push(nd(a.x+(b.x-a.x)*t,y+Math.sin(t*Math.PI)*40,ALT[j-1]));}
- NX[from].push(ids[0]);for(let j=0;j<6;j++)NX[ids[j]].push(ids[j+1]);NX[ids[6]].push(to);FORKS.push({at:from,short:NX[from][0],long:ids[0]});return ids;}
-const A1=alt(r1[2],r1[8],R[1]+120),A2=alt(r3[2],r3[8],R[3]+115);
-const SHORT_START=MAIN.indexOf(r1[10])+12;
 
 /* ===== 共通 ===== */
 const $=id=>document.getElementById(id),app=$('app');
@@ -416,86 +488,99 @@ async function test3(qs,title){let n=0;const res=[];
   const ok=await askQ(qs[i],head);res.push(ok);if(ok)n++;}
  return n;}
 
+
+
+const TYPE={S:['🎉','収穫祭'],G:['😊','いいこと'],B:['😣','ピンチ'],Q:['❓','クイズ'],K:['🃏','カード'],C:['👾','キャラ'],H:['🛒','市場の日'],P:['🏗️','施設'],R:['🎲','大勝負']};
+const COLORS=['#e74c3c','#2e86de','#27ae60','#f39c12','#8e44ad','#16a085','#d35400'];
+const HAND=3,START=300,MATE=300,BIG={price:2,inc:2.5,dmg:2};
+
+/* ===== 盤面（ぐるぐる回る周回コース・30マス） ===== */
+const LOOP='S G Q P B K R Q H C P Q G B K P G Q B R C K Q H G P Q B R K'.split(' ');
+const NODES=LOOP.map((t,i)=>{let x,y;if(i<=8){x=170+i*185;y=170;}else if(i<=14){x=1650;y=170+(i-8)*126;}else if(i<=23){x=1650-(i-15)*185;y=1052;}else{x=170;y=1052-(i-23)*126;}return{x,y,t,i};});
+const NN=NODES.length;
+
 /* ===== 状態 ===== */
-let setup={n:4,course:'normal',kumi:'',han:'',pl:Array.from({length:7},()=>({name:''}))};
+let setup={n:4,years:12,pl:Array.from({length:7},()=>({name:''})),kumi:'',han:''};
 let G=null;
 const CP=()=>G.P[G.cur];
 const E=()=>ERAS[G.era];
 const devPct=()=>Math.min(100,Math.round(G.dev/G.devMax*100));
 const assets=p=>p.money+p.props.reduce((a,x)=>a+x.price,0)+p.mates*MATE;
+const pInc=p=>p.props.reduce((a,x)=>a+x.inc,0);
 function cardsUpTo(){const L=[];ERAS.forEach((e,ei)=>{if(ei<=G.era)e.cards.forEach(c=>{for(let k=0;k<(ei===G.era?4:1);k++)L.push({...c,era:ei});});});return L;}
+function quizPool(){const L=[];ERAS.forEach((e,ei)=>{if(ei<=G.era)e.qs.forEach(q=>{for(let k=0;k<(ei===G.era?2:1);k++)L.push(q);});});return L;}
 
 /* ===== 準備画面 ===== */
 function renderSetup(){
- const opt=(n,v)=>`<option value="">選択</option>`+Array.from({length:n},(_,i)=>`<option ${String(i+1)===String(v)?'selected':''}>${i+1}</option>`).join('');
  app.innerHTML=`<div class="card hero"><div class="icons">${ERAS.map(e=>`<span>${e.i}</span>`).join('')}</div><h2>いのちの1万年すごろく</h2>
- <p>縄文時代のムラから出発！ 生き物を育てて暮らしながら、<b>班みんなで第1次産業を発展させ、令和の時代をめざそう！</b></p>
+ <p>縄文時代のムラから出発！ 生き物を育ててコースを何周も回りながら、<b>班みんなで第1次産業を発展させ、令和の時代をめざそう！</b></p>
  <div class="etl">${ERAS.map(e=>`<span>${e.i} ${e.n}</span>`).join('<span>→</span>')}</div></div>
  <div class="card"><h2>① 人数と名前</h2><div class="row" style="margin-bottom:8px">${[2,3,4,5,6,7].map(n=>`<button class="nbtn ${n===setup.n?'sel':''}" data-n="${n}">${n}人</button>`).join('')}</div>
  ${setup.pl.slice(0,setup.n).map((p,i)=>`<div class="prow"><span class="dot" style="background:${COLORS[i]}">${i+1}</span><input data-i="${i}" value="${esc(p.name)}" placeholder="プレイヤー${i+1}" maxlength="10"></div>`).join('')}</div>
- <div class="card"><h2>② コース</h2><div class="row">${[['normal','ノーマル（約50マス・約30分）'],['short','ショート（約30マス・約15分）']].map(([k,l])=>`<button class="nbtn ${k===setup.course?'sel':''}" data-co="${k}">${l}</button>`).join('')}</div>
- <div style="margin-top:14px"><button id="start" class="big">⏳ 縄文時代へ出発！</button></div></div>
+ <div class="card"><h2>② 遊ぶ長さ（全員が1回ずつ回ると1年）</h2><div class="row">${[[8,'8年（約20分）'],[12,'12年（約30分）'],[16,'16年（約40分）']].map(([k,l])=>`<button class="nbtn ${k===setup.years?'sel':''}" data-y="${k}">${l}</button>`).join('')}</div>
+ <p class="small">時間が来たら、画面右下の「ゲームを終える」でいつでも表彰式にできます。</p>
+ <div style="margin-top:10px"><button id="start" class="big">⏳ 縄文時代へ出発！</button></div></div>
  <div class="card"><h2>📖 ルール</h2><ul class="rules">
-  <li>🎡 順番に<b>ルーレット（1〜10）</b>を回して、1本道を進みます。分かれ道では「近道」か「遠回り」かを選びます。</li>
-  <li>🛑 <b>チャンスマス（止まれ）</b>では全員が止まり、その時代の施設を手に入れるチャンス！<b>3問中2問正解</b>で買えます（班で相談OK）。</li>
-  <li>📈 施設を買ったりクイズに正解したりすると、<b>班の「発展度」</b>が上がり、<b>時代が進みます</b>。時代が進むと、技術が発達して収入もふえます。</li>
-  <li>🌾 <b>収穫日マス</b>を通ると、時代の基本収入＋持っている施設の収入が入ります。</li>
-  <li>😊いいこと　😣ピンチ　❓クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）</li>
-  <li>全員がゴールしたら表彰式。最後に<b>一人ずつ、組・番号・名前とふりかえりを入力して提出</b>します。個人の総資産と、<b>班の得点（どの時代まで発展できたか）</b>でクラスで競います。</li></ul></div>`;
- const keep=()=>{};
- app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{keep();setup.n=+b.dataset.n;renderSetup();});
- app.querySelectorAll('[data-co]').forEach(b=>b.onclick=()=>{keep();setup.course=b.dataset.co;renderSetup();});
+  <li>🎡 順番に<b>ルーレット（1〜10）</b>を回して、ぐるぐる回るコースを進みます。ゴールはありません。</li>
+  <li>🎉 <b>収穫祭</b>（スタート地点）を通るたびに、時代の基本収入＋持っている施設の収入が入ります。</li>
+  <li>🏗️ <b>施設マス</b>では、その時代の施設を買うチャンス！ <b>3問中2問正解</b>で買えます。<b>大規模</b>にすると収入2.5倍、でも災害の被害も2倍！</li>
+  <li>🎲 <b>大勝負マス</b>：安全にいくか、大きく勝負するか。ハイリスク・ハイリターン！</li>
+  <li>📰 1年ごとに<b>ニュース</b>が起き、班の全員に影響します。洪水や台風は農地・漁場に被害、豊作や関税の緩和はプラスに！</li>
+  <li>📈 施設を買ったりクイズに正解したりすると<b>班の「発展度」</b>が上がり、<b>時代が進みます</b>。</li>
+  <li>😊いいこと　😣ピンチ　❓生物育成クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）</li>
+  <li>決めた年数が終わったら表彰式。個人の総資産と、<b>班の得点（どの時代まで発展できたか）</b>で競います。</li></ul></div>`;
+ app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{setup.n=+b.dataset.n;renderSetup();});
+ app.querySelectorAll('[data-y]').forEach(b=>b.onclick=()=>{setup.years=+b.dataset.y;renderSetup();});
  app.querySelectorAll('input[data-i]').forEach(el=>el.oninput=()=>{setup.pl[+el.dataset.i].name=el.value.trim();});
- $('start').onclick=()=>startGame();;window.scrollTo(0,0);}
+ $('start').onclick=()=>startGame();window.scrollTo(0,0);}
 
 /* ===== ゲーム ===== */
-async function startGame(){const short=setup.course==='short',start=short?MAIN[SHORT_START]:MAIN[0];
- G={P:setup.pl.slice(0,setup.n).map((p,i)=>({name:p.name||`プレイヤー${i+1}`,color:COLORS[i],node:start,money:START,props:[],cards:[],mates:0,done:false,rank:0,spin2:false,tp:0,tf:0})),
-  cur:0,era:0,dev:0,devMax:setup.n*(short?9:30),chars:[],busy:false,finished:0,start,short};
+async function startGame(){
+ G={P:setup.pl.slice(0,setup.n).map((p,i)=>({name:p.name||`プレイヤー${i+1}`,color:COLORS[i],node:0,money:START,props:[],cards:[],mates:0,spin2:false,laps:0})),
+  cur:0,era:0,dev:0,devMax:setup.n*setup.years*2.3,chars:[],busy:false,year:1,years:setup.years,ended:false};
  G.P.forEach(p=>p.cards.push(pick(ERAS[0].cards)));
  applyEra();renderGame();
  await eraModal(true);await turnStart();}
 function applyEra(){const e=E(),r=document.documentElement.style;r.setProperty('--ground',e.ground);r.setProperty('--ground2',e.ground2);r.setProperty('--sky1',e.sky1);r.setProperty('--sky2',e.sky2);}
-const DPOS=[[350,300],[700,290],[1050,300],[1400,290],[1650,560],[1300,575],[900,560],[500,590],[300,850],[700,845],[1100,855],[1500,850],[1650,1120],[1250,1120],[850,1115],[450,1120]];
+const DPOS=[[400,330],[640,320],[1180,330],[1420,320],[1480,560],[1450,800],[1180,890],[640,880],[380,890],[340,640],[560,700],[1260,650]];
 function renderGame(){
  app.innerHTML=`<div class="game"><div class="stage" id="stage"><div class="cam"><div class="tilt" id="tilt"><div class="map" id="map"></div></div></div><div class="hud" id="hud"></div></div><div class="side" id="side"></div></div>`;
  buildMap();fit();renderPawns();renderHud();renderSide();window.scrollTo(0,0);}
-function pathPts(ids){return ids.map(i=>`${NODES[i].x},${NODES[i].y}`).join(' ');}
-function buildMap(){const m=$('map');
- const a1=[r1[2],...A1,r1[8]],a2=[r3[2],...A2,r3[8]];
+function buildMap(){const m=$('map');const pts=[...NODES,NODES[0]].map(n=>`${n.x},${n.y}`).join(' ');
  m.innerHTML=`<div class="board-base"></div><svg width="1820" height="1220" viewBox="0 0 1820 1220">
  <defs><pattern id="gp" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" style="fill:var(--ground)"/><circle cx="12" cy="14" r="5" style="fill:var(--ground2)"/><circle cx="30" cy="30" r="4" style="fill:var(--ground2)"/></pattern></defs>
  <rect width="1820" height="1220" rx="34" fill="url(#gp)"/>
- ${[MAIN,a1,a2].map(ids=>`<polyline points="${pathPts(ids)}" fill="none" stroke="#e9d3a6" stroke-width="86" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
- ${[MAIN,a1,a2].map(ids=>`<polyline points="${pathPts(ids)}" fill="none" stroke="#fff6e0" stroke-width="6" stroke-dasharray="14 12" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`+
- DPOS.map((d,i)=>`<div class="bb deco ${i%3?'sway':''}" id="dc${i}" style="left:${d[0]}px;top:${d[1]}px;--fs:${38+(i%3)*6}px"><div class="up"></div></div>`).join('')+
+ <polyline points="${pts}" fill="none" stroke="#e9d3a6" stroke-width="96" stroke-linecap="round" stroke-linejoin="round"/>
+ <polyline points="${pts}" fill="none" stroke="#fff6e0" stroke-width="6" stroke-dasharray="14 12" stroke-linejoin="round"/></svg>`+
+ DPOS.map((d,i)=>`<div class="bb deco ${i%3?'sway':''}" id="dc${i}" style="left:${d[0]}px;top:${d[1]}px;--fs:${40+(i%3)*8}px"><div class="up"></div></div>`).join('')+
+ `<div class="bb center" style="left:910px;top:650px"><div class="up" id="ctr"></div></div>`+
  NODES.map(n=>`<div class="nd" id="nd${n.i}" style="left:${n.x}px;top:${n.y}px"><div class="sq ${n.t}"><span class="si">${TYPE[n.t][0]}</span><span class="sl">${TYPE[n.t][1]}</span></div></div>`).join('')+
- NODES.filter(n=>n.t==='P').map(n=>`<div class="bb stopsign" style="left:${n.x}px;top:${n.y-40}px"><div class="up">止まれ！</div></div>`).join('')+
- FORKS.map(f=>`<div class="bb fork" style="left:${NODES[f.at].x}px;top:${NODES[f.at].y-40}px"><div class="up">分かれ道</div></div>`).join('')+
- (G.short?`<div class="bb stopsign" style="left:${NODES[G.start].x}px;top:${NODES[G.start].y-44}px"><div class="up" style="background:#2a6fd6">スタート</div></div>`:'')+`<div id="pawns"></div>`;
+ `<div class="bb stopsign" style="left:${NODES[0].x}px;top:${NODES[0].y-46}px"><div class="up" style="background:#d49a00">スタート／収穫祭</div></div><div id="pawns"></div>`;
  setDeco(false);}
-function setDeco(anim){const set=E().deco;DPOS.forEach((d,i)=>{const el=$('dc'+i);if(!el)return;el.querySelector('.up').textContent=set[i%set.length];if(anim){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');}});}
+function setDeco(anim){const e=E(),set=e.deco;DPOS.forEach((d,i)=>{const el=$('dc'+i);if(!el)return;el.querySelector('.up').textContent=set[i%set.length];if(anim){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');}});
+ const c=$('ctr');if(c)c.innerHTML=`<div class="ci">${e.i}</div><div class="cn">${e.n}</div><div class="cy">${G.year}年目 ／ 全${G.years}年</div>`;}
 function fit(){const st=$('stage'),t=$('tilt');if(!st||!t)return;const z=Math.max(.6,Math.min(1.05,st.clientWidth/1080,st.clientHeight/640));t.style.setProperty('--z',z);}
 addEventListener('resize',fit);
 function focus(i){const n=NODES[i],m=$('map');if(m)m.style.transform=`translate(${-n.x}px,${-n.y}px)`;}
 function renderPawns(hop){const box=$('pawns');if(!box)return;const at={};
  box.innerHTML=G.P.map((p,i)=>{const n=NODES[p.node],k=at[p.node]=(at[p.node]||0)+1,ox=[0,-26,26,-13,13,-32,32][k-1],oy=[0,10,10,26,26,-12,-12][k-1];
   const ch=G.chars.filter(c=>c.h===i).map(c=>CHARS[c.k].i).join('');
-  return`<div class="pawn ${i===G.cur&&!p.done?'cur':''} ${hop===i?'hop':''} ${p.done?'done':''}" style="left:${n.x+ox}px;top:${n.y+oy+8}px;--c:${p.color}"><div class="psh"></div><div class="pst"><div class="phop">${ch?`<span class="pchar">${ch}</span>`:''}<div class="pbody">${E().veh}<b>${i+1}</b></div><div class="pegs">${'<i></i>'.repeat(Math.min(6,p.mates))}</div><div class="pbase"></div></div></div></div>`;}).join('');}
+  return`<div class="pawn ${i===G.cur?'cur':''} ${hop===i?'hop':''}" style="left:${n.x+ox}px;top:${n.y+oy+8}px;--c:${p.color}"><div class="psh"></div><div class="pst"><div class="phop">${ch?`<span class="pchar">${ch}</span>`:''}<div class="pbody">${E().veh}<b>${i+1}</b></div><div class="pegs">${'<i></i>'.repeat(Math.min(6,p.mates))}</div><div class="pbase"></div></div></div></div>`;}).join('');}
 function renderHud(){if(!$('hud'))return;const pct=devPct(),e=E();
  const chips=G.chars.map(c=>`<span>${CHARS[c.k].i}${CHARS[c.k].n}${c.h>=0?'→'+esc(G.P[c.h].name):'（班全体）'}</span>`).join('');
- $('hud').innerHTML=`<div class="box"><div class="hrow"><span>${e.i} いまは <b style="font-size:1.05rem">${e.n}</b> <span class="small">${e.y}</span></span><span>📈 班の発展度 ${pct}%${G.era<6?`<span class="small">（次の時代まで あと${ETH[G.era+1]-pct}%）</span>`:'<span class="small">（現代に到達！）</span>'}</span>${chips?`<span class="chips">${chips}</span>`:''}</div>
+ $('hud').innerHTML=`<div class="box"><div class="hrow"><span>${e.i} いまは <b style="font-size:1.05rem">${e.n}</b> <span class="small">${e.y}</span></span><span>📅 ${G.year}年目／全${G.years}年</span><span>📈 班の発展度 ${pct}%${G.era<6?`<span class="small">（次の時代まで あと${ETH[G.era+1]-pct}%）</span>`:'<span class="small">（現代に到達！）</span>'}</span>${chips?`<span class="chips">${chips}</span>`:''}</div>
  <div class="eras">${ERAS.map((x,i)=>`<span class="${i<G.era?'past':i===G.era?'now':''}">${x.i}${x.n.replace('時代','')}</span>`).join('')}</div>
  <div class="mbar"><i style="width:${pct}%"></i>${ETH.slice(1).map(x=>`<span style="left:${x}%"></span>`).join('')}</div></div>`;}
 function renderSide(newCard){const p=CP(),e=E();
  $('side').innerHTML=`<div class="turn" style="border-color:${p.color}"><div class="tname"><span class="dot" style="background:${p.color}">${G.cur+1}</span>${e.veh} ${esc(p.name)}さんの番</div>
- <div class="money ${p.money<0?'neg':''}" id="pmoney">💰 ${fmt(p.money)}</div><div class="tsub">施設 ${p.props.map(x=>x.i).join('')||'なし'} ・ 仲間 ${p.mates}人</div>
+ <div class="money ${p.money<0?'neg':''}" id="pmoney">💰 ${fmt(p.money)}</div><div class="tsub">施設 ${p.props.map(x=>x.i+(x.big?'<sup>大</sup>':'')).join('')||'なし'} ・ 収穫祭の収入 ${fmt(e.base+pInc(p))}</div>
  <div id="act">${G.busy?'':`<button id="spin">🎡 ルーレットを回す${p.spin2?'（2回）':''}</button>`}</div>
- <div class="branch" id="branch"></div>
  <div class="hand"><b>🃏 技術カード（${p.cards.length}/${HAND}）</b>${p.cards.map((c,i)=>`<button class="cardc ${newCard&&i===p.cards.length-1?'new':''}" data-c="${i}"><span>${c.i}</span>${c.n}</button>`).join('')||'<div class="small">まだありません</div>'}</div></div>
- <div class="plist">${G.P.map((q,i)=>`<div class="pr ${i===G.cur?'now':''}"><span class="dot" style="background:${q.color}">${i+1}</span><span class="pn">${esc(q.name)}${q.done?' 🏁':''}</span><span class="pm ${q.money<0?'neg':''}">${fmt(q.money)}</span><span>🏠${q.props.length} 👤${q.mates}</span><span>${G.chars.filter(c=>c.h===i).map(c=>CHARS[c.k].i).join('')}</span></div>`).join('')}</div>
- <div class="eracard">${e.i} <b>${e.n}の生物育成</b><br>${e.sum}</div>`;
+ <div class="plist">${G.P.map((q,i)=>`<div class="pr ${i===G.cur?'now':''}"><span class="dot" style="background:${q.color}">${i+1}</span><span class="pn">${esc(q.name)}</span><span class="pm ${q.money<0?'neg':''}">${fmt(q.money)}</span><span>🏗️${q.props.length} 👤${q.mates}</span><span>${G.chars.filter(c=>c.h===i).map(c=>CHARS[c.k].i).join('')}</span></div>`).join('')}</div>
+ <div class="eracard">${e.i} <b>${e.n}の生物育成</b><br>${e.sum}</div>
+ <div style="text-align:right;margin-top:8px"><button class="sub" id="endg" style="font-size:.8rem;padding:4px 12px">⏹ ゲームを終える</button></div>`;
  if($('spin'))$('spin').onclick=spin;
+ $('endg').onclick=async()=>{if(G.busy)return;const v=await modal({icon:'⏹',title:'ゲームを終えて表彰式にしますか？',body:'先生の合図があったときに押してください。',buttons:[{label:'表彰式へ',v:1},{label:'続ける',v:0,cls:'sub'}]});if(v)finish();};
  $('side').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>useCard(+b.dataset.c));}
 document.addEventListener('keydown',ev=>{if((ev.key==='Enter'||ev.key===' ')&&$('spin')&&$('modal').classList.contains('hidden')){ev.preventDefault();spin();}});
 
@@ -510,12 +595,12 @@ async function eraUp(why){const e=E();sfx('era');
 async function eraModal(first,why){const e=E();
  await modal({cls:'era',raw:`<div class="eratop" style="--ec1:${e.c1};--ec2:${e.c2}"><div class="ei">${e.i}</div><small>${first?'ここから物語が始まる…':'時代が進んだ！'}</small><h2>${e.n}</h2><small>${e.y}</small></div>
   <div class="erabody">${why&&!first?`<p><b>${why}</b></p>`:''}<p><b>🌱 この時代の生物育成</b><br>${e.sum}</p><b>🔧 この時代の技術</b><ul>${e.tech.map(t=>`<li>${t}</li>`).join('')}</ul>
-  ${first?'<p class="small">施設を買ったりクイズに正解したりして「発展度」を上げると、次の時代へ進みます。</p>':`<p class="okc">全員に「${e.n}」の技術カードを1枚配りました！ 収穫日の収入もアップ！</p>`}</div>`,buttons:[{label:first?'⏳ 出発！':'この時代を生きよう！ ▶',v:1}]});}
+  ${first?'<p class="small">施設を買ったりクイズに正解したりして「発展度」を上げると、次の時代へ進みます。</p>':`<p class="okc">全員に「${e.n}」の技術カードを配りました！ 収穫祭の収入もアップ！ 施設マスで新しい施設が買えます。</p>`}</div>`,buttons:[{label:first?'⏳ 出発！':'この時代を生きよう！ ▶',v:1}]});}
 
 /* ===== カード ===== */
 async function useCard(i){if(G.busy)return;const p=CP(),c=p.cards[i];
  const ch=G.chars.find(x=>x.h===G.cur);const can=c.t!=='guard'||!!ch;
- const v=await modal({icon:c.i,title:`${c.n}（${ERAS[c.era].n}）`,body:`<p class="memo">${c.m}</p>${can?'':'<p class="small">このカードは、ピンチやキャラクターが現れたときに使えます。</p>'}`,buttons:can?[{label:'使う',v:1},{label:'やめる',v:0,cls:'sub'}]:[{label:'とじる',v:0,cls:'sub'}]});
+ const v=await modal({icon:c.i,title:`${c.n}（${ERAS[c.era].n}）`,body:`<p class="memo">${c.m}</p>${can?'':'<p class="small">守りのカードは、ピンチや災害、キャラクターのときに使えます（災害のニュースでは自動で使われます）。</p>'}`,buttons:can?[{label:'使う',v:1},{label:'やめる',v:0,cls:'sub'}]:[{label:'とじる',v:0,cls:'sub'}]});
  if(!v)return;p.cards.splice(i,1);
  if(c.t==='spin2'){p.spin2=true;sfx('card');await banner(`${c.i} ルーレット2回！`,'',p.color,1100);}
  else if(c.t==='income'){const g=E().base*3;p.money+=g;sfx('coin');renderSide();floatMoney(g);await modal({icon:c.i,cls:'good',title:`${c.n}で +${fmt(g)}`,body:c.m,buttons:[OK]});}
@@ -530,40 +615,32 @@ async function getCard(p,title,icon){const c=pick(cardsUpTo());sfx('card');
 
 /* ===== ターン ===== */
 async function turnStart(){const p=CP();G.busy=false;focus(p.node);renderPawns();renderSide();renderHud();
- await banner(`${E().veh} ${esc(p.name)}さんの番！`,`💰 ${fmt(p.money)} ・ ${E().n}`,p.color,1200);}
+ await banner(`${E().veh} ${esc(p.name)}さんの番！`,`💰 ${fmt(p.money)} ・ ${G.year}年目`,p.color,1200);}
 async function spin(){if(G.busy)return;G.busy=true;renderSide();const p=CP();
  let n=await spinWheel();if(p.spin2){p.spin2=false;const n2=await spinWheel();n+=n2;await banner(`合計 ${n}マス！`,'',p.color,900);}
- const r=await move(p,n);
- if(!p.done){$('nd'+p.node).classList.add('lit');await sleep(250);await land(p,NODES[p.node]);$('nd'+p.node).classList.remove('lit');await charTurn(p);}
+ await move(p,n);
+ $('nd'+p.node).classList.add('lit');await sleep(250);await land(p,NODES[p.node]);$('nd'+p.node).classList.remove('lit');await charTurn(p);
  await endTurn();}
 async function move(p,steps){let moved=false;
- for(let s=steps;s>0;s--){const opts=NX[p.node];if(!opts.length)break;
-  let nx=opts[0];if(opts.length>1)nx=await chooseFork(p,s);
+ for(let s=steps;s>0;s--){const nx=(p.node+1)%NN;
   p.node=nx;focus(nx);renderPawns(G.cur);sfx('hop');await sleep(RM?60:280);
-  const t=NODES[nx].t;
-  if(t==='H'&&s>1)await harvest(p,true);
-  const ch=G.chars.find(c=>c.h===G.cur);const other=G.P.findIndex((q,i)=>i!==G.cur&&!q.done&&q.node===nx);
-  if(ch&&other>=0&&!moved){moved=true;ch.h=other;renderPawns();renderHud();sfx('boss');await banner(`${CHARS[ch.k].i} ${CHARS[ch.k].n}が ${esc(G.P[other].name)}さんに うつった！`,'追いこすと、キャラクターがうつります',G.P[other].color,1400);renderSide();}
-  if(t==='E'){await goal(p);return'goal';}
-  if(t==='P'&&s>1){await banner('🛑 止まれ！','チャンスマスでは必ず止まります','#e2483a',1100);break;}}
- return'';}
-function chooseFork(p,left){const f=FORKS.find(x=>x.at===p.node);return new Promise(res=>{const br=$('branch');
- [f.short,f.long].forEach(o=>$('nd'+o).classList.add('cand'));
- const done=v=>{[f.short,f.long].forEach(o=>$('nd'+o).classList.remove('cand'));br.innerHTML='';res(v);};
- br.innerHTML=`<b>🔀 分かれ道！ のこり${left}マス</b><button id="fs">⚡ 近道<br><span class="small">早く進めるけど、ピンチが多め</span></button><button id="fl">🌈 遠回り<br><span class="small">長いけど、収穫日やカードが多め</span></button>`;
- $('fs').onclick=()=>done(f.short);$('fl').onclick=()=>done(f.long);});}
+  if(nx===0){p.laps++;if(s>1)await harvest(p,true);}
+  const ch=G.chars.find(c=>c.h===G.cur);const other=G.P.findIndex((q,i)=>i!==G.cur&&q.node===nx);
+  if(ch&&other>=0&&!moved){moved=true;ch.h=other;renderPawns();renderHud();sfx('boss');await banner(`${CHARS[ch.k].i} ${CHARS[ch.k].n}が ${esc(G.P[other].name)}さんに うつった！`,'追いこすと、キャラクターがうつります',G.P[other].color,1400);renderSide();}}}
 
 /* ===== マスの出来事 ===== */
 async function land(p,nd){const t=nd.t;
- if(t==='H')return harvest(p,false);if(t==='G')return good(p);if(t==='B')return bad(p);if(t==='Q')return quizSq(p);if(t==='K')return getCard(p,'技術カードを手に入れた！','🃏');if(t==='C')return charSq(p);if(t==='P')return chance(p);}
-async function harvest(p,pass){const e=E(),inc=e.base+p.props.reduce((a,x)=>a+x.inc,0);p.money+=inc;sfx('coin');renderSide();floatMoney(inc);
- particles({kind:'rise',e:['🌾','💰','✨'],n:12,d:1.5,fs:30});tint('rgba(255,210,80,.25)',1000);
- if(pass){await banner(`🌾 収穫日！ +${fmt(inc)}`,'通りすぎても収入が入ります','#d49a00',1100);}
- else await modal({icon:'🌾',cls:'gold',title:`収穫日！ +${fmt(inc)}`,body:`${e.n}の基本収入 ${fmt(e.base)}＋施設の収入 ${fmt(inc-e.base)}<p class="memo">時代が進むと技術が発達し、同じ広さからとれる量がふえていきます。</p>`,buttons:[OK]});
- await addDev(1);}
+ if(t==='S')return harvest(p,false);if(t==='H')return market(p);if(t==='G')return good(p);if(t==='B')return bad(p);if(t==='Q')return quizSq(p);if(t==='K')return getCard(p,'技術カードを手に入れた！','🃏');if(t==='C')return charSq(p);if(t==='P')return chance(p);if(t==='R')return risk(p);}
+async function harvest(p,pass){const e=E(),bonus=pass?0:e.base,inc=e.base+pInc(p)+bonus;p.money+=inc;sfx('coin');renderSide();floatMoney(inc);
+ particles({kind:'rise',e:['🌾','💰','✨'],n:14,d:1.5,fs:30});tint('rgba(255,210,80,.25)',1000);
+ if(pass)await banner(`🎉 収穫祭！ +${fmt(inc)}`,'スタートを通ると、施設の収入が入ります','#d49a00',1200);
+ else await modal({icon:'🎉',cls:'gold',title:`収穫祭にぴったり止まった！ +${fmt(inc)}`,body:`${e.n}の基本収入 ${fmt(e.base)}＋施設の収入 ${fmt(pInc(p))}＋ぴったりボーナス ${fmt(bonus)}<p class="memo">時代が進むと技術が発達し、同じ広さからとれる量がふえていきます。</p>`,buttons:[OK]});
+ await addDev(2);}
+async function market(p){const e=E(),g=Math.round(e.base+pInc(p)*.5);p.money+=g;sfx('coin');renderSide();floatMoney(g);
+ await modal({icon:'🛒',cls:'gold',title:`市場の日！ +${fmt(g)}`,body:`育てた物を市場で売った！（基本 ${fmt(e.base)}＋施設の収入の半分）<p class="memo">生産した物は、運んで売ることで初めて収入になる。保存や輸送の技術も大切。</p>`,buttons:[OK]});}
 async function good(p){const e=E(),ev=pick(e.good);p.money+=ev.v;if(ev.mate)p.mates+=ev.mate;sfx('good');renderSide();renderPawns();floatMoney(ev.v);
  particles({kind:'burst',e:['✨','🌟','😊'],n:16,d:1.2,fs:30});tint('rgba(80,220,140,.22)',1100);
- await modal({icon:'😊',cls:'good',title:ev.t,body:`<b class="okc" style="font-size:1.3rem">+${fmt(ev.v)}</b>${ev.mate?'<br>👤 仲間が1人ふえた！（ゴールで1人300万円）':''}${ev.dev?'<br>📈 班の発展度アップ！':''}<p class="small">${e.i} ${e.n}のできごと</p>`,buttons:[OK]});
+ await modal({icon:'😊',cls:'good',title:ev.t,body:`<b class="okc" style="font-size:1.3rem">+${fmt(ev.v)}</b>${ev.mate?'<br>👤 仲間が1人ふえた！（最後に1人300万円）':''}${ev.dev?'<br>📈 班の発展度アップ！':''}<p class="small">${e.i} ${e.n}のできごと</p>`,buttons:[OK]});
  if(ev.dev)await addDev(ev.dev,`「${ev.t}」で技術が進んだ！`);}
 async function bad(p){const e=E(),ev=pick(e.bad);let d=ev.v;await eventFx(ev.fx);
  const gi=p.cards.findIndex(c=>c.t==='guard');let note='';
@@ -571,20 +648,51 @@ async function bad(p){const e=E(),ev=pick(e.bad);let d=ev.v;await eventFx(ev.fx)
   if(v){p.cards.splice(gi,1);d=0;note=`${g.i} ${g.n}で防いだ！`;sfx('good');particles({kind:'burst',e:['🛡️','✨'],n:14,d:1,fs:30});}}
  p.money-=d;renderSide();if(d)floatMoney(-d);
  await modal({icon:'😣',cls:'warn',title:ev.t,body:`${note?`<b class="okc">${note}</b><br>`:''}${d?`<b class="ng" style="font-size:1.3rem">−${fmt(d)}</b>`:'<b class="okc">損害なし！</b>'}<p class="small">${e.i} ${e.n}のできごと</p>`,buttons:[OK]});}
-async function quizSq(p){const ok=await askQ(pick(E().qs),`<b>❓ ${E().n}クイズ</b><br>`);
- if(ok){const g=E().base*2;p.money+=g;renderSide();floatMoney(g);sfx('coin');await addDev(3,'クイズに正解して、知識が広まった！');}}
-async function chance(p){const e=E(),opts=e.props.filter(x=>!p.props.some(y=>y.n===x.n));
- const list=opts.map(x=>`<div class="pcard"><span class="pi">${x.i}</span><div><b>${x.n}</b><br>価格 ${fmt(x.price)}・収穫日の収入 +${fmt(x.inc)}<br><span class="small">${x.m}</span></div></div>`).join('');
- if(!opts.length)return modal({icon:'🛑',title:'チャンスマス',body:`${e.n}の施設はすべて持っています！ ボーナス +${fmt(e.base*2)}`,buttons:[OK]}).then(()=>{p.money+=e.base*2;renderSide();});
- const v=await modal({icon:'🛑',cls:'gold',title:`チャンス！ ${e.n}の施設を手に入れよう`,body:`${list}<b>産地テスト（3問中2問正解）に合格すると買えます。全問正解なら1割引！</b>`,
-  buttons:[...opts.map((x,i)=>({label:`${x.i} ${x.n}（${fmt(x.price)}）に挑戦`,v:i+1,dis:p.money<x.price*.9})),{label:'今回は見送る',v:0,cls:'sub'}]});
- if(!v)return;const x=opts[v-1];
- const n=await test3(shuffle(e.qs).slice(0,3),`${e.n}テスト`);
- if(n>=2){const perfect=n===3,price=Math.round(x.price*(perfect?.9:1));p.money-=price;p.props.push({...x,era:G.era});if(perfect)p.tp++;
+async function quizSq(p){const ok=await askQ(pick(quizPool()),`<b>❓ 生物育成クイズ</b> 正解で +${fmt(E().base*2)}<br>`);
+ if(ok){const g=E().base*2;p.money+=g;renderSide();floatMoney(g);sfx('coin');await addDev(3,'クイズに正解して、技術が広まった！');}}
+async function chance(p){const e=E(),opts=e.props;
+ const list=opts.map(x=>`<div class="pcard"><span class="pi">${x.i}</span><div><b>${x.n}</b> <span class="small">${CATN[x.cat]}${x.noWx?'・天候の被害なし':''}</span><br>通常：${fmt(x.price)}・収入 +${fmt(x.inc)} ／ <b style="color:#c0392b">大規模：${fmt(x.price*BIG.price)}・収入 +${fmt(Math.round(x.inc*BIG.inc))}</b><br><span class="small">${x.m}</span></div></div>`).join('');
+ const btns=[];opts.forEach((x,i)=>{btns.push({label:`${x.i} ${x.n}（${fmt(x.price)}）`,v:{i,big:false},dis:p.money<x.price*.9});btns.push({label:`🔥 ${x.n}を大規模に（${fmt(x.price*BIG.price)}）`,v:{i,big:true},cls:'risky',dis:p.money<x.price*BIG.price*.9});});
+ btns.push({label:'今回は見送る',v:0,cls:'sub'});
+ const v=await modal({icon:'🏗️',cls:'gold',title:`施設マス！ ${e.n}の施設を手に入れよう`,body:`${list}<b>テスト（3問中2問正解）に合格すると買えます。全問正解なら1割引！</b><br><span class="small">🔥大規模：収入2.5倍。でも、災害のニュースの被害も2倍になります。</span>`,buttons:btns});
+ if(!v)return;const x=opts[v.i];
+ const n=await test3(shuffle(e.qs).slice(0,3),`${e.n}の技術テスト`);
+ if(n>=2){const perfect=n===3,price=Math.round(x.price*(v.big?BIG.price:1)*(perfect?.9:1));p.money-=price;
+  p.props.push({...x,era:G.era,big:v.big,price:x.price*(v.big?BIG.price:1),inc:Math.round(x.inc*(v.big?BIG.inc:1))});
   sfx('fan');fireworks(3);confetti(50);renderSide();floatMoney(-price);
-  await modal({icon:x.i,cls:'gold',title:`合格！「${x.n}」を手に入れた！`,body:`${n}問正解${perfect?'（全問正解で1割引！）':''}<br>支払い <b>${fmt(price)}</b><p class="memo">${x.m}<br>収穫日のたびに +${fmt(x.inc)} の収入があります。</p>`,buttons:[OK]});
-  await addDev(perfect?14:10,`${esc(p.name)}さんが「${x.n}」をつくり、ムラが発展した！`);}
- else{p.tf++;sfx('bad');await modal({icon:'📚',title:`不合格…（${n}問正解）`,body:'今回は手に入りませんでした。解説を思い出して、次のチャンスで挑戦しよう！',buttons:[OK]});}}
+  await modal({icon:x.i,cls:'gold',title:`合格！「${x.n}」${v.big?'を大規模に':''}手に入れた！`,body:`${n}問正解${perfect?'（全問正解で1割引！）':''}<br>支払い <b>${fmt(price)}</b><p class="memo">${x.m}<br>収穫祭のたびに +${fmt(Math.round(x.inc*(v.big?BIG.inc:1)))} の収入があります。</p>`,buttons:[OK]});
+  await addDev(perfect?14:10,`${esc(p.name)}さんが「${x.n}」をつくり、産業が発展した！`);}
+ else{sfx('bad');await modal({icon:'📚',title:`不合格…（${n}問正解）`,body:'今回は手に入りませんでした。解説を思い出して、次のチャンスで挑戦しよう！',buttons:[OK]});}}
+async function risk(p){const e=E(),r=pick(RISKS),win=e.base*6,lose=e.base*4,safe=e.base;
+ const v=await modal({icon:'🎲',cls:'gold',title:`大勝負マス！ ${r.i} ${r.t}`,body:`<div class="riskbox"><div><b>🛡️ 安全にいく</b><br>確実に <b class="okc">+${fmt(safe)}</b></div><div><b>🔥 勝負する</b><br>ルーレットで <b>6〜10</b> なら <b class="okc">+${fmt(win)}</b><br>1〜5 なら <b class="ng">−${fmt(lose)}</b></div><div><b>🧠 難問で勝負</b><br>次の時代の技術クイズに正解で <b class="okc">+${fmt(win)}</b><br>まちがえたら <b class="ng">−${fmt(lose)}</b></div></div>`,
+  buttons:[{label:'🛡️ 安全にいく',v:1,cls:'sub'},{label:'🔥 ルーレットで勝負！',v:2,cls:'risky'},{label:'🧠 難問で勝負！',v:3,cls:'risky'}]});
+ let ok;
+ if(v===1){p.money+=safe;sfx('coin');renderSide();floatMoney(safe);return banner(`🛡️ 堅実に +${fmt(safe)}`,'',p.color,1000);}
+ if(v===2){const n=await spinWheel();ok=n>=6;}
+ else{const q=pick(ERAS[Math.min(6,G.era+1)].qs);ok=await askQ(q,'<b>🧠 難問チャレンジ（次の時代の技術）</b><br>');}
+ if(ok){p.money+=win;sfx('fan');fireworks(3);confetti(40);renderSide();floatMoney(win);
+  await modal({icon:'🎉',cls:'good',title:`大成功！ +${fmt(win)}`,body:`思い切った挑戦が実を結んだ！<p class="memo">新しい技術や方法への挑戦は、成功すれば大きな成果につながる。</p>`,buttons:[OK]});await addDev(3,'思い切った挑戦で、新しい技術が広まった！');}
+ else{p.money-=lose;await eventFx('warn');renderSide();floatMoney(-lose);
+  await modal({icon:'💥',cls:'warn',title:`失敗… −${fmt(lose)}`,body:`今回はうまくいかなかった…。<p class="memo">大きな挑戦にはリスクがある。生産者は、計画を立て、試験的に小さく始めるなどしてリスクを減らしている。</p>`,buttons:[OK]});}}
+
+/* ===== 毎年のニュース（班全体） ===== */
+async function yearNews(){const e=E(),goodNews=Math.random()<.5;
+ const pool=(goodNews?NEWS_GOOD:NEWS_BAD).filter(x=>x.from<=G.era),ev=pick(pool);
+ const rows=G.P.map(p=>{const hit=ev.cats?p.props.filter(x=>ev.cats.includes(x.cat)&&!(ev.wx&&x.noWx)):[];
+  let amt=hit.reduce((a,x)=>a+Math.round(x.inc*(ev.m||1)*(x.big&&!goodNews?BIG.dmg/BIG.inc:1)),0)+(ev.all?e.base*ev.all:0);
+  return{p,hit,amt,note:''};});
+ const any=rows.some(r=>r.amt>0);
+ if(!any)rows.forEach(r=>{r.amt=goodNews?e.base:Math.round(e.base*.5);r.note=goodNews?'地域全体が少しうるおった':'地域全体の暮らしに影響';});
+ if(!goodNews)rows.forEach(r=>{const gi=r.p.cards.findIndex(c=>c.t==='guard');if(r.amt>=e.base&&gi>=0){const g=r.p.cards.splice(gi,1)[0];r.note=`${g.i}${g.n}で守った！`;r.amt=0;}});
+ rows.forEach(r=>r.p.money+=goodNews?r.amt:-r.amt);
+ if(goodNews){sfx('fan');tint('rgba(80,220,140,.25)',1400);particles({kind:'fall',e:[ev.i,'✨','💰'],n:24,d:2.2,fs:30});}else await eventFx(ev.fx);
+ renderSide();
+ await modal({cls:goodNews?'good':'warn',raw:`<div class="news"><div class="nh">📰 ${G.year}年目のニュース</div><div class="micon">${ev.i}</div><h2>${ev.t}</h2>
+  <p>${ev.cats?`影響する施設：<b>${ev.cats.map(c=>CATN[c]).join('・')}</b>${ev.wx&&!goodNews&&G.era>=6?'（植物工場は影響なし）':''}${!goodNews?'　🔥大規模の施設は被害も大きい':''}`:'班の全員に影響！'}</p>
+  <table><tr><th>プレイヤー</th><th>影響した施設</th><th>${goodNews?'収入':'被害'}</th></tr>${rows.map(r=>`<tr><td><span class="dot" style="background:${r.p.color}">${G.P.indexOf(r.p)+1}</span> ${esc(r.p.name)}</td><td>${r.hit.map(x=>x.i+(x.big?'<sup>大</sup>':'')).join('')||'—'} <span class="small">${r.note}</span></td><td class="${goodNews?'okc':'ng'}">${r.amt?(goodNews?'+':'−')+fmt(r.amt):'0円'}</td></tr>`).join('')}</table>
+  ${ev.note?`<p class="memo">🔧 ${ev.note}</p>`:''}</div>`,buttons:[{label:'次の年へ ▶',v:1}]});
+ if(ev.dev)await addDev(ev.dev,`「${ev.t}」で技術が進んだ！`);
+ renderSide();}
 
 /* ===== キャラクター ===== */
 async function charSq(p){const ks=Object.keys(CHARS).filter(k=>CHARS[k].from<=G.era&&!G.chars.some(c=>c.k===k));
@@ -595,13 +703,13 @@ async function charSq(p){const ks=Object.keys(CHARS).filter(k=>CHARS[k].from<=G.
   await modal({cls:'dark',title:'オンダンカ神様 が あらわれた！',body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>いる間は、だれかの番が来るたびに<b>班の発展度</b>が下がってしまう！<p class="memo">${C.m}</p>`,buttons:[{label:'みんなで立ち向かおう！ ▶',v:1}]});
   renderHud();return ondankaChallenge();}
  G.chars.push({k,h:G.cur,left:3});
- await modal({cls:'dark',title:`${C.n} が あらわれた！`,body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>${esc(p.name)}さんに とりついた！<p class="memo">${C.m}<br>追い払うには：守りの技術カード（${E().cards.filter(c=>c.t==='guard').map(c=>c.i+c.n).join('、')||'時代の守りのカード'}など）。ほかの人を追いこすと、うつることも。</p>`,buttons:[{label:'負けないぞ！ ▶',v:1}]});
+ await modal({cls:'dark',title:`${C.n} が あらわれた！`,body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>${esc(p.name)}さんに とりついた！<p class="memo">${C.m}<br>追い払うには：守りの技術カード。ほかの人を追いこすと、うつることも。</p>`,buttons:[{label:'負けないぞ！ ▶',v:1}]});
  renderPawns();renderHud();renderSide();}
 async function repelChar(ch,card){const C=CHARS[ch.k];G.chars=G.chars.filter(c=>c!==ch);sfx('good');particles({kind:'burst',e:['✨','💥',card.i],n:18,d:1.2,fs:32});
  await modal({cls:'good',title:`${C.n}を 追い払った！`,body:`<div class="charfly">${C.i}</div><br>${card.i} <b>${card.n}</b>の技術で撃退！<p class="memo">${C.m}</p>`,buttons:[{label:'やったー！ ▶',v:1}]});
  await addDev(3);renderPawns();renderHud();}
 async function charTurn(p){const od=G.chars.find(c=>c.k==='ondanka');
- if(od){od.left-=1/G.P.length;await addDev(-1);if(od.left<=0){G.chars=G.chars.filter(c=>c!==od);await banner('🌡️ オンダンカ神様は去っていった','',' #6a4a8a',1200);}renderHud();}
+ if(od){od.left-=1/G.P.length;await addDev(-1);if(od.left<=0){G.chars=G.chars.filter(c=>c!==od);await banner('🌡️ オンダンカ神様は去っていった','','#6a4a8a',1200);}renderHud();}
  const ch=G.chars.find(c=>c.h===G.cur);if(!ch)return;const C=CHARS[ch.k];
  const gi=p.cards.findIndex(c=>c.t==='guard');
  if(gi>=0){const g=p.cards[gi];const v=await modal({cls:'dark',title:`${C.i} ${C.n}が いたずらしようとしている！`,body:`<span class="say">「${C.say}」</span><br>${g.i} ${g.n}で追い払える！`,buttons:[{label:`${g.i} 使って追い払う`,v:1},{label:'使わない',v:0,cls:'sub'}]});
@@ -609,7 +717,7 @@ async function charTurn(p){const od=G.chars.find(c=>c.k==='ondanka');
  const d=Math.round(E().base*1.5+p.props.length*E().base*.3);p.money-=d;ch.left--;
  sfx('bad');shake();tint('rgba(60,0,80,.35)',1400);particles({kind:'drift',e:[C.i],n:8,d:1.4,fs:34});renderSide();floatMoney(-d);
  await modal({cls:'dark',title:`${C.i} ${C.n}の いたずら！`,body:`<span class="say">「${C.say}」</span><br><b style="color:#ff9a8a;font-size:1.3rem">−${fmt(d)}</b><p class="memo">${C.m}</p>`,buttons:[OK]});
- if(ch.left<=0){G.chars=G.chars.filter(c=>c!==ch);await banner(`${C.i} ${C.n}は去っていった`,'',' #6a4a8a',1200);renderPawns();renderHud();}}
+ if(ch.left<=0){G.chars=G.chars.filter(c=>c!==ch);await banner(`${C.i} ${C.n}は去っていった`,'','#6a4a8a',1200);renderPawns();renderHud();}}
 async function ondankaChallenge(){const C=CHARS.ondanka;
  const v=await modal({cls:'dark',title:'🌡️ 班のみんなで温暖化対策チャレンジ！',body:`<div class="charbig" style="font-size:80px">${C.i}</div><br>3問中2問正解で、オンダンカ神様をしずめられる！<br>成功すると、<b>発展度アップ＋全員に${fmt(E().base*2)}</b>！`,buttons:[{label:'🔥 班で挑戦する！',v:1},{label:'今回はやめておく',v:0,cls:'sub'}]});
  if(!v)return;const n=await test3(shuffle(WARM).slice(0,3),'温暖化対策チャレンジ');
@@ -618,55 +726,41 @@ async function ondankaChallenge(){const C=CHARS.ondanka;
  else await modal({cls:'dark',title:`失敗…（${n}問正解）`,body:'オンダンカ神様はまだいる…。キャラクターマスに止まると、また挑戦できます。',buttons:[OK]});
  renderHud();renderSide();}
 
-/* ===== ゴールと進行 ===== */
-const RANKB=[1000,700,500,300,200,100,0];
-async function goal(p){p.done=true;G.finished++;p.rank=G.finished;const b=Math.round(RANKB[p.rank-1]*(1+G.era*.5));p.money+=b;
- G.chars.filter(c=>c.h===G.cur).forEach(c=>{G.chars=G.chars.filter(x=>x!==c);});
- sfx('fan');fireworks(4);confetti(70);renderPawns();renderSide();floatMoney(b);
- await modal({icon:'<span class="trophy">🏆</span>',cls:'gold',title:`${esc(p.name)}さん、${p.rank}番目にゴール！`,body:`ゴールボーナス <b class="okc">+${fmt(b)}</b><br>仲間 ${p.mates}人・施設 ${p.props.length}件<p class="small">ほかの人がゴールするまで、応援しよう！ 班の発展度は、まだ上げられます。</p>`,buttons:[OK]});}
-async function endTurn(){G.busy=false;
- if(G.P.every(q=>q.done))return finish();
- do{G.cur=(G.cur+1)%G.P.length;}while(G.P[G.cur].done);
+/* ===== 進行 ===== */
+async function endTurn(){G.busy=false;if(G.ended)return;
+ G.cur=(G.cur+1)%G.P.length;
+ if(G.cur===0){G.year++;
+  if(G.year>G.years){G.year=G.years;return finish();}
+  setDeco(false);renderHud();focus(CP().node);
+  await banner(`📅 ${G.year}年目`,G.year===G.years?'いよいよ最後の年！':`のこり${G.years-G.year+1}年`,'#2a6fd6',1200);
+  await yearNews();}
  await turnStart();}
 
 /* ===== 結果 ===== */
 function postForm(url,data){const f=document.createElement('form');f.method='POST';f.action=url;f.target='_blank';f.acceptCharset='UTF-8';f.style.display='none';const i=document.createElement('input');i.type='hidden';i.name='payload';i.value=JSON.stringify(data);f.appendChild(i);document.body.appendChild(f);f.submit();setTimeout(()=>f.remove(),1500);}
-const RFQ=[{k:'q1',min:30,q:'時代が進むにつれて、生物を育てる技術はどのように変わってきましたか。よくなったことと、新しく生まれた課題（環境・人手不足・温暖化など）の両方にふれて書きましょう。'},
- {k:'q2',min:30,q:'これからの「生物育成の技術」の学習で、自分が調べたいこと・挑戦したいことは何ですか。その理由も書きましょう。'}];
-function finish(){const ranked=[...G.P].sort((a,b)=>assets(b)-assets(a)),avg=Math.round(G.P.reduce((a,p)=>a+assets(p),0)/G.P.length),bonus=G.era*1500+(G.era>=6?3000:0),score=avg+bonus,props=G.P.reduce((a,p)=>a+p.props.length,0);
- G.P.forEach(p=>{p.prank=ranked.indexOf(p)+1;p.rf=p.rf||{kumi:'',ban:'',name:/^プレイヤー\d$/.test(p.name)?'':p.name,q1:'',q2:''};});
+function finish(){G.ended=true;const ranked=[...G.P].sort((a,b)=>assets(b)-assets(a)),avg=Math.round(G.P.reduce((a,p)=>a+assets(p),0)/G.P.length),bonus=G.era*1500+(G.era>=6?3000:0),score=avg+bonus,props=G.P.reduce((a,p)=>a+p.props.length,0);
  const opt=(n,v)=>`<option value="">選択</option>`+Array.from({length:n},(_,i)=>`<option ${String(i+1)===String(v)?'selected':''}>${i+1}</option>`).join('');
- app.innerHTML=`<div class="card hero"><div class="trophy">🏆</div><h2>表彰式</h2><p>たどり着いた時代：<b>${E().i} ${E().n}</b></p>
+ app.innerHTML=`<div class="card hero"><div class="trophy">🏆</div><h2>表彰式</h2><p>${G.year}年間で たどり着いた時代：<b>${E().i} ${E().n}</b></p>
  <div class="etl">${ERAS.map((e,i)=>`<span style="${i<=G.era?'background:#ffe48a':''}">${e.i} ${e.n}</span>`).join('')}</div></div>
- <div class="card"><h2>👑 個人の順位（総資産＝お金＋施設の価値＋仲間）</h2><table><tr><th>順位</th><th>名前</th><th>総資産</th><th>お金</th><th>施設</th><th>仲間</th><th>ゴール</th></tr>
- ${ranked.map((p,i)=>`<tr><td><b>${['🥇','🥈','🥉'][i]||''} ${i+1}位</b></td><td>${esc(p.name)}</td><td><b>${fmt(assets(p))}</b></td><td>${fmt(p.money)}</td><td>${p.props.map(x=>`<span title="${esc(ERAS[x.era].n+'・'+x.n)}">${x.i}</span>`).join('')||'—'}</td><td>${p.mates}人</td><td>${p.rank}番目</td></tr>`).join('')}</table></div>
+ <div class="card"><h2>👑 個人の順位（総資産＝お金＋施設の価値＋仲間）</h2><table><tr><th>順位</th><th>名前</th><th>総資産</th><th>お金</th><th>施設</th><th>仲間</th></tr>
+ ${ranked.map((p,i)=>`<tr><td><b>${['🥇','🥈','🥉'][i]||''} ${i+1}位</b></td><td>${esc(p.name)}</td><td><b>${fmt(assets(p))}</b></td><td>${fmt(p.money)}</td><td>${p.props.map(x=>`<span title="${esc(ERAS[x.era].n+'・'+x.n)}">${x.i}${x.big?'<sup>大</sup>':''}</span>`).join('')||'—'}</td><td>${p.mates}人</td></tr>`).join('')}</table></div>
  <div class="card" style="text-align:center"><h2>🤝 班の得点</h2><div class="score">${fmt(score)}</div>
  <p>班員の平均資産 ${fmt(avg)} ＋ 時代ボーナス ${fmt(bonus)}（${E().n}まで発展${G.era>=6?'・現代到達ボーナス込み':''}）</p>
- <p>${G.era>=6?'🏆 <b>班の目標「令和の時代まで発展させる」を達成！</b>':`班の目標（平成・令和）まで、あと${6-G.era}つの時代でした。`}</p></div>
+ <p>${G.era>=6?'🏆 <b>班の目標「令和の時代まで発展させる」を達成！</b>':`班の目標（平成・令和）まで、あと${6-G.era}つの時代でした。`}</p>
+ <div class="row" style="justify-content:center;margin:8px 0"><label>組 <select id="kumi">${opt(8,setup.kumi)}</select></label><label>班 <select id="han">${opt(10,setup.han)}</select></label></div>
+ <div class="row" style="justify-content:center"><button id="send" class="big">📮 班の結果を提出する</button><button class="sub" id="rank">🏅 クラスの班ランキングを見る</button></div><p id="smsg" class="small"></p></div>
  <div class="card"><h2>⏳ 生物育成の歩み</h2><table><tr><th>時代</th><th>生物育成のようす</th></tr>${ERAS.map((e,i)=>`<tr style="${i>G.era?'opacity:.5':''}"><td>${e.i} <b>${e.n}</b><br><span class="small">${e.y}</span></td><td>${e.sum}</td></tr>`).join('')}</table></div>
- <div class="card qcard"><h2>✏️ ふりかえり（一人ずつ入力しよう）</h2><p>上の「生物育成の歩み」を見ながら、<b>自分の考え</b>を書きましょう。全員が入力したら、下のボタンで班まとめて提出します。</p>
- ${G.P.map((p,i)=>`<div class="rf" style="border-color:${p.color}"><div class="rfh"><span class="dot" style="background:${p.color}">${i+1}</span><b>${esc(p.name)}</b>さん<span class="small">（${p.prank}位）</span><span class="rfok" id="rfok${i}"></span></div>
-  <div class="row"><label>組 <select data-p="${i}" data-k="kumi">${opt(8,p.rf.kumi)}</select></label><label>番号 <select data-p="${i}" data-k="ban">${opt(40,p.rf.ban)}</select></label><label>名前 <input data-p="${i}" data-k="name" value="${esc(p.rf.name)}" placeholder="本名（フルネーム）" maxlength="20"></label></div>
-  ${RFQ.map((q,j)=>`<div class="rfq"><b>${j+1}．</b>${q.q}<textarea data-p="${i}" data-k="${q.k}" rows="3" maxlength="400" placeholder="${q.min}字以上で書こう">${esc(p.rf[q.k])}</textarea><div class="cnt" id="cnt${i}${q.k}"></div></div>`).join('')}</div>`).join('')}
- <div style="text-align:center;margin-top:10px"><div class="row" style="justify-content:center"><button id="send" class="big">📮 班の結果とふりかえりを提出する</button><button class="sub" id="rank">🏅 クラスの班ランキングを見る</button></div><p id="smsg" class="small"></p></div></div>
  <div class="row" style="justify-content:center;margin-bottom:20px"><button id="again" class="sub">⏳ 同じメンバーでもう一度</button><button class="sub" id="reset">設定にもどる</button></div>`;
  sfx('fan');confetti(100);fireworks(6);
- const check=i=>{const r=G.P[i].rf;RFQ.forEach(q=>{const n=r[q.k].replace(/\s/g,'').length,el=$('cnt'+i+q.k);el.textContent=`${n}字${n<q.min?`（あと${q.min-n}字）`:' ✅'}`;el.style.color=n<q.min?'#c0392b':'#1a8a4d';});
-  const ok=r.kumi&&r.ban&&r.name&&RFQ.every(q=>r[q.k].replace(/\s/g,'').length>=q.min);$('rfok'+i).textContent=ok?'✅ 入力OK':'';return ok;};
- app.querySelectorAll('[data-p]').forEach(el=>{const h=()=>{G.P[+el.dataset.p].rf[el.dataset.k]=el.value.trim();check(+el.dataset.p);};el.oninput=h;el.onchange=h;});
- G.P.forEach((_,i)=>check(i));
- const kumiOf=()=>{const c={};G.P.forEach(p=>{if(p.rf.kumi)c[p.rf.kumi]=(c[p.rf.kumi]||0)+1;});return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||'';};
- $('send').onclick=()=>{const ng=G.P.map((p,i)=>check(i)?'':p.name).filter(Boolean);
-  if(ng.length){$('smsg').innerHTML=`<b class="ng">まだ入力が終わっていない人がいます：${ng.map(esc).join('、')}</b><br>組・番号・名前と、ふりかえり（各${RFQ[0].min}字以上）を入力してください。`;return;}
-  const kumi=kumiOf();
-  const payload={kind:'すごろく',kumi,han:G.P.map(p=>p.rf.name).join('・'),count:G.P.length,months:G.short?'ショート':'ノーマル',level:E().n,avgAssets:avg,groupScore:score,props,
-   members:ranked.map((p,i)=>`${i+1}位 ${p.rf.name}（${fmt(assets(p))}）`).join(' ／ '),
-   reflections:G.P.map(p=>({kumi:p.rf.kumi,ban:p.rf.ban,name:p.rf.name,player:p.name,rank:p.prank,assets:assets(p),level:E().n,q1:p.rf.q1,q2:p.rf.q2,group:G.P.map(q=>q.rf.name).join('・')}))};
-  postForm(GAS_URL,payload);$('send').disabled=true;$('smsg').textContent='新しいタブで「✅ 提出できました」と出たら完了です。ログイン画面が出たら、学校のアカウントでログインしてからもう一度押してください。';setTimeout(()=>$('send').disabled=false,4000);};
- $('rank').onclick=()=>window.open(`${GAS_URL}?page=ranking&kumi=${encodeURIComponent(kumiOf())}`,'_blank');
+ const keep=()=>{setup.kumi=$('kumi').value;setup.han=$('han').value;};
+ $('send').onclick=()=>{keep();if(!setup.kumi||!setup.han){$('smsg').innerHTML='<b class="ng">組と班を選んでから提出してください。</b>';return;}
+  postForm(GAS_URL,{kind:'すごろく',kumi:setup.kumi,han:setup.han+'班',count:G.P.length,months:G.year+'年',level:E().n,avgAssets:avg,groupScore:score,props,members:ranked.map((p,i)=>`${i+1}位 ${p.name}（${fmt(assets(p))}）`).join(' ／ ')});
+  $('send').disabled=true;$('smsg').textContent='新しいタブで「✅ 提出できました」と出たら完了です。ログイン画面が出たら、学校のアカウントでログインしてからもう一度押してください。';setTimeout(()=>$('send').disabled=false,4000);};
+ $('rank').onclick=()=>{keep();window.open(`${GAS_URL}?page=ranking&kumi=${encodeURIComponent(setup.kumi)}`,'_blank');};
  $('again').onclick=startGame;$('reset').onclick=renderSetup;window.scrollTo(0,0);}
 
 renderSetup();
+
 </script>
 </body>
 </html>
