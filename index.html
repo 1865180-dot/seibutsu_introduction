@@ -215,6 +215,34 @@ button.risky{background:linear-gradient(#ff6a3d,#d9381e);box-shadow:0 5px 0 #9a2
 .center .ci{font-size:70px;line-height:1.1}.center .cn{font-size:30px;font-weight:800;color:#5a3d00}.center .cy{font-size:18px;font-weight:700;color:#5a6b74}
 .sq.R{background:linear-gradient(135deg,#ff6a3d,#c2185b)}.sq.S{width:96px;height:80px}
 sup{font-size:.6em;color:#c0392b;font-weight:800}
+
+.cardc .rtag{font-size:.7rem!important}.rtag{display:inline-block;font-size:.7rem;font-weight:800;color:#fff;border-radius:6px;padding:0 6px;margin-left:4px;vertical-align:middle}.rtag.rR{background:#8a96a3}.rtag.rSR{background:#d49a00}.rtag.rLR{background:linear-gradient(90deg,#ff4d4d,#ffb84d,#ffe24d,#4dd17a,#4da6ff,#a64dff)}
+.cardc.cSR{border-color:#f0c64a;background:#fff8e1}.cardc.cLR{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,#ff4d4d,#ffe24d,#4dd17a,#4da6ff,#a64dff) border-box;animation:glow 1.6s infinite}
+.bigcard.rR .fr{border-color:#9aa5b1}.bigcard.rSR .fr{border-color:#f0c64a;background:linear-gradient(160deg,#fffdf0,#ffe9a8)}
+.bigcard.rLR .fr{border:6px solid transparent;background:linear-gradient(160deg,#fff,#fff0fb) padding-box,conic-gradient(#ff4d4d,#ffb84d,#ffe24d,#4dd17a,#4da6ff,#a64dff,#ff4d4d) border-box}
+.gacha-box{max-width:420px}
+.gm{position:relative;width:240px;height:300px;margin:6px auto}
+.gm-dome{position:absolute;left:20px;top:0;width:200px;height:170px;border-radius:100px 100px 20px 20px;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.95),rgba(200,230,255,.55) 40%,rgba(150,200,240,.5));border:5px solid #e04a4a;overflow:hidden}
+.gm-dome i{position:absolute;left:var(--x);top:var(--y);width:46px;height:46px;border-radius:50%;background:linear-gradient(var(--c) 50%,#fff 50%);border:2px solid rgba(0,0,0,.15);transform:translate(-50%,-50%)}
+.gm-body{position:absolute;left:10px;top:160px;width:220px;height:130px;background:linear-gradient(#ff6a6a,#d63a3a);border-radius:14px;box-shadow:0 8px 0 #9a2412}
+.gm-handle{position:absolute;left:24px;top:30px;width:64px;height:64px;border-radius:50%;background:#fff;border:6px solid #9a2412;font-size:38px;color:#d63a3a;display:flex;align-items:center;justify-content:center;font-weight:800;transition:transform .9s cubic-bezier(.3,.7,.3,1)}
+.gm-handle.turn{transform:rotate(540deg)}
+.gm-out{position:absolute;right:22px;top:40px;width:80px;height:70px;background:#5a1a1a;border-radius:10px 10px 30px 30px}
+.cap{position:absolute;left:145px;top:150px;width:64px;height:64px;opacity:0;z-index:2}
+.cap .ct2,.cap .cb2{position:absolute;left:0;width:64px;height:32px;border:3px solid rgba(0,0,0,.2)}
+.cap .ct2{top:0;border-radius:32px 32px 0 0;background:#eee;transform-origin:10% 100%;transition:transform .5s}
+.cap .cb2{top:32px;border-radius:0 0 32px 32px;background:#fff}
+.cap.c-silver .ct2{background:linear-gradient(135deg,#ffffff,#b8c2cc 50%,#8a96a3)}
+.cap.c-gold .ct2{background:linear-gradient(135deg,#fff6c2,#ffd34d 45%,#c98a00)}
+.cap.c-rainbow .ct2{background:conic-gradient(#ff4d4d,#ffb84d,#ffe24d,#4dd17a,#4da6ff,#a64dff,#ff4d4d)}
+.cap.c-rainbow{filter:drop-shadow(0 0 14px #fff) drop-shadow(0 0 22px #ff8ad8)}
+.cap.c-gold{filter:drop-shadow(0 0 10px #ffd34d)}
+.cap.drop{animation:capdrop 1s cubic-bezier(.3,1.4,.5,1) forwards}
+.cap.shake{animation:capshake .25s ease-in-out infinite;opacity:1;top:225px;left:120px}
+.cap.open{animation:none;opacity:1;top:225px;left:120px}.cap.open .ct2{transform:rotate(-120deg)}
+@keyframes capdrop{0%{opacity:1;top:150px;left:145px;transform:scale(.6)}60%{top:235px;left:120px;transform:scale(1.1)}100%{opacity:1;top:225px;left:120px;transform:scale(1)}}
+@keyframes capshake{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+.warp.rb{background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,140,220,.6) 30%,rgba(120,180,255,.5) 50%,transparent 72%)}
 </style>
 
 </head>
@@ -511,6 +539,17 @@ const pInc=p=>p.props.reduce((a,x)=>a+x.inc,0);
 function combo(p){const s=new Set(p.props.map(x=>x.cat));if(s.size>=3)return{m:1.5,n:'農・畜・水そろい（×1.5）',i:'🌈'};if(s.has('crop')&&s.has('animal'))return{m:1.3,n:'循環型農業（×1.3）',i:'♻️'};if(s.size===2)return{m:1.2,n:'組み合わせ（×1.2）',i:'🤝'};return{m:1,n:'',i:''};}
 const spurt=()=>G.year>G.years-2?2:1;
 const incOf=p=>Math.round((E().base+pInc(p)*combo(p).m)*spurt());
+const RAR={R:{n:'レア',cap:'silver',st:'★',col:'#8a96a3'},SR:{n:'スーパーレア',cap:'gold',st:'★★',col:'#d49a00'},LR:{n:'レジェンドレア',cap:'rainbow',st:'★★★',col:'#c2185b'}};
+const LEGEND=[
+ {n:'スマート農業革命',i:'🤖',t:'double',m:'AI・ロボット・ドローンで、生産が一気に効率化！ 自分のお金が2倍になる（2倍より基本収入×20のほうが多いときは、そちらがもらえる）。'},
+ {n:'黄金の新品種',i:'🌟',t:'goldbig',m:'品種改良で、奇跡の新品種が誕生！ 持っている施設がすべて大規模（収入2.5倍）になる。施設がなければ、今の時代の施設を1つ大規模で無料でもらえる。'},
+ {n:'大逆転の大取引',i:'🔄',t:'swap',m:'世界とのビッグな取引！ いちばんお金を持っている人と、お金をそっくり入れかえる。'},
+ {n:'時代を切りひらく大発明',i:'💡',t:'invent',m:'歴史を変える大発明！ 班の時代が1つ進み、自分は基本収入×20を手に入れる。'}];
+const SRTXT={spin2:'ルーレットを3回回せる！',income:'すぐに基本収入×8の収入！',meter:'班の発展度が大きく（+15）アップ！',guard:'悪いできごとを防ぎ、さらに基本収入×5がもらえる！'};
+function rollRar(){const r=Math.random();return r<.05?'LR':r<.40?'SR':'R';}
+function makeCard(rar){if(rar==='LR')return{...pick(LEGEND),era:G.era,rar};const c=pick(cardsUpTo());return{...c,rar,m:rar==='SR'?c.m.replace(/次のルーレットを2回回せる。|すぐに収入が入る。|班の発展度がアップ。|悪いできごとを1回防ぐ。/,'')+'【SR】'+SRTXT[c.t]:c.m};}
+function rarTag(c){const r=RAR[c.rar||'R'];return`<span class="rtag r${c.rar||'R'}">${c.rar||'R'}</span>`;}
+function guardBonus(p,g){if(g.rar!=='SR')return'';const b=E().base*5;p.money+=b;return`（SRボーナス +${fmt(b)}）`;}
 function cardsUpTo(){const L=[];ERAS.forEach((e,ei)=>{if(ei<=G.era)e.cards.forEach(c=>{for(let k=0;k<(ei===G.era?4:1);k++)L.push({...c,era:ei});});});return L;}
 function quizPool(){const L=[];ERAS.forEach((e,ei)=>{if(ei<=G.era)e.qs.forEach(q=>{for(let k=0;k<(ei===G.era?2:1);k++)L.push(q);});});return L;}
 
@@ -533,6 +572,7 @@ function renderSetup(){
   <li>🗳️ 2年ごとに<b>村の会議</b>。全員で多数決をして、村の進め方を決めます。</li>
   <li>🤝 ちがう種類の施設を組み合わせると<b>収入アップ</b>（農地＋畜産＝循環型農業）。🔥 <b>最後の2年は収入2倍</b>！</li>
   <li>📈 施設を買ったりクイズに正解したりすると<b>班の「発展度」</b>が上がり、<b>時代が進みます</b>。</li>
+  <li>🃏 <b>技術カードはガチャ</b>で入手！ シルバー＝レア、ゴールド＝スーパーレア、レインボー＝レジェンドレア（一発逆転のすごい効果！）</li>
   <li>😊いいこと　😣ピンチ　❓生物育成クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）。キャラクターは、<b>すれちがった人にうつります</b>。</li>
   <li>決めた年数が終わったら表彰式。個人の総資産の順位と、<b>班の得点（どの時代まで発展できたか）</b>を確かめよう。</li></ul></div>`;
  app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{setup.n=+b.dataset.n;renderSetup();});
@@ -542,9 +582,9 @@ function renderSetup(){
 
 /* ===== ゲーム ===== */
 async function startGame(){
- G={P:setup.pl.slice(0,setup.n).map((p,i)=>({name:p.name||`プレイヤー${i+1}`,color:COLORS[i],node:0,money:START,props:[],cards:[],mates:0,spin2:false,laps:0})),
+ G={P:setup.pl.slice(0,setup.n).map((p,i)=>({name:p.name||`プレイヤー${i+1}`,color:COLORS[i],node:0,money:START,props:[],cards:[],mates:0,spinN:0,laps:0})),
   cur:0,era:0,dev:0,shield:0,devMax:setup.n*setup.years*2.3,chars:[],busy:false,year:1,years:setup.years,ended:false};
- G.P.forEach(p=>p.cards.push(pick(ERAS[0].cards)));
+ G.P.forEach(p=>p.cards.push({...pick(ERAS[0].cards),era:0,rar:'R'}));
  applyEra();renderGame();
  await eraModal(true);await turnStart();}
 function applyEra(){const e=E(),r=document.documentElement.style;r.setProperty('--ground',e.ground);r.setProperty('--ground2',e.ground2);r.setProperty('--sky1',e.sky1);r.setProperty('--sky2',e.sky2);}
@@ -580,8 +620,8 @@ function renderHud(){if(!$('hud'))return;const pct=devPct(),e=E();
 function renderSide(newCard){const p=CP(),e=E();
  $('side').innerHTML=`<div class="turn" style="border-color:${p.color}"><div class="tname"><span class="dot" style="background:${p.color}">${G.cur+1}</span>${e.veh} ${esc(p.name)}さんの番</div>
  <div class="money ${p.money<0?'neg':''}" id="pmoney">💰 ${fmt(p.money)}</div><div class="tsub">施設 ${p.props.map(x=>x.i+(x.big?'<sup>大</sup>':'')).join('')||'なし'} ・ 収穫祭 ${fmt(incOf(p))}${combo(p).n?`<br><b style="color:#1a8a4d">${combo(p).i} ${combo(p).n}</b>`:''}${spurt()>1?'<br><b style="color:#c0392b">🔥 ラストスパート：収入2倍</b>':''}</div>
- <div id="act">${G.busy?'':`<button id="spin">🎡 ルーレットを回す${p.spin2?'（2回）':''}</button>`}</div>
- <div class="hand"><b>🃏 技術カード（${p.cards.length}/${HAND}）</b>${p.cards.map((c,i)=>`<button class="cardc ${newCard&&i===p.cards.length-1?'new':''}" data-c="${i}"><span>${c.i}</span>${c.n}</button>`).join('')||'<div class="small">まだありません</div>'}</div></div>
+ <div id="act">${G.busy?'':`<button id="spin">🎡 ルーレットを回す${p.spinN>1?`（${p.spinN}回）`:''}</button>`}</div>
+ <div class="hand"><b>🃏 技術カード（${p.cards.length}/${HAND}）</b>${p.cards.map((c,i)=>`<button class="cardc ${newCard&&i===p.cards.length-1?'new':''} c${c.rar||'R'}" data-c="${i}"><span>${c.i}</span>${c.n} ${rarTag(c)}</button>`).join('')||'<div class="small">まだありません</div>'}</div></div>
  <div class="plist">${G.P.map((q,i)=>`<div class="pr ${i===G.cur?'now':''}"><span class="dot" style="background:${q.color}">${i+1}</span><span class="pn">${esc(q.name)}</span><span class="pm ${q.money<0?'neg':''}">${fmt(q.money)}</span><span>🏗️${q.props.length} 👤${q.mates}</span><span>${G.chars.filter(c=>c.h===i).map(c=>CHARS[c.k].i).join('')}</span></div>`).join('')}</div>
  <div class="eracard">${e.i} <b>${e.n}の生物育成</b><br>${e.sum}</div>
  <div style="text-align:right;margin-top:8px"><button class="sub" id="endg" style="font-size:.8rem;padding:4px 12px">⏹ ゲームを終える</button></div>`;
@@ -596,7 +636,7 @@ async function addDev(v,why){G.dev=Math.max(0,G.dev+v);renderHud();
 async function eraUp(why){const e=E();sfx('era');
  const w=document.createElement('div');w.className='warp';document.body.appendChild(w);setTimeout(()=>w.remove(),1700);
  await sleep(RM?50:700);applyEra();setDeco(true);renderPawns();renderHud();renderSide();fireworks(5);confetti(60);
- G.P.forEach(p=>{const c=pick(e.cards);if(p.cards.length<HAND)p.cards.push({...c,era:G.era});});
+ G.P.forEach(p=>{const c=pick(e.cards);if(p.cards.length<HAND)p.cards.push({...c,era:G.era,rar:'R'});});
  await eraModal(false,why);renderSide();}
 async function eraModal(first,why){const e=E();
  await modal({cls:'era',raw:`<div class="eratop" style="--ec1:${e.c1};--ec2:${e.c2}"><div class="ei">${e.i}</div><small>${first?'ここから物語が始まる…':'時代が進んだ！'}</small><h2>${e.n}</h2><small>${e.y}</small></div>
@@ -604,26 +644,48 @@ async function eraModal(first,why){const e=E();
   ${first?'<p class="small">施設を買ったりクイズに正解したりして「発展度」を上げると、次の時代へ進みます。</p>':`<p class="okc">全員に「${e.n}」の技術カードを配りました！ 収穫祭の収入もアップ！ 施設マスで新しい施設が買えます。</p>`}</div>`,buttons:[{label:first?'⏳ 出発！':'この時代を生きよう！ ▶',v:1}]});}
 
 /* ===== カード ===== */
-async function useCard(i){if(G.busy)return;const p=CP(),c=p.cards[i];
+async function useCard(i){if(G.busy)return;const p=CP(),c=p.cards[i];if(!c)return;const sr=c.rar==='SR';
  const ch=G.chars.find(x=>x.h===G.cur);const can=c.t!=='guard'||!!ch;
- const v=await modal({icon:c.i,title:`${c.n}（${ERAS[c.era].n}）`,body:`<p class="memo">${c.m}</p>${can?'':'<p class="small">守りのカードは、ピンチや災害、キャラクターのときに使えます（災害のニュースでは自動で使われます）。</p>'}`,buttons:can?[{label:'使う',v:1},{label:'やめる',v:0,cls:'sub'}]:[{label:'とじる',v:0,cls:'sub'}]});
- if(!v)return;p.cards.splice(i,1);
- if(c.t==='spin2'){p.spin2=true;sfx('card');await banner(`${c.i} ルーレット2回！`,'',p.color,1100);}
- else if(c.t==='income'){const g=E().base*3;p.money+=g;sfx('coin');renderSide();floatMoney(g);await modal({icon:c.i,cls:'good',title:`${c.n}で +${fmt(g)}`,body:c.m,buttons:[OK]});}
- else if(c.t==='meter'){sfx('good');particles({kind:'burst',e:[c.i,'✨'],n:14,d:1.2,fs:30});await modal({icon:c.i,cls:'good',title:`${c.n}で班の発展度アップ！`,body:c.m,buttons:[OK]});await addDev(6,`${esc(p.name)}さんの「${c.n}」で技術が進んだ！`);}
+ const v=await modal({icon:c.i,title:`${c.n}`,body:`<p>${rarTag(c)} <b style="color:${RAR[c.rar||'R'].col}">${RAR[c.rar||'R'].n}</b>${c.rar!=='LR'?`（${ERAS[c.era].n}の技術）`:''}</p><p class="memo">${c.m}</p>${can?'':'<p class="small">守りのカードは、ピンチや災害、キャラクターのときに使えます（災害のニュースでは自動で使われます）。</p>'}`,buttons:can?[{label:'使う',v:1},{label:'やめる',v:0,cls:'sub'}]:[{label:'とじる',v:0,cls:'sub'}]});
+ if(!v)return;p.cards.splice(i,1);const e=E();
+ if(c.t==='spin2'){p.spinN=sr?3:2;sfx('card');await banner(`${c.i} ルーレット${p.spinN}回！`,'',p.color,1100);}
+ else if(c.t==='income'){const g=e.base*(sr?8:3);p.money+=g;sfx('coin');renderSide();floatMoney(g);await modal({icon:c.i,cls:'good',title:`${c.n}で +${fmt(g)}`,body:c.m,buttons:[OK]});}
+ else if(c.t==='meter'){sfx('good');particles({kind:'burst',e:[c.i,'✨'],n:14,d:1.2,fs:30});await modal({icon:c.i,cls:'good',title:`${c.n}で班の発展度アップ！`,body:c.m,buttons:[OK]});await addDev(sr?15:6,`${esc(p.name)}さんの「${c.n}」で技術が進んだ！`);}
  else if(c.t==='guard'&&ch)await repelChar(ch,c);
+ else if(c.rar==='LR'){await legendFx(c);let msg='';
+  if(c.t==='double'){const before=p.money;p.money=Math.max(p.money*2,p.money+e.base*20);msg=`お金 ${fmt(before)} → <b class="okc">${fmt(p.money)}</b>`;}
+  else if(c.t==='goldbig'){if(p.props.length){p.props.forEach(x=>{if(!x.big){x.big=true;x.inc=Math.round(x.inc*BIG.inc);x.price*=BIG.price;}});msg=`施設 ${p.props.map(x=>x.i).join('')} がすべて大規模に！`;}
+   else{const x=pick(e.props);p.props.push({...x,era:G.era,big:true,price:x.price*BIG.price,inc:Math.round(x.inc*BIG.inc)});msg=`「${x.n}」を大規模で手に入れた！`;}}
+  else if(c.t==='swap'){const rich=G.P.filter(q=>q!==p).sort((a,b)=>b.money-a.money)[0];if(rich&&rich.money>p.money){const m=p.money;p.money=rich.money;rich.money=m;msg=`${esc(rich.name)}さんとお金を入れかえた！<br>${esc(p.name)}さん：<b class="okc">${fmt(p.money)}</b> ／ ${esc(rich.name)}さん：${fmt(rich.money)}`;}else{const g=e.base*20;p.money+=g;msg=`すでにいちばんのお金持ち！ かわりに +${fmt(g)}`;}}
+  else if(c.t==='invent'){const g=e.base*20;p.money+=g;msg=`+${fmt(g)}！ 班の時代が1つ進む！`;}
+  renderSide();renderPawns();
+  await modal({icon:c.i,cls:'gold',title:`🌈 ${c.n} 発動！`,body:`<p style="font-size:1.15rem">${msg}</p><p class="memo">${c.m}</p>`,buttons:[{label:'すごすぎる…！ ▶',v:1}]});
+  if(c.t==='invent'&&G.era<6){G.dev=Math.max(G.dev,Math.ceil(ETH[G.era+1]*G.devMax/100));await addDev(0,`${esc(p.name)}さんの大発明で、時代が進んだ！`);}}
  renderSide();}
-async function getCard(p,title,icon){const c=pick(cardsUpTo());sfx('card');
- const big=`<div class="bigcard"><div class="in"><div class="bk">🃏</div><div class="fr"><div class="ct">${ERAS[c.era].n}の技術</div><div class="ci">${c.i}</div><div class="cn">${c.n}</div></div></div></div><p class="memo">${c.m}</p>`;
- if(p.cards.length<HAND){await modal({icon,title,body:big,buttons:[{label:'手札に加える ▶',v:1}]});p.cards.push(c);renderSide(true);return;}
- const all=[...p.cards,c];const v=await modal({icon,title,body:`${big}カードは${HAND}枚までです。<b>1枚すてる</b>カードを選ぼう。`,buttons:all.map((x,i)=>({label:`${x.i} ${x.n}をすてる${i===all.length-1?'（新しいカード）':''}`,v:i,cls:'sub'}))});
+async function legendFx(c){sfx('era');const w=document.createElement('div');w.className='warp rb';document.body.appendChild(w);setTimeout(()=>w.remove(),1700);fireworks(6);confetti(120);particles({kind:'burst',e:['🌈','✨','💎',c.i],n:30,d:1.6,fs:36});await sleep(RM?50:900);}
+async function gacha(rar){return new Promise(res=>{const ov=$('modal'),R=RAR[rar];
+ $('mwrap').innerHTML=`<div class="mbox gacha-box"><h2>🎰 技術カードガチャ！</h2><div class="gm"><div class="gm-dome"><i style="--x:20%;--y:55%;--c:#c9d1d9"></i><i style="--x:45%;--y:65%;--c:#ffd34d"></i><i style="--x:68%;--y:52%;--c:#c9d1d9"></i><i style="--x:33%;--y:35%;--c:#ff8ad8"></i><i style="--x:58%;--y:30%;--c:#c9d1d9"></i><i style="--x:75%;--y:70%;--c:#ffd34d"></i></div><div class="gm-body"><div class="gm-handle" id="gh">✚</div><div class="gm-out"></div></div><div class="cap" id="cap"><div class="ct2"></div><div class="cb2"></div></div></div>
+ <p class="small">シルバー＝レア（60%）／ゴールド＝スーパーレア（35%）／レインボー＝レジェンドレア（5%）</p><div class="mbtns"><button id="gturn" class="big">ハンドルを回す！</button></div></div>`;
+ ov.classList.remove('hidden');
+ $('gturn').onclick=async()=>{$('gturn').disabled=true;sfx('tick');$('gh').classList.add('turn');await sleep(RM?50:900);
+  const cap=$('cap');cap.classList.add('drop','c-'+R.cap);sfx('hop');await sleep(RM?50:1000);
+  cap.classList.add('shake');if(rar!=='R'){sfx('card');}await sleep(RM?50:rar==='LR'?1800:1100);
+  if(rar==='LR'){tint('rgba(255,255,255,.95)',600);legendFx({i:'🌈'});}else if(rar==='SR'){particles({kind:'burst',e:['✨','⭐'],n:18,d:1.2,fs:30});sfx('fan');}else sfx('good');
+  cap.classList.add('open');await sleep(RM?50:700);ov.classList.add('hidden');res();};});}
+async function getCard(p,title,icon){const rar=rollRar(),c=makeCard(rar);
+ await gacha(rar);const R=RAR[rar];
+ const big=`<div class="bigcard r${rar}"><div class="in"><div class="bk">🃏</div><div class="fr"><div class="ct" style="color:${R.col}">${R.st} ${R.n} ${R.st}</div><div class="ci">${c.i}</div><div class="cn">${c.n}</div><div class="ct">${rar==='LR'?'伝説の技術':ERAS[c.era].n+'の技術'}</div></div></div></div><p class="memo">${c.m}</p>`;
+ title=rar==='LR'?'🌈 レジェンドレア！！！':rar==='SR'?'✨ スーパーレア！':'レアカードを手に入れた！';
+ if(p.cards.length<HAND){await modal({cls:rar==='LR'?'gold':'',title,body:big,buttons:[{label:'手札に加える ▶',v:1}]});p.cards.push(c);renderSide(true);return;}
+ const all=[...p.cards,c];const v=await modal({title,body:`${big}カードは${HAND}枚までです。<b>1枚すてる</b>カードを選ぼう。`,buttons:all.map((x,i)=>({label:`${x.i} ${x.n}（${x.rar||'R'}）をすてる${i===all.length-1?'（新しいカード）':''}`,v:i,cls:'sub'}))});
  all.splice(v,1);p.cards=all;renderSide();}
+
 
 /* ===== ターン ===== */
 async function turnStart(){const p=CP();G.busy=false;focus(p.node);renderPawns();renderSide();renderHud();
  await banner(`${E().veh} ${esc(p.name)}さんの番！`,`💰 ${fmt(p.money)} ・ ${G.year}年目`,p.color,1200);}
 async function spin(){if(G.busy)return;G.busy=true;renderSide();const p=CP();
- let n=await spinWheel();if(p.spin2){p.spin2=false;const n2=await spinWheel();n+=n2;await banner(`合計 ${n}マス！`,'',p.color,900);}
+ let n=await spinWheel();if(p.spinN>1){const k=p.spinN;p.spinN=0;for(let j=1;j<k;j++)n+=await spinWheel();await banner(`合計 ${n}マス！`,'',p.color,900);}
  await move(p,n);
  $('nd'+p.node).classList.add('lit');await sleep(250);await land(p,NODES[p.node]);$('nd'+p.node).classList.remove('lit');await charTurn(p);
  await endTurn();}
@@ -655,7 +717,7 @@ async function good(p){const e=E(),ev=pick(e.good);p.money+=ev.v;if(ev.mate)p.ma
 async function bad(p){const e=E(),ev=pick(e.bad);let d=ev.v;await eventFx(ev.fx);
  const gi=p.cards.findIndex(c=>c.t==='guard');let note='';
  if(gi>=0){const g=p.cards[gi];const v=await modal({icon:'😣',cls:'warn',title:ev.t,body:`このままだと <b class="ng">−${fmt(d)}</b><br>${g.i} ${g.n}で防げます！ 使いますか？`,buttons:[{label:`${g.i} ${g.n}を使う`,v:1},{label:'使わない',v:0,cls:'sub'}]});
-  if(v){p.cards.splice(gi,1);d=0;note=`${g.i} ${g.n}で防いだ！`;sfx('good');particles({kind:'burst',e:['🛡️','✨'],n:14,d:1,fs:30});}}
+  if(v){p.cards.splice(gi,1);d=0;note=`${g.i} ${g.n}で防いだ！${guardBonus(p,g)}`;sfx('good');particles({kind:'burst',e:['🛡️','✨'],n:14,d:1,fs:30});}}
  p.money-=d;renderSide();if(d)floatMoney(-d);
  await modal({icon:'😣',cls:'warn',title:ev.t,body:`${note?`<b class="okc">${note}</b><br>`:''}${d?`<b class="ng" style="font-size:1.3rem">−${fmt(d)}</b>`:'<b class="okc">損害なし！</b>'}<p class="small">${e.i} ${e.n}のできごと</p>`,buttons:[OK]});}
 async function quizSq(p){const ok=await askQ(pick(quizPool()),`<b>❓ 生物育成クイズ</b> 正解で +${fmt(E().base*2)}<br>`);
@@ -695,7 +757,7 @@ async function yearNews(){const e=E(),goodNews=Math.random()<.5;
   return{p,hit,amt,note:''};});
  const any=rows.some(r=>r.amt>0);
  if(!any)rows.forEach(r=>{r.amt=goodNews?e.base:Math.round(e.base*.5);r.note=goodNews?'地域全体が少しうるおった':'地域全体の暮らしに影響';});
- if(!goodNews)rows.forEach(r=>{const gi=r.p.cards.findIndex(c=>c.t==='guard');if(r.amt>=e.base&&gi>=0){const g=r.p.cards.splice(gi,1)[0];r.note=`${g.i}${g.n}で守った！`;r.amt=0;}});
+ if(!goodNews)rows.forEach(r=>{const gi=r.p.cards.findIndex(c=>c.t==='guard');if(r.amt>=e.base&&gi>=0){const g=r.p.cards.splice(gi,1)[0];r.note=`${g.i}${g.n}で守った！${guardBonus(r.p,g)}`;r.amt=0;}});
  let sh='';if(!goodNews&&G.shield>0){G.shield--;rows.forEach(r=>r.amt=Math.round(r.amt/2));sh='🛡️ 村のみんなで備えていたので、被害が半分になった！';}
  rows.forEach(r=>r.p.money+=goodNews?r.amt:-r.amt);
  if(goodNews){sfx('fan');tint('rgba(80,220,140,.25)',1400);particles({kind:'fall',e:[ev.i,'✨','💰'],n:24,d:2.2,fs:30});}else await eventFx(ev.fx);
@@ -747,8 +809,8 @@ async function charSq(p){const ks=Object.keys(CHARS).filter(k=>CHARS[k].from<=G.
  G.chars.push({k,h:G.cur,left:3});
  await modal({cls:'dark',title:`${C.n} が あらわれた！`,body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>${esc(p.name)}さんに とりついた！<p class="memo">${C.m}<br>追い払うには：守りの技術カード。ほかの人とすれちがうと、その人にうつる！</p>`,buttons:[{label:'負けないぞ！ ▶',v:1}]});
  renderPawns();renderHud();renderSide();}
-async function repelChar(ch,card){const C=CHARS[ch.k];G.chars=G.chars.filter(c=>c!==ch);sfx('good');particles({kind:'burst',e:['✨','💥',card.i],n:18,d:1.2,fs:32});
- await modal({cls:'good',title:`${C.n}を 追い払った！`,body:`<div class="charfly">${C.i}</div><br>${card.i} <b>${card.n}</b>の技術で撃退！<p class="memo">${C.m}</p>`,buttons:[{label:'やったー！ ▶',v:1}]});
+async function repelChar(ch,card){const C=CHARS[ch.k],gb=guardBonus(CP(),card);G.chars=G.chars.filter(c=>c!==ch);sfx('good');particles({kind:'burst',e:['✨','💥',card.i],n:18,d:1.2,fs:32});
+ await modal({cls:'good',title:`${C.n}を 追い払った！`,body:`<div class="charfly">${C.i}</div><br>${card.i} <b>${card.n}</b>の技術で撃退！${gb}<p class="memo">${C.m}</p>`,buttons:[{label:'やったー！ ▶',v:1}]});
  await addDev(3);renderPawns();renderHud();}
 async function charTurn(p){const od=G.chars.find(c=>c.k==='ondanka');
  if(od){od.left-=1/G.P.length;await addDev(-1);if(od.left<=0){G.chars=G.chars.filter(c=>c!==od);await banner('🌡️ オンダンカ神様は去っていった','','#6a4a8a',1200);}renderHud();}
