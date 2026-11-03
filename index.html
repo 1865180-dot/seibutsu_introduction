@@ -117,18 +117,18 @@ ul.rules li{margin-bottom:3px}
 .mbox{background:#fff;border-radius:22px;padding:18px 22px;max-width:640px;width:100%;max-height:94vh;overflow:auto;text-align:center;border:5px solid #9cc8ef;box-shadow:0 12px 40px rgba(0,0,0,.3);animation:zoomin .35s cubic-bezier(.2,.9,.3,1.3) both}
 .mbox.warn{border-color:#f08a3a}.mbox.good{border-color:#4cc38a}.mbox.quiz{border-color:#9b78d6}.mbox.gold{border-color:#f0c64a;background:linear-gradient(180deg,#fffbea,#fff)}
 .mbox.dark{background:radial-gradient(circle at 50% 0,#3b2c4a,#140f1c);color:#eee;border-color:#6a4a8a}
-.mbox.era{max-width:720px;border:none;padding:0;background:#f7ecd2;overflow:hidden}
-.eratop{padding:18px;color:#fff;background:linear-gradient(135deg,var(--ec1),var(--ec2))}
-.eratop .ei{font-size:70px;line-height:1.1;animation:starpop .7s both}.eratop h2{font-size:2rem;margin:4px 0;letter-spacing:.1em}.eratop small{font-size:1rem;opacity:.95}
-.erabody{padding:14px 22px 18px;text-align:left;background:repeating-linear-gradient(0deg,#f7ecd2 0 28px,#f2e3c2 28px 29px)}
+.mbox.era{max-width:720px;border:none;padding:0;background:#f7ecd2;overflow:auto;max-height:92vh}
+.eratop{padding:10px 18px;color:#fff;background:linear-gradient(135deg,var(--ec1),var(--ec2))}
+.eratop .ei{font-size:52px;line-height:1.1;animation:starpop .7s both}.eratop h2{font-size:1.7rem;margin:0;letter-spacing:.1em}.eratop small{font-size:1rem;opacity:.95}
+.erabody{padding:8px 22px 6px;text-align:left;background:repeating-linear-gradient(0deg,#f7ecd2 0 28px,#f2e3c2 28px 29px)}
 .erabody li{margin-bottom:4px}
 .micon{font-size:60px;line-height:1.2;animation:starpop .5s both}
 .mbox h2{font-size:1.35rem;margin:4px 0 8px}
 .mbody{font-size:1.02rem}
 .memo{font-size:.9rem;color:var(--sub);background:#f4f7f9;border-radius:10px;padding:8px 12px;text-align:left;margin:10px 0 0}
 .mbox.dark .memo{background:rgba(255,255,255,.08);color:#ddd}
-.mbtns{display:flex;flex-direction:column;gap:9px;margin-top:14px}
-.mbox.era .mbtns{padding:0 22px 18px;margin:0;background:#f7ecd2}
+.mbtns{display:flex;flex-direction:column;gap:9px;margin-top:14px;position:sticky;bottom:-18px;background:inherit;padding:8px 0 4px}
+.mbox.era .mbtns{padding:10px 22px 14px;margin:0;background:#f7ecd2;position:sticky;bottom:0;box-shadow:0 -6px 12px rgba(247,236,210,.9)}
 .mbtns button{width:100%}
 .mbtns.choices button{background:#fff;color:var(--ink);border:3px solid #b79ee0;box-shadow:0 4px 0 #d9ccf0;text-align:left}
 .ng{color:var(--bad);font-weight:800}.okc{color:#1a8a4d;font-weight:800}
@@ -226,8 +226,6 @@ sup{font-size:.6em;color:#c0392b;font-weight:800}
 <div id="modal" class="ov hidden"><div id="mwrap"></div></div>
 <footer>いのちの1万年すごろく ／ 生物育成の技術 ／ © Irie Kanji</footer>
 <script>
-/* ===== 設定（先生用）：提出先のApps ScriptのURL ===== */
-const GAS_URL='https://script.google.com/a/macros/fuku-c.ed.jp/s/AKfycbz1UhknPTwIbp4X1SKVapY20HcQvc-wqbvM9AIvK74_iN1PgoVwjJ_uuVfBCLwdLgKkLQ/exec';
 
 /* ===== 時代のデータ ===== */
 const ERAS=[
@@ -527,8 +525,8 @@ function renderSetup(){
   <li>🎲 <b>大勝負マス</b>：安全にいくか、大きく勝負するか。ハイリスク・ハイリターン！</li>
   <li>📰 1年ごとに<b>ニュース</b>が起き、班の全員に影響します。洪水や台風は農地・漁場に被害、豊作や関税の緩和はプラスに！</li>
   <li>📈 施設を買ったりクイズに正解したりすると<b>班の「発展度」</b>が上がり、<b>時代が進みます</b>。</li>
-  <li>😊いいこと　😣ピンチ　❓生物育成クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）</li>
-  <li>決めた年数が終わったら表彰式。個人の総資産と、<b>班の得点（どの時代まで発展できたか）</b>で競います。</li></ul></div>`;
+  <li>😊いいこと　😣ピンチ　❓生物育成クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）。キャラクターは、<b>すれちがった人にうつります</b>。</li>
+  <li>決めた年数が終わったら表彰式。個人の総資産の順位と、<b>班の得点（どの時代まで発展できたか）</b>を確かめよう。</li></ul></div>`;
  app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{setup.n=+b.dataset.n;renderSetup();});
  app.querySelectorAll('[data-y]').forEach(b=>b.onclick=()=>{setup.years=+b.dataset.y;renderSetup();});
  app.querySelectorAll('input[data-i]').forEach(el=>el.oninput=()=>{setup.pl[+el.dataset.i].name=el.value.trim();});
@@ -621,12 +619,16 @@ async function spin(){if(G.busy)return;G.busy=true;renderSide();const p=CP();
  await move(p,n);
  $('nd'+p.node).classList.add('lit');await sleep(250);await land(p,NODES[p.node]);$('nd'+p.node).classList.remove('lit');await charTurn(p);
  await endTurn();}
-async function move(p,steps){let moved=false;
+async function move(p,steps){const done=new Set();
  for(let s=steps;s>0;s--){const nx=(p.node+1)%NN;
   p.node=nx;focus(nx);renderPawns(G.cur);sfx('hop');await sleep(RM?60:280);
   if(nx===0){p.laps++;if(s>1)await harvest(p,true);}
-  const ch=G.chars.find(c=>c.h===G.cur);const other=G.P.findIndex((q,i)=>i!==G.cur&&q.node===nx);
-  if(ch&&other>=0&&!moved){moved=true;ch.h=other;renderPawns();renderHud();sfx('boss');await banner(`${CHARS[ch.k].i} ${CHARS[ch.k].n}が ${esc(G.P[other].name)}さんに うつった！`,'追いこすと、キャラクターがうつります',G.P[other].color,1400);renderSide();}}}
+  for(const oi of G.P.map((q,i)=>i).filter(i=>i!==G.cur&&G.P[i].node===nx)){
+   const mine=G.chars.filter(c=>c.h===G.cur&&!done.has(c)),theirs=G.chars.filter(c=>c.h===oi&&!done.has(c));
+   for(const c of mine){c.h=oi;done.add(c);await swapFx(c,oi);}
+   for(const c of theirs){c.h=G.cur;done.add(c);await swapFx(c,G.cur);}}}}
+async function swapFx(c,to){renderPawns(G.cur);renderHud();renderSide();sfx('boss');particles({kind:'burst',e:[CHARS[c.k].i,'💨'],n:10,d:1,fs:30});
+ await banner(`${CHARS[c.k].i} ${CHARS[c.k].n}が ${esc(G.P[to].name)}さんに うつった！`,'すれちがうと、キャラクターがうつります',G.P[to].color,1400);}
 
 /* ===== マスの出来事 ===== */
 async function land(p,nd){const t=nd.t;
@@ -703,7 +705,7 @@ async function charSq(p){const ks=Object.keys(CHARS).filter(k=>CHARS[k].from<=G.
   await modal({cls:'dark',title:'オンダンカ神様 が あらわれた！',body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>いる間は、だれかの番が来るたびに<b>班の発展度</b>が下がってしまう！<p class="memo">${C.m}</p>`,buttons:[{label:'みんなで立ち向かおう！ ▶',v:1}]});
   renderHud();return ondankaChallenge();}
  G.chars.push({k,h:G.cur,left:3});
- await modal({cls:'dark',title:`${C.n} が あらわれた！`,body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>${esc(p.name)}さんに とりついた！<p class="memo">${C.m}<br>追い払うには：守りの技術カード。ほかの人を追いこすと、うつることも。</p>`,buttons:[{label:'負けないぞ！ ▶',v:1}]});
+ await modal({cls:'dark',title:`${C.n} が あらわれた！`,body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>${esc(p.name)}さんに とりついた！<p class="memo">${C.m}<br>追い払うには：守りの技術カード。ほかの人とすれちがうと、その人にうつる！</p>`,buttons:[{label:'負けないぞ！ ▶',v:1}]});
  renderPawns();renderHud();renderSide();}
 async function repelChar(ch,card){const C=CHARS[ch.k];G.chars=G.chars.filter(c=>c!==ch);sfx('good');particles({kind:'burst',e:['✨','💥',card.i],n:18,d:1.2,fs:32});
  await modal({cls:'good',title:`${C.n}を 追い払った！`,body:`<div class="charfly">${C.i}</div><br>${card.i} <b>${card.n}</b>の技術で撃退！<p class="memo">${C.m}</p>`,buttons:[{label:'やったー！ ▶',v:1}]});
@@ -737,9 +739,7 @@ async function endTurn(){G.busy=false;if(G.ended)return;
  await turnStart();}
 
 /* ===== 結果 ===== */
-function postForm(url,data){const f=document.createElement('form');f.method='POST';f.action=url;f.target='_blank';f.acceptCharset='UTF-8';f.style.display='none';const i=document.createElement('input');i.type='hidden';i.name='payload';i.value=JSON.stringify(data);f.appendChild(i);document.body.appendChild(f);f.submit();setTimeout(()=>f.remove(),1500);}
 function finish(){G.ended=true;const ranked=[...G.P].sort((a,b)=>assets(b)-assets(a)),avg=Math.round(G.P.reduce((a,p)=>a+assets(p),0)/G.P.length),bonus=G.era*1500+(G.era>=6?3000:0),score=avg+bonus,props=G.P.reduce((a,p)=>a+p.props.length,0);
- const opt=(n,v)=>`<option value="">選択</option>`+Array.from({length:n},(_,i)=>`<option ${String(i+1)===String(v)?'selected':''}>${i+1}</option>`).join('');
  app.innerHTML=`<div class="card hero"><div class="trophy">🏆</div><h2>表彰式</h2><p>${G.year}年間で たどり着いた時代：<b>${E().i} ${E().n}</b></p>
  <div class="etl">${ERAS.map((e,i)=>`<span style="${i<=G.era?'background:#ffe48a':''}">${e.i} ${e.n}</span>`).join('')}</div></div>
  <div class="card"><h2>👑 個人の順位（総資産＝お金＋施設の価値＋仲間）</h2><table><tr><th>順位</th><th>名前</th><th>総資産</th><th>お金</th><th>施設</th><th>仲間</th></tr>
@@ -747,16 +747,10 @@ function finish(){G.ended=true;const ranked=[...G.P].sort((a,b)=>assets(b)-asset
  <div class="card" style="text-align:center"><h2>🤝 班の得点</h2><div class="score">${fmt(score)}</div>
  <p>班員の平均資産 ${fmt(avg)} ＋ 時代ボーナス ${fmt(bonus)}（${E().n}まで発展${G.era>=6?'・現代到達ボーナス込み':''}）</p>
  <p>${G.era>=6?'🏆 <b>班の目標「令和の時代まで発展させる」を達成！</b>':`班の目標（平成・令和）まで、あと${6-G.era}つの時代でした。`}</p>
- <div class="row" style="justify-content:center;margin:8px 0"><label>組 <select id="kumi">${opt(8,setup.kumi)}</select></label><label>班 <select id="han">${opt(10,setup.han)}</select></label></div>
- <div class="row" style="justify-content:center"><button id="send" class="big">📮 班の結果を提出する</button><button class="sub" id="rank">🏅 クラスの班ランキングを見る</button></div><p id="smsg" class="small"></p></div>
+</div>
  <div class="card"><h2>⏳ 生物育成の歩み</h2><table><tr><th>時代</th><th>生物育成のようす</th></tr>${ERAS.map((e,i)=>`<tr style="${i>G.era?'opacity:.5':''}"><td>${e.i} <b>${e.n}</b><br><span class="small">${e.y}</span></td><td>${e.sum}</td></tr>`).join('')}</table></div>
  <div class="row" style="justify-content:center;margin-bottom:20px"><button id="again" class="sub">⏳ 同じメンバーでもう一度</button><button class="sub" id="reset">設定にもどる</button></div>`;
  sfx('fan');confetti(100);fireworks(6);
- const keep=()=>{setup.kumi=$('kumi').value;setup.han=$('han').value;};
- $('send').onclick=()=>{keep();if(!setup.kumi||!setup.han){$('smsg').innerHTML='<b class="ng">組と班を選んでから提出してください。</b>';return;}
-  postForm(GAS_URL,{kind:'すごろく',kumi:setup.kumi,han:setup.han+'班',count:G.P.length,months:G.year+'年',level:E().n,avgAssets:avg,groupScore:score,props,members:ranked.map((p,i)=>`${i+1}位 ${p.name}（${fmt(assets(p))}）`).join(' ／ ')});
-  $('send').disabled=true;$('smsg').textContent='新しいタブで「✅ 提出できました」と出たら完了です。ログイン画面が出たら、学校のアカウントでログインしてからもう一度押してください。';setTimeout(()=>$('send').disabled=false,4000);};
- $('rank').onclick=()=>{keep();window.open(`${GAS_URL}?page=ranking&kumi=${encodeURIComponent(setup.kumi)}`,'_blank');};
  $('again').onclick=startGame;$('reset').onclick=renderSetup;window.scrollTo(0,0);}
 
 renderSetup();
