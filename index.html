@@ -166,6 +166,11 @@ ul.rules li{margin-bottom:3px}
 .confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:60;pointer-events:none;animation:fallc linear forwards;border-radius:2px}
 table{border-collapse:collapse;width:100%;font-size:.95rem}
 th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}th{background:#eef5f1}
+.rf{border:4px solid;border-radius:16px;padding:10px 14px;margin:12px 0;background:#fff}
+.rfh{display:flex;align-items:center;gap:8px;font-size:1.05rem;margin-bottom:6px}.rfok{margin-left:auto;color:#1a8a4d;font-weight:800}
+.rf input{font:inherit;padding:7px;border:2px solid #cbd6dc;border-radius:10px;width:220px}
+.rfq{margin-top:8px;font-size:.95rem}.rfq textarea{display:block;width:100%;font:inherit;padding:8px;border:2px solid #cbd6dc;border-radius:10px;margin-top:4px;resize:vertical}
+.cnt{text-align:right;font-size:.82rem;font-weight:700}
 .qcard{border:4px solid #f0c64a;background:linear-gradient(180deg,#fffbea,#fff)}
 .qcard li{margin-bottom:6px;font-size:1.03rem}
 .score{font-size:2.2rem;font-weight:800;color:#1f7a4d}
@@ -425,10 +430,9 @@ function renderSetup(){
  app.innerHTML=`<div class="card hero"><div class="icons">${ERAS.map(e=>`<span>${e.i}</span>`).join('')}</div><h2>いのちの1万年すごろく</h2>
  <p>縄文時代のムラから出発！ 生き物を育てて暮らしながら、<b>班みんなで第1次産業を発展させ、令和の時代をめざそう！</b></p>
  <div class="etl">${ERAS.map(e=>`<span>${e.i} ${e.n}</span>`).join('<span>→</span>')}</div></div>
- <div class="card"><h2>① 組と班</h2><div class="row"><label>組 <select id="kumi">${opt(8,setup.kumi)}</select></label><label>班 <select id="han">${opt(10,setup.han)}</select></label></div></div>
- <div class="card"><h2>② 人数と名前</h2><div class="row" style="margin-bottom:8px">${[2,3,4,5,6,7].map(n=>`<button class="nbtn ${n===setup.n?'sel':''}" data-n="${n}">${n}人</button>`).join('')}</div>
+ <div class="card"><h2>① 人数と名前</h2><div class="row" style="margin-bottom:8px">${[2,3,4,5,6,7].map(n=>`<button class="nbtn ${n===setup.n?'sel':''}" data-n="${n}">${n}人</button>`).join('')}</div>
  ${setup.pl.slice(0,setup.n).map((p,i)=>`<div class="prow"><span class="dot" style="background:${COLORS[i]}">${i+1}</span><input data-i="${i}" value="${esc(p.name)}" placeholder="プレイヤー${i+1}" maxlength="10"></div>`).join('')}</div>
- <div class="card"><h2>③ コース</h2><div class="row">${[['normal','ノーマル（約50マス・約30分）'],['short','ショート（約30マス・約15分）']].map(([k,l])=>`<button class="nbtn ${k===setup.course?'sel':''}" data-co="${k}">${l}</button>`).join('')}</div>
+ <div class="card"><h2>② コース</h2><div class="row">${[['normal','ノーマル（約50マス・約30分）'],['short','ショート（約30マス・約15分）']].map(([k,l])=>`<button class="nbtn ${k===setup.course?'sel':''}" data-co="${k}">${l}</button>`).join('')}</div>
  <div style="margin-top:14px"><button id="start" class="big">⏳ 縄文時代へ出発！</button></div></div>
  <div class="card"><h2>📖 ルール</h2><ul class="rules">
   <li>🎡 順番に<b>ルーレット（1〜10）</b>を回して、1本道を進みます。分かれ道では「近道」か「遠回り」かを選びます。</li>
@@ -436,12 +440,12 @@ function renderSetup(){
   <li>📈 施設を買ったりクイズに正解したりすると、<b>班の「発展度」</b>が上がり、<b>時代が進みます</b>。時代が進むと、技術が発達して収入もふえます。</li>
   <li>🌾 <b>収穫日マス</b>を通ると、時代の基本収入＋持っている施設の収入が入ります。</li>
   <li>😊いいこと　😣ピンチ　❓クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）</li>
-  <li>全員がゴールしたら表彰式。個人の総資産と、<b>班の得点（どの時代まで発展できたか）</b>でクラスで競います。</li></ul></div>`;
- const keep=()=>{setup.kumi=$('kumi').value;setup.han=$('han').value;};
+  <li>全員がゴールしたら表彰式。最後に<b>一人ずつ、組・番号・名前とふりかえりを入力して提出</b>します。個人の総資産と、<b>班の得点（どの時代まで発展できたか）</b>でクラスで競います。</li></ul></div>`;
+ const keep=()=>{};
  app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{keep();setup.n=+b.dataset.n;renderSetup();});
  app.querySelectorAll('[data-co]').forEach(b=>b.onclick=()=>{keep();setup.course=b.dataset.co;renderSetup();});
  app.querySelectorAll('input[data-i]').forEach(el=>el.oninput=()=>{setup.pl[+el.dataset.i].name=el.value.trim();});
- $('start').onclick=()=>{keep();if(!setup.kumi||!setup.han){alert('組と班を選んでください。');return;}startGame();};window.scrollTo(0,0);}
+ $('start').onclick=()=>startGame();;window.scrollTo(0,0);}
 
 /* ===== ゲーム ===== */
 async function startGame(){const short=setup.course==='short',start=short?MAIN[SHORT_START]:MAIN[0];
@@ -626,22 +630,39 @@ async function endTurn(){G.busy=false;
 
 /* ===== 結果 ===== */
 function postForm(url,data){const f=document.createElement('form');f.method='POST';f.action=url;f.target='_blank';f.acceptCharset='UTF-8';f.style.display='none';const i=document.createElement('input');i.type='hidden';i.name='payload';i.value=JSON.stringify(data);f.appendChild(i);document.body.appendChild(f);f.submit();setTimeout(()=>f.remove(),1500);}
+const RFQ=[{k:'q1',min:30,q:'時代が進むにつれて、生物を育てる技術はどのように変わってきましたか。よくなったことと、新しく生まれた課題（環境・人手不足・温暖化など）の両方にふれて書きましょう。'},
+ {k:'q2',min:30,q:'これからの「生物育成の技術」の学習で、自分が調べたいこと・挑戦したいことは何ですか。その理由も書きましょう。'}];
 function finish(){const ranked=[...G.P].sort((a,b)=>assets(b)-assets(a)),avg=Math.round(G.P.reduce((a,p)=>a+assets(p),0)/G.P.length),bonus=G.era*1500+(G.era>=6?3000:0),score=avg+bonus,props=G.P.reduce((a,p)=>a+p.props.length,0);
- const payload={kind:'すごろく',kumi:setup.kumi,han:setup.han,count:G.P.length,months:G.short?'ショート':'ノーマル',level:E().n,avgAssets:avg,groupScore:score,props,members:ranked.map((p,i)=>`${i+1}位 ${p.name}（${fmt(assets(p))}）`).join(' ／ ')};
- app.innerHTML=`<div class="card hero"><div class="trophy">🏆</div><h2>表彰式</h2><p>${setup.kumi}組 ${setup.han}班 ・ たどり着いた時代：<b>${E().i} ${E().n}</b></p>
+ G.P.forEach(p=>{p.prank=ranked.indexOf(p)+1;p.rf=p.rf||{kumi:'',ban:'',name:/^プレイヤー\d$/.test(p.name)?'':p.name,q1:'',q2:''};});
+ const opt=(n,v)=>`<option value="">選択</option>`+Array.from({length:n},(_,i)=>`<option ${String(i+1)===String(v)?'selected':''}>${i+1}</option>`).join('');
+ app.innerHTML=`<div class="card hero"><div class="trophy">🏆</div><h2>表彰式</h2><p>たどり着いた時代：<b>${E().i} ${E().n}</b></p>
  <div class="etl">${ERAS.map((e,i)=>`<span style="${i<=G.era?'background:#ffe48a':''}">${e.i} ${e.n}</span>`).join('')}</div></div>
  <div class="card"><h2>👑 個人の順位（総資産＝お金＋施設の価値＋仲間）</h2><table><tr><th>順位</th><th>名前</th><th>総資産</th><th>お金</th><th>施設</th><th>仲間</th><th>ゴール</th></tr>
  ${ranked.map((p,i)=>`<tr><td><b>${['🥇','🥈','🥉'][i]||''} ${i+1}位</b></td><td>${esc(p.name)}</td><td><b>${fmt(assets(p))}</b></td><td>${fmt(p.money)}</td><td>${p.props.map(x=>`<span title="${esc(ERAS[x.era].n+'・'+x.n)}">${x.i}</span>`).join('')||'—'}</td><td>${p.mates}人</td><td>${p.rank}番目</td></tr>`).join('')}</table></div>
  <div class="card" style="text-align:center"><h2>🤝 班の得点</h2><div class="score">${fmt(score)}</div>
  <p>班員の平均資産 ${fmt(avg)} ＋ 時代ボーナス ${fmt(bonus)}（${E().n}まで発展${G.era>=6?'・現代到達ボーナス込み':''}）</p>
- <p>${G.era>=6?'🏆 <b>班の目標「令和の時代まで発展させる」を達成！</b>':`班の目標（平成・令和）まで、あと${6-G.era}つの時代でした。`}</p>
- <div class="row" style="justify-content:center"><button id="send" class="big">📮 班の結果を提出する</button><button class="sub" id="rank">🏅 クラスの班ランキングを見る</button></div><p id="smsg" class="small"></p></div>
+ <p>${G.era>=6?'🏆 <b>班の目標「令和の時代まで発展させる」を達成！</b>':`班の目標（平成・令和）まで、あと${6-G.era}つの時代でした。`}</p></div>
  <div class="card"><h2>⏳ 生物育成の歩み</h2><table><tr><th>時代</th><th>生物育成のようす</th></tr>${ERAS.map((e,i)=>`<tr style="${i>G.era?'opacity:.5':''}"><td>${e.i} <b>${e.n}</b><br><span class="small">${e.y}</span></td><td>${e.sum}</td></tr>`).join('')}</table></div>
- <div class="card qcard"><h2>✏️ ふりかえろう</h2><ol><li>時代が進むにつれて、生物を育てる技術はどのように変わってきた？ 特に大きく変わったと思う時代と、その理由は？</li><li>技術が発達して、よくなったことと、新しく生まれた課題（環境・人手不足・温暖化など）は何だろう？</li><li>これからの時代、生物育成の技術はどうなっていくべきだろう？ 気になったことを「問い」にして付箋に書こう。</li></ol></div>
+ <div class="card qcard"><h2>✏️ ふりかえり（一人ずつ入力しよう）</h2><p>上の「生物育成の歩み」を見ながら、<b>自分の考え</b>を書きましょう。全員が入力したら、下のボタンで班まとめて提出します。</p>
+ ${G.P.map((p,i)=>`<div class="rf" style="border-color:${p.color}"><div class="rfh"><span class="dot" style="background:${p.color}">${i+1}</span><b>${esc(p.name)}</b>さん<span class="small">（${p.prank}位）</span><span class="rfok" id="rfok${i}"></span></div>
+  <div class="row"><label>組 <select data-p="${i}" data-k="kumi">${opt(8,p.rf.kumi)}</select></label><label>番号 <select data-p="${i}" data-k="ban">${opt(40,p.rf.ban)}</select></label><label>名前 <input data-p="${i}" data-k="name" value="${esc(p.rf.name)}" placeholder="本名（フルネーム）" maxlength="20"></label></div>
+  ${RFQ.map((q,j)=>`<div class="rfq"><b>${j+1}．</b>${q.q}<textarea data-p="${i}" data-k="${q.k}" rows="3" maxlength="400" placeholder="${q.min}字以上で書こう">${esc(p.rf[q.k])}</textarea><div class="cnt" id="cnt${i}${q.k}"></div></div>`).join('')}</div>`).join('')}
+ <div style="text-align:center;margin-top:10px"><div class="row" style="justify-content:center"><button id="send" class="big">📮 班の結果とふりかえりを提出する</button><button class="sub" id="rank">🏅 クラスの班ランキングを見る</button></div><p id="smsg" class="small"></p></div></div>
  <div class="row" style="justify-content:center;margin-bottom:20px"><button id="again" class="sub">⏳ 同じメンバーでもう一度</button><button class="sub" id="reset">設定にもどる</button></div>`;
  sfx('fan');confetti(100);fireworks(6);
- $('send').onclick=()=>{postForm(GAS_URL,payload);$('send').disabled=true;$('smsg').textContent='新しいタブで「✅ 提出できました」と出たら完了です。ログイン画面が出たら、学校のアカウントでログインしてからもう一度押してください。';setTimeout(()=>$('send').disabled=false,4000);};
- $('rank').onclick=()=>window.open(`${GAS_URL}?page=ranking&kumi=${encodeURIComponent(setup.kumi)}`,'_blank');
+ const check=i=>{const r=G.P[i].rf;RFQ.forEach(q=>{const n=r[q.k].replace(/\s/g,'').length,el=$('cnt'+i+q.k);el.textContent=`${n}字${n<q.min?`（あと${q.min-n}字）`:' ✅'}`;el.style.color=n<q.min?'#c0392b':'#1a8a4d';});
+  const ok=r.kumi&&r.ban&&r.name&&RFQ.every(q=>r[q.k].replace(/\s/g,'').length>=q.min);$('rfok'+i).textContent=ok?'✅ 入力OK':'';return ok;};
+ app.querySelectorAll('[data-p]').forEach(el=>{const h=()=>{G.P[+el.dataset.p].rf[el.dataset.k]=el.value.trim();check(+el.dataset.p);};el.oninput=h;el.onchange=h;});
+ G.P.forEach((_,i)=>check(i));
+ const kumiOf=()=>{const c={};G.P.forEach(p=>{if(p.rf.kumi)c[p.rf.kumi]=(c[p.rf.kumi]||0)+1;});return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||'';};
+ $('send').onclick=()=>{const ng=G.P.map((p,i)=>check(i)?'':p.name).filter(Boolean);
+  if(ng.length){$('smsg').innerHTML=`<b class="ng">まだ入力が終わっていない人がいます：${ng.map(esc).join('、')}</b><br>組・番号・名前と、ふりかえり（各${RFQ[0].min}字以上）を入力してください。`;return;}
+  const kumi=kumiOf();
+  const payload={kind:'すごろく',kumi,han:G.P.map(p=>p.rf.name).join('・'),count:G.P.length,months:G.short?'ショート':'ノーマル',level:E().n,avgAssets:avg,groupScore:score,props,
+   members:ranked.map((p,i)=>`${i+1}位 ${p.rf.name}（${fmt(assets(p))}）`).join(' ／ '),
+   reflections:G.P.map(p=>({kumi:p.rf.kumi,ban:p.rf.ban,name:p.rf.name,player:p.name,rank:p.prank,assets:assets(p),level:E().n,q1:p.rf.q1,q2:p.rf.q2,group:G.P.map(q=>q.rf.name).join('・')}))};
+  postForm(GAS_URL,payload);$('send').disabled=true;$('smsg').textContent='新しいタブで「✅ 提出できました」と出たら完了です。ログイン画面が出たら、学校のアカウントでログインしてからもう一度押してください。';setTimeout(()=>$('send').disabled=false,4000);};
+ $('rank').onclick=()=>window.open(`${GAS_URL}?page=ranking&kumi=${encodeURIComponent(kumiOf())}`,'_blank');
  $('again').onclick=startGame;$('reset').onclick=renderSetup;window.scrollTo(0,0);}
 
 renderSetup();

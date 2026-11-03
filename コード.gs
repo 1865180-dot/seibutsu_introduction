@@ -13,7 +13,10 @@ const HEADERS = ['送信日時','種類','組','番号','氏名','題材','挑�
   'ゲームオーバーの原因','ゲームオーバーの振り返り（30〜50字）',
   '振り返り1 工夫した管理と理由','振り返り2 立場ごとの評価','振り返り3 品種についての考え','振り返り4 次の改善'];
 const SG_SHEET = '1万年すごろく';
-const SG_HEADERS = ['送信日時','組','班','人数','コース','到達した時代','平均資産（万円）','班の得点（万円）','買われた施設数','個人の結果'];
+const RF_SHEET = '1万年すごろく_ふりかえり';
+const RF_HEADERS = ['送信日時','組','番号','氏名','ゲームでの名前','到達した時代','個人順位','総資産（万円）',
+  'ふりかえり1 技術の変化（よくなったこと・課題）','ふりかえり2 これから学びたいこと','文字数（合計）','班のメンバー'];
+const SG_HEADERS = ['送信日時','組','班のメンバー','人数','コース','到達した時代','平均資産（万円）','班の得点（万円）','買われた施設数','個人の結果'];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -25,7 +28,7 @@ function doPost(e) {
     const list = Array.isArray(data) ? data : [data];
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     list.forEach(d => {
-      if (d.kind === 'すごろく') { writeSugoroku(ss, d); isSg = true; count++; return; }
+      if (d.kind === 'すごろく') { count += writeSugoroku(ss, d); isSg = true; return; }
       const sh = getSheet(ss, SHEET_NAME, HEADERS);
       const ax = d.axes || [];
       sh.appendRow([new Date(), d.kind, d.kumi, d.ban, d.name, d.sim, d.play, d.overCount,
@@ -39,7 +42,7 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
-  if (isSg) return page('✅ 班の結果を提出できました', 'このタブを閉じて、アプリにもどってください。<br>クラスの班ランキングに反映されます。');
+  if (isSg) return page('✅ 班の結果とふりかえりを提出できました', (count ? count + '人分のふりかえりを受け付けました。<br>' : '') + 'このタブを閉じて、アプリにもどってください。<br>クラスの班ランキングに反映されます。');
   return page('✅ 提出できました', (count > 1 ? count + '件の記録を受け付けました。<br>' : '') + 'このタブを閉じて、アプリにもどってください。');
 }
 
@@ -55,7 +58,16 @@ function getSheet(ss, name, headers) {
 
 function writeSugoroku(ss, d) {
   const sh = getSheet(ss, SG_SHEET, SG_HEADERS);
-  sh.appendRow([new Date(), d.kumi, d.han, d.count, d.months, d.level, d.avgAssets, d.groupScore, d.props, d.members]);
+  const now = new Date();
+  sh.appendRow([now, d.kumi, d.han, d.count, d.months, d.level, d.avgAssets, d.groupScore, d.props, d.members]);
+  const rf = d.reflections || [];
+  if (rf.length) {
+    const rs = getSheet(ss, RF_SHEET, RF_HEADERS);
+    const rows = rf.map(r => [now, r.kumi, Number(r.ban) || r.ban, r.name, r.player, r.level, r.rank, r.assets,
+      r.q1, r.q2, String(r.q1 || '').replace(/\s/g, '').length + String(r.q2 || '').replace(/\s/g, '').length, r.group]);
+    rs.getRange(rs.getLastRow() + 1, 1, rows.length, RF_HEADERS.length).setValues(rows);
+  }
+  return rf.length;
 }
 
 /** ランキング画面から呼ばれる：組ごとに、各班の最新の結果を得点順に返す */
@@ -89,7 +101,7 @@ h1{text-align:center;margin:0;padding:14px;background:linear-gradient(90deg,#1f8
 .wrap{max-width:1100px;margin:0 auto;padding:16px}
 .podium{display:flex;justify-content:center;align-items:flex-end;gap:16px;margin:10px 0 22px}
 .pd{background:#fff;border-radius:18px 18px 0 0;width:240px;text-align:center;padding:12px;box-shadow:0 6px 0 rgba(0,0,0,.12);animation:up .8s both}
-.pd .m{font-size:3rem}.pd .h{font-size:1.6rem;font-weight:800}.pd .s{font-size:1.4rem;font-weight:800;color:#1f7a4d}
+.pd .m{font-size:3rem}.pd .h{font-size:1.05rem;font-weight:800}.pd .s{font-size:1.4rem;font-weight:800;color:#1f7a4d}
 .p1{height:230px;border:5px solid #f0c64a}.p2{height:190px;border:5px solid #b8c4cc;animation-delay:.2s}.p3{height:160px;border:5px solid #d9a37a;animation-delay:.4s}
 table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 6px 0 rgba(0,0,0,.1)}
 th,td{padding:9px 12px;border-bottom:1px solid #e2e8ee;text-align:left;font-size:1.05rem}th{background:#eef5f1}
@@ -105,8 +117,8 @@ var last='';
 function render(list){var key=JSON.stringify(list);if(key===last)return;last=key;var el=document.getElementById('v');
  if(!list.length){el.className='empty';el.innerHTML='まだ提出された班はありません。';return;}
  el.className='';var med=['🥇','🥈','🥉'],cls=['p1','p2','p3'],order=[1,0,2];
- var pod='<div class="podium">'+order.filter(function(i){return list[i];}).map(function(i){var r=list[i];return '<div class="pd '+cls[i]+'"><div class="m">'+med[i]+'</div><div class="h">'+esc(r.kumi)+'組 '+esc(r.han)+'班</div><div class="s">'+fmt(r.score)+'</div><div class="small">'+esc(r.level)+(String(r.level).indexOf('令和')>=0?' 🏆':'')+'</div></div>';}).join('')+'</div>';
- var tb='<table><tr><th>順位</th><th>班</th><th>班の得点</th><th>到達した時代</th><th>施設</th><th>メンバー（個人の順位）</th><th>提出</th></tr>'+list.map(function(r,i){return '<tr><td><b>'+(med[i]||'')+' '+(i+1)+'位</b></td><td>'+esc(r.kumi)+'組 '+esc(r.han)+'班</td><td class="sc">'+fmt(r.score)+'</td><td>'+esc(r.level)+(String(r.level).indexOf('令和')>=0?' 🏆':'')+'</td><td>'+r.props+'件</td><td class="small">'+esc(r.members)+'</td><td class="small">'+esc(r.time)+'</td></tr>';}).join('')+'</table>';
+ var pod='<div class="podium">'+order.filter(function(i){return list[i];}).map(function(i){var r=list[i];return '<div class="pd '+cls[i]+'"><div class="m">'+med[i]+'</div><div class="h">'+esc(r.kumi)+'組 '+'<br>'+esc(r.han)+'</div><div class="s">'+fmt(r.score)+'</div><div class="small">'+esc(r.level)+(String(r.level).indexOf('令和')>=0?' 🏆':'')+'</div></div>';}).join('')+'</div>';
+ var tb='<table><tr><th>順位</th><th>班のメンバー</th><th>班の得点</th><th>到達した時代</th><th>施設</th><th>メンバー（個人の順位）</th><th>提出</th></tr>'+list.map(function(r,i){return '<tr><td><b>'+(med[i]||'')+' '+(i+1)+'位</b></td><td>'+esc(r.kumi)+'組 '+esc(r.han)+'</td><td class="sc">'+fmt(r.score)+'</td><td>'+esc(r.level)+(String(r.level).indexOf('令和')>=0?' 🏆':'')+'</td><td>'+r.props+'件</td><td class="small">'+esc(r.members)+'</td><td class="small">'+esc(r.time)+'</td></tr>';}).join('')+'</table>';
  el.innerHTML=pod+tb;}
 function load(){google.script.run.withSuccessHandler(render).getRanking('${kumi}');}
 load();setInterval(load,10000);
