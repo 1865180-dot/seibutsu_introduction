@@ -380,18 +380,20 @@ const TQ=[
   {q:'アニマルウェルフェアの説明として正しいものは？',a:['家畜が快適に、健康に暮らせるよう配慮した飼い方','家畜をできるだけせまい所で飼う方法','家畜を野生にもどす方法'],k:0,m:'平飼いなど、家畜が本来の行動をとれる飼い方も広がっている。'},
   {q:'天敵の昆虫などを利用して、害虫を減らす方法を何という？',a:['生物的防除','化学的防除','物理的防除'],k:0,m:'農薬は化学的防除、防虫ネットは物理的防除。'}]];
 TQ.forEach((q,i)=>ERAS[i].qs=q);
+/* お金の動きを大きく：増えるときも減るときも大きい */
+ERAS.forEach(e=>{e.base*=3;e.props.forEach(x=>x.inc=Math.round(x.inc*2.5));e.good.forEach(g=>g.v*=3);e.bad.forEach(b=>b.v*=4);});
 
 /* ===== 毎年のニュース（班全体に影響） ===== */
 const NEWS_BAD=[
- {t:'大雨で洪水が起きた',i:'🌊',cats:['crop'],m:2,wx:1,fx:'rain',from:0,note:'堤防や排水路、水田の水の管理で、被害を減らしてきた。'},
- {t:'台風が上陸した',i:'🌀',cats:['crop','fish'],m:2,wx:1,fx:'storm',from:0,note:'防風ネットや、いけすを海中に沈めて守る技術がある。'},
- {t:'雨が降らず、日照りが続いた（干ばつ）',i:'☀️',cats:['crop','animal'],m:1,wx:1,fx:'heat',from:0,note:'ため池や用水路などのかんがい施設で備えてきた。'},
- {t:'害虫が大発生した',i:'🦗',cats:['crop'],m:1,fx:'bug',from:0,note:'天敵の利用、防虫ネット、農薬の適正な使用で防ぐ。'},
- {t:'冷夏で作物が育たない（冷害）',i:'❄️',cats:['crop'],m:2,wx:1,fx:'cold',from:1,note:'寒さに強い品種の開発や、田の水を深くする管理で守る。'},
- {t:'家畜の伝染病が広がった',i:'🦠',cats:['animal'],m:2,fx:'germ',from:2,note:'消毒、ワクチン、人や車の出入りの管理（防疫）で防ぐ。'},
- {t:'赤潮が発生した',i:'🔴',cats:['fish'],m:2,fx:'germ',from:4,note:'プランクトンの観測や、いけすの移動、えさの量の調整で被害を減らす。'},
- {t:'記録的な猛暑（地球温暖化）',i:'🌡️',cats:['crop','animal','fish'],m:1,wx:1,fx:'heat',from:5,note:'暑さに強い品種、畜舎の換気や細霧、遮光などで適応する。'},
- {t:'えさや肥料、燃料が値上がりした',i:'💸',cats:['animal','crop'],m:1,fx:'warn',from:5,note:'国産の飼料の利用や、肥料を必要な分だけ使う技術で対応する。'}];
+ {t:'大雨で洪水が起きた',i:'🌊',cats:['crop'],m:3,wx:1,fx:'rain',from:0,note:'堤防や排水路、水田の水の管理で、被害を減らしてきた。'},
+ {t:'台風が上陸した',i:'🌀',cats:['crop','fish'],m:3,wx:1,fx:'storm',from:0,note:'防風ネットや、いけすを海中に沈めて守る技術がある。'},
+ {t:'雨が降らず、日照りが続いた（干ばつ）',i:'☀️',cats:['crop','animal'],m:2,wx:1,fx:'heat',from:0,note:'ため池や用水路などのかんがい施設で備えてきた。'},
+ {t:'害虫が大発生した',i:'🦗',cats:['crop'],m:2,fx:'bug',from:0,note:'天敵の利用、防虫ネット、農薬の適正な使用で防ぐ。'},
+ {t:'冷夏で作物が育たない（冷害）',i:'❄️',cats:['crop'],m:3,wx:1,fx:'cold',from:1,note:'寒さに強い品種の開発や、田の水を深くする管理で守る。'},
+ {t:'家畜の伝染病が広がった',i:'🦠',cats:['animal'],m:3,fx:'germ',from:2,note:'消毒、ワクチン、人や車の出入りの管理（防疫）で防ぐ。'},
+ {t:'赤潮が発生した',i:'🔴',cats:['fish'],m:3,fx:'germ',from:4,note:'プランクトンの観測や、いけすの移動、えさの量の調整で被害を減らす。'},
+ {t:'記録的な猛暑（地球温暖化）',i:'🌡️',cats:['crop','animal','fish'],m:2,wx:1,fx:'heat',from:5,note:'暑さに強い品種、畜舎の換気や細霧、遮光などで適応する。'},
+ {t:'えさや肥料、燃料が値上がりした',i:'💸',cats:['animal','crop'],m:2,fx:'warn',from:5,note:'国産の飼料の利用や、肥料を必要な分だけ使う技術で対応する。'}];
 const NEWS_GOOD=[
  {t:'天候にめぐまれ、豊作の年になった',i:'🌾',cats:['crop'],m:2,from:0},
  {t:'大漁が続いた',i:'🐟',cats:['fish'],m:2,from:0},
@@ -491,7 +493,7 @@ async function test3(qs,title){let n=0;const res=[];
 
 const TYPE={S:['🎉','収穫祭'],G:['😊','いいこと'],B:['😣','ピンチ'],Q:['❓','クイズ'],K:['🃏','カード'],C:['👾','キャラ'],H:['🛒','市場の日'],P:['🏗️','施設'],R:['🎲','大勝負']};
 const COLORS=['#e74c3c','#2e86de','#27ae60','#f39c12','#8e44ad','#16a085','#d35400'];
-const HAND=3,START=300,MATE=300,BIG={price:2,inc:2.5,dmg:2};
+const HAND=3,START=1000,MATE=300,BIG={price:2,inc:2.5,dmg:2};
 
 /* ===== 盤面（ぐるぐる回る周回コース・30マス） ===== */
 const LOOP='S G Q P B K R Q H C P Q G B K P G Q B R C K Q H G P Q B R K'.split(' ');
@@ -673,7 +675,7 @@ async function chance(p){const e=E(),opts=e.props;
   if(after.m>before.m){sfx('fan');confetti(40);await modal({icon:after.i,cls:'good',title:`組み合わせボーナス！ ${after.n}`,body:after.m===1.3?'家畜のふんを堆肥にして畑に使い、畑でとれた作物の一部を家畜のえさにする。資源がめぐる「循環型農業」で、収入がアップ！':after.m===1.5?'農業・畜産・水産の3つをそろえた！ 技術や資源をつなげて、収入が大きくアップ！':'ちがう種類の生物を育てると、リスクが分散され、収入もアップ！',buttons:[OK]});}
   await addDev(perfect?14:10,`${esc(p.name)}さんが「${x.n}」をつくり、産業が発展した！`);}
  else{sfx('bad');await modal({icon:'📚',title:`不合格…（${n}問正解）`,body:'今回は手に入りませんでした。解説を思い出して、次のチャンスで挑戦しよう！',buttons:[OK]});}}
-async function risk(p){const e=E(),r=pick(RISKS),win=e.base*6,lose=e.base*4,safe=e.base;
+async function risk(p){const e=E(),r=pick(RISKS),win=e.base*8,lose=e.base*6,safe=e.base;
  const v=await modal({icon:'🎲',cls:'gold',title:`大勝負マス！ ${r.i} ${r.t}`,body:`<div class="riskbox"><div><b>🛡️ 安全にいく</b><br>確実に <b class="okc">+${fmt(safe)}</b></div><div><b>🔥 勝負する</b><br>ルーレットで <b>6〜10</b> なら <b class="okc">+${fmt(win)}</b><br>1〜5 なら <b class="ng">−${fmt(lose)}</b></div><div><b>🧠 難問で勝負</b><br>次の時代の技術クイズに正解で <b class="okc">+${fmt(win)}</b><br>まちがえたら <b class="ng">−${fmt(lose)}</b></div></div>`,
   buttons:[{label:'🛡️ 安全にいく',v:1,cls:'sub'},{label:'🔥 ルーレットで勝負！',v:2,cls:'risky'},{label:'🧠 難問で勝負！',v:3,cls:'risky'}]});
  let ok;
@@ -779,7 +781,7 @@ async function endTurn(){G.busy=false;if(G.ended)return;
  await turnStart();}
 
 /* ===== 結果 ===== */
-function finish(){G.ended=true;const ranked=[...G.P].sort((a,b)=>assets(b)-assets(a)),avg=Math.round(G.P.reduce((a,p)=>a+assets(p),0)/G.P.length),bonus=G.era*1500+(G.era>=6?3000:0),score=avg+bonus,props=G.P.reduce((a,p)=>a+p.props.length,0);
+function finish(){G.ended=true;const ranked=[...G.P].sort((a,b)=>assets(b)-assets(a)),avg=Math.round(G.P.reduce((a,p)=>a+assets(p),0)/G.P.length),bonus=G.era*5000+(G.era>=6?10000:0),score=avg+bonus,props=G.P.reduce((a,p)=>a+p.props.length,0);
  app.innerHTML=`<div class="card hero"><div class="trophy">🏆</div><h2>表彰式</h2><p>${G.year}年間で たどり着いた時代：<b>${E().i} ${E().n}</b></p>
  <div class="etl">${ERAS.map((e,i)=>`<span style="${i<=G.era?'background:#ffe48a':''}">${e.i} ${e.n}</span>`).join('')}</div></div>
  <div class="card"><h2>👑 個人の順位（総資産＝お金＋施設の価値＋仲間）</h2><table><tr><th>順位</th><th>名前</th><th>総資産</th><th>お金</th><th>施設</th><th>仲間</th></tr>
