@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>いのちの1万年すごろく</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#22313a;--sub:#5a6b74;--line:#e2e8ee;--accent:#23905c;--accent2:#176b43;--bad:#c0392b;--rx:46deg;--ground:#cfe7a6;--ground2:#b6d98a;--sky1:#bfe6ff;--sky2:#8fc9f0}
+*{box-sizing:border-box}
+body{margin:0;font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Noto Sans JP",Meiryo,sans-serif;color:var(--ink);line-height:1.6;background:radial-gradient(ellipse at 50% 30%,var(--sky1),var(--sky2)) fixed;min-height:100vh;overflow-x:hidden;transition:background 1.5s}
+header{background:linear-gradient(90deg,#8a5a2b,#1f8a57,#2a9fc9);color:#fff;padding:6px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 0 rgba(0,0,0,.15);position:relative;z-index:5}
+header h1{font-size:1.08rem;margin:0;letter-spacing:.05em}
+.hbtn{background:rgba(255,255,255,.22);box-shadow:none;padding:3px 12px;font-size:.85rem;border-radius:999px}
+.hbtn:active{transform:none;box-shadow:none}
+main{max-width:1440px;margin:0 auto;padding:8px}
+.card{background:#fff;border-radius:18px;padding:16px 18px;margin-bottom:14px;box-shadow:0 6px 0 rgba(30,60,80,.12),0 10px 24px rgba(30,60,80,.1);animation:pop .35s both}
+.hero{text-align:center}.hero h2{font-size:1.8rem;color:#1f7a4d;margin:4px 0}
+.hero .icons{font-size:44px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap}.hero .icons span{animation:float 3s ease-in-out infinite;display:inline-block}
+.hero .icons span:nth-child(2n){animation-delay:.6s}.hero .icons span:nth-child(3n){animation-delay:1.2s}
+h2{font-size:1.15rem;margin:4px 0 10px}
+button{font:inherit;border:none;border-radius:14px;padding:10px 20px;background:var(--accent);color:#fff;cursor:pointer;font-weight:800;box-shadow:0 5px 0 var(--accent2);transition:transform .1s,box-shadow .1s}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 var(--accent2)}
+button.sub{background:#fff;color:var(--accent);border:2px solid var(--accent);box-shadow:0 5px 0 #bfe3cf}
+button:disabled{background:#b7c2bc;box-shadow:0 5px 0 #98a49d;cursor:not-allowed;color:#eef}
+button.big{font-size:1.15rem;padding:13px 30px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.nbtn{background:#fff;color:var(--ink);border:3px solid var(--line);box-shadow:0 4px 0 var(--line);min-width:60px;font-size:1.05rem}
+.nbtn.sel{border-color:var(--accent);background:#e7f7ee;box-shadow:0 4px 0 var(--accent)}
+select,.prow input{font:inherit;padding:7px;border:2px solid #cbd6dc;border-radius:10px}
+.prow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:5px 0;border-bottom:1px dashed var(--line)}
+.prow input{width:210px}
+.dot{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;color:#fff;font-weight:800;flex:none;font-size:.85rem}
+ul.rules li{margin-bottom:3px}
+.small{font-size:.85rem;color:var(--sub)}
+.etl{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:6px}.etl span{background:#f4efe4;border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:700}
+/* ===== 盤面 ===== */
+.game{display:grid;grid-template-columns:1fr 320px;gap:8px;align-items:start}
+@media(max-width:960px){.game{grid-template-columns:1fr}}
+.stage{position:relative;height:calc(100vh - 62px);min-height:470px;overflow:hidden;border-radius:20px;background:linear-gradient(var(--sky1),var(--sky2) 70%);transition:background 1.5s}
+.cam{position:absolute;inset:0;perspective:1100px;perspective-origin:50% 15%}
+.tilt{position:absolute;left:50%;top:62%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(var(--rx)) scale(var(--z,1))}
+.map{position:absolute;left:0;top:0;width:1820px;height:1220px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.3,1)}
+.map>svg{position:absolute;left:0;top:0}
+.board-base{position:absolute;left:-30px;top:-30px;width:1880px;height:1280px;border-radius:40px;background:linear-gradient(135deg,#8a5a34,#6b4226);box-shadow:0 26px 0 #4a2d18;transform:translateZ(-2px)}
+.nd{position:absolute;transform:translate(-50%,-50%);transform-style:preserve-3d}
+.sq{width:64px;height:64px;border-radius:14px;color:#fff;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 7px 0 rgba(0,0,0,.3),inset 0 0 0 3px rgba(255,255,255,.5);line-height:1.05}
+.sq .si{font-size:24px}.sq .sl{font-size:10px;margin-top:2px;white-space:nowrap}
+.sq.G{background:#3bb36b}.sq.B{background:#e2483a}.sq.Q{background:#9b5fd6}.sq.K{background:#f2b81c;color:#5a3d00}.sq.C{background:#5b3a7a}
+.sq.H{background:linear-gradient(#ffd34d,#f0a500);color:#5a3d00}.sq.P{background:#2a6fd6;width:84px;height:84px;border-radius:50%;border:5px solid #fff}
+.sq.S,.sq.E{background:linear-gradient(135deg,#fff8d0,#ffcf4d);color:#7a4b00;width:96px;height:80px}
+.sq.P .si{font-size:26px}.sq.S .si,.sq.E .si{font-size:30px}
+.nd.cand .sq{animation:candp .7s infinite alternate}
+.nd.lit .sq{box-shadow:0 0 0 6px #ffd34d,0 0 30px 10px #fff3a8}
+.bb{position:absolute;transform-style:preserve-3d}
+.bb>.up{position:absolute;left:0;bottom:0;transform:translateX(-50%) rotateX(calc(-1 * var(--rx)));transform-origin:50% 100%;white-space:nowrap}
+.deco>.up{font-size:var(--fs,40px);line-height:1;filter:drop-shadow(0 4px 2px rgba(0,0,0,.25))}
+.deco.sway>.up{animation:sway 3s ease-in-out infinite alternate}
+.deco.pop>.up{animation:popup .9s both}
+.stopsign>.up{background:#e2483a;color:#fff;font-weight:800;font-size:15px;padding:2px 12px;border-radius:10px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.fork>.up{background:#fff;color:#2a6fd6;font-weight:800;font-size:14px;padding:2px 10px;border-radius:10px;border:3px solid #2a6fd6}
+.pawn{position:absolute;width:0;height:0;transform-style:preserve-3d;transition:left .26s ease,top .26s ease}
+.pawn .psh{position:absolute;width:34px;height:14px;left:-17px;top:-7px;border-radius:50%;background:rgba(0,0,0,.3)}
+.pawn .pst{position:absolute;left:-22px;bottom:0;width:44px;transform-origin:50% 100%;transform:rotateX(calc(-1 * var(--rx)));display:flex;flex-direction:column;align-items:center}
+.pawn .phop{display:flex;flex-direction:column;align-items:center;position:relative}
+.pawn .pbody{width:42px;height:42px;border-radius:50%;background:#fff;border:4px solid var(--c);display:flex;align-items:center;justify-content:center;font-size:23px;box-shadow:0 3px 0 rgba(0,0,0,.25);position:relative}
+.pawn .pbody b{position:absolute;right:-8px;top:-8px;background:var(--c);color:#fff;border-radius:50%;width:19px;height:19px;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.pawn .pegs{display:flex;gap:2px;margin-top:-2px;height:9px}.pawn .pegs i{width:8px;height:8px;border-radius:50%;background:var(--c);border:1px solid #fff}
+.pawn .pbase{width:30px;height:12px;margin-top:-1px;background:var(--c);clip-path:polygon(22% 0,78% 0,100% 100%,0 100%);border-radius:0 0 6px 6px;filter:brightness(.8)}
+.pawn .pchar{position:absolute;top:-34px;left:26px;font-size:30px;animation:bob .6s ease-in-out infinite alternate;filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
+.pawn.cur .pbody{box-shadow:0 0 0 4px #fff,0 0 18px 7px var(--c)}
+.pawn.cur .phop{animation:bob .8s ease-in-out infinite alternate}
+.pawn.hop .phop{animation:hop .26s ease-out}
+.pawn.done{opacity:.8}
+/* HUD */
+.hud{position:absolute;left:10px;right:10px;top:8px;z-index:4;pointer-events:none}
+.hud .box{background:rgba(255,255,255,.95);border-radius:14px;padding:6px 12px;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.eras{display:flex;gap:3px}
+.eras span{flex:1;text-align:center;font-size:.72rem;font-weight:800;padding:2px 0;border-radius:8px;background:#eee;color:#888;white-space:nowrap;overflow:hidden}
+.eras span.past{background:#d9efe0;color:#2f6b4f}.eras span.now{background:#ffd34d;color:#5a3d00;box-shadow:0 0 0 2px #f0a500;transform:scale(1.06)}
+.mbar{height:12px;background:#e3e9ec;border-radius:999px;overflow:hidden;position:relative;margin-top:4px}
+.mbar i{display:block;height:100%;background:linear-gradient(90deg,#b08a5a,#8bd36a,#4aa3df,#b06ad9);transition:width .9s}
+.mbar span{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.9)}
+.hrow{display:flex;justify-content:space-between;gap:8px;font-weight:800;font-size:.88rem;flex-wrap:wrap}
+.chips span{display:inline-block;background:#f3e9fb;border:2px solid #c7a6e6;border-radius:999px;padding:0 8px;margin-left:4px;font-size:.78rem}
+/* サイド */
+.side .turn{background:#fff;border-radius:18px;padding:10px 12px;border:5px solid;box-shadow:0 6px 0 rgba(30,60,80,.12);margin-bottom:8px;text-align:center}
+.tname{font-size:1.15rem;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+.money{font-size:1.35rem;font-weight:800;color:#8a5a00}.money.neg{color:var(--bad)}
+.tsub{color:var(--sub);font-size:.85rem;margin-bottom:6px}
+#spin{width:100%;font-size:1.2rem;padding:12px;background:linear-gradient(#ff9f2e,#ff7a1a);box-shadow:0 6px 0 #c4520a}
+#spin:not(:disabled){animation:pulse 1.4s infinite}
+.hand{margin-top:8px;text-align:left}
+.cardc{display:flex;gap:6px;align-items:center;background:#eef6fd;border:2px solid #9cc8ef;border-radius:10px;padding:4px 9px;margin-top:5px;font-weight:700;font-size:.86rem;cursor:pointer;width:100%;color:var(--ink);box-shadow:none;text-align:left}
+.cardc:active{transform:none;box-shadow:none}.cardc span{font-size:1.2rem}.cardc.new{animation:glow 1.2s 2}
+.branch{margin-top:8px}.branch button{width:100%;margin-top:6px;text-align:left;background:#fff;color:var(--ink);border:3px solid #2a6fd6;box-shadow:0 4px 0 #9cc8ef;font-size:.92rem}
+.plist{background:#fff;border-radius:18px;padding:6px 10px;box-shadow:0 6px 0 rgba(30,60,80,.12);margin-bottom:8px}
+.pr{display:grid;grid-template-columns:24px 1fr 80px 64px 26px;gap:4px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line);font-size:.84rem}
+.pr:last-child{border-bottom:none}.pr.now{background:#fffbea;border-radius:8px}
+.pr .pn{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:700}
+.pr .pm{text-align:right;font-weight:800;color:#8a5a00}.pr .pm.neg{color:var(--bad)}
+.eracard{background:#fffaf0;border-radius:18px;padding:8px 12px;box-shadow:0 6px 0 rgba(30,60,80,.12);font-size:.85rem}
+.eracard b{font-size:1rem}
+/* ルーレット */
+.rlov{position:fixed;inset:0;z-index:45;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(10,20,40,.3)}
+.rlov.hidden{display:none}
+.rlwrap{position:relative;width:300px;height:300px;animation:zoomin .4s both}
+.rlwrap .ptr{position:absolute;left:50%;top:-22px;transform:translateX(-50%);font-size:44px;color:#e2483a;z-index:2;filter:drop-shadow(0 3px 2px rgba(0,0,0,.4))}
+.rlwrap svg{width:300px;height:300px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}
+.rlres{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:120px;font-weight:800;color:#fff;text-shadow:0 6px 0 #ff7a1a,0 0 30px rgba(0,0,0,.4);z-index:46}
+.rlres span{display:block;animation:starpop .5s both}
+/* モーダル */
+.ov{position:fixed;inset:0;background:rgba(20,30,40,.5);display:flex;align-items:center;justify-content:center;z-index:50;padding:14px}
+.ov.hidden{display:none}
+.mbox{background:#fff;border-radius:22px;padding:18px 22px;max-width:640px;width:100%;max-height:94vh;overflow:auto;text-align:center;border:5px solid #9cc8ef;box-shadow:0 12px 40px rgba(0,0,0,.3);animation:zoomin .35s cubic-bezier(.2,.9,.3,1.3) both}
+.mbox.warn{border-color:#f08a3a}.mbox.good{border-color:#4cc38a}.mbox.quiz{border-color:#9b78d6}.mbox.gold{border-color:#f0c64a;background:linear-gradient(180deg,#fffbea,#fff)}
+.mbox.dark{background:radial-gradient(circle at 50% 0,#3b2c4a,#140f1c);color:#eee;border-color:#6a4a8a}
+.mbox.era{max-width:720px;border:none;padding:0;background:#f7ecd2;overflow:hidden}
+.eratop{padding:18px;color:#fff;background:linear-gradient(135deg,var(--ec1),var(--ec2))}
+.eratop .ei{font-size:70px;line-height:1.1;animation:starpop .7s both}.eratop h2{font-size:2rem;margin:4px 0;letter-spacing:.1em}.eratop small{font-size:1rem;opacity:.95}
+.erabody{padding:14px 22px 18px;text-align:left;background:repeating-linear-gradient(0deg,#f7ecd2 0 28px,#f2e3c2 28px 29px)}
+.erabody li{margin-bottom:4px}
+.micon{font-size:60px;line-height:1.2;animation:starpop .5s both}
+.mbox h2{font-size:1.35rem;margin:4px 0 8px}
+.mbody{font-size:1.02rem}
+.memo{font-size:.9rem;color:var(--sub);background:#f4f7f9;border-radius:10px;padding:8px 12px;text-align:left;margin:10px 0 0}
+.mbox.dark .memo{background:rgba(255,255,255,.08);color:#ddd}
+.mbtns{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.mbox.era .mbtns{padding:0 22px 18px;margin:0;background:#f7ecd2}
+.mbtns button{width:100%}
+.mbtns.choices button{background:#fff;color:var(--ink);border:3px solid #b79ee0;box-shadow:0 4px 0 #d9ccf0;text-align:left}
+.ng{color:var(--bad);font-weight:800}.okc{color:#1a8a4d;font-weight:800}
+.qprog{display:flex;gap:6px;justify-content:center;margin-bottom:6px}.qprog span{width:30px;height:30px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:800}
+.pcard{display:flex;gap:12px;align-items:center;text-align:left;background:#f6fbf8;border:3px solid #8bc34a;border-radius:14px;padding:10px 14px;margin:8px 0}
+.pcard .pi{font-size:44px}.pcard b{font-size:1.05rem}
+.bigcard{width:200px;height:270px;margin:6px auto 4px;perspective:900px}
+.bigcard .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:flip 1s .15s cubic-bezier(.3,.8,.3,1.1) both}
+.bigcard .bk,.bigcard .fr{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.bigcard .bk{background:repeating-linear-gradient(45deg,#b08a5a 0 12px,#1f8a57 12px 24px);color:#fff;font-size:64px;border:6px solid #fff}
+.bigcard .fr{background:linear-gradient(160deg,#fff,#fff6e0);border:6px solid #f0a500;transform:rotateY(180deg);padding:12px}
+.bigcard .fr .ci{font-size:74px;line-height:1.1}.bigcard .fr .cn{font-weight:800;font-size:1.1rem;margin-top:8px}
+.bigcard .fr .ct{font-size:.72rem;color:#b07800;font-weight:800;letter-spacing:.1em}
+.charbig{font-size:110px;line-height:1;display:inline-block;animation:charin 1s cubic-bezier(.2,.9,.3,1.3) both}
+.charfly{font-size:110px;display:inline-block;animation:charout 1.1s ease-in both}
+.say{display:inline-block;background:#fff;color:#22313a;border-radius:16px;padding:6px 16px;font-weight:800;margin:6px 0}
+/* 演出 */
+.fxl{position:fixed;inset:0;pointer-events:none;z-index:44;overflow:hidden}
+.tint{position:fixed;inset:0;pointer-events:none;z-index:43;opacity:0}
+.tint.on{animation:tint var(--d,1.6s) ease both}
+.pt{position:absolute;line-height:1}
+.pt.fall{animation:fallp var(--d) linear var(--dl) both}
+.pt.rain{width:2px;height:22px;background:linear-gradient(transparent,rgba(220,235,255,.95));animation:rainf var(--d) linear var(--dl) both}
+.pt.rise{animation:risep var(--d) ease-out var(--dl) both}
+.pt.crawl{animation:crawl var(--d) linear var(--dl) both}
+.pt.burst,.pt.fw{animation:burst var(--d) cubic-bezier(.2,.8,.3,1) var(--dl) both}
+.pt.burst{left:50%;top:50%}
+.pt.drift{animation:drift var(--d) ease-in-out var(--dl) both}
+.banner{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:47}
+.banner div{background:#fff;padding:12px 44px;border-radius:22px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.12),0 18px 40px rgba(0,0,0,.2);animation:banner var(--bd,1.5s) cubic-bezier(.2,.8,.3,1) both;border:5px solid var(--c,#23905c)}
+.banner b{display:block;font-size:1.9rem;color:var(--c,#23905c);line-height:1.3}
+.banner small{font-size:1rem;color:var(--sub)}
+.floatm{position:fixed;z-index:48;font-weight:800;font-size:1.6rem;pointer-events:none;animation:floatm 1.6s ease-out both;text-shadow:0 2px 0 #fff,0 0 8px #fff}
+.shake{animation:hit .55s}
+.warp{position:fixed;inset:0;z-index:49;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,230,150,.6) 40%,transparent 70%);animation:warp 1.6s ease both}
+.confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:60;pointer-events:none;animation:fallc linear forwards;border-radius:2px}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}th{background:#eef5f1}
+.qcard{border:4px solid #f0c64a;background:linear-gradient(180deg,#fffbea,#fff)}
+.qcard li{margin-bottom:6px;font-size:1.03rem}
+.score{font-size:2.2rem;font-weight:800;color:#1f7a4d}
+.trophy{font-size:80px;display:inline-block;animation:spinY 2.4s ease-in-out infinite}
+footer{text-align:center;color:#eaf6ff;font-size:.78rem;padding:6px}
+@keyframes pop{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:none}}
+@keyframes zoomin{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-7px)}}
+@keyframes hop{0%{transform:translateY(0)}45%{transform:translateY(-28px) scale(1.05)}100%{transform:translateY(0)}}
+@keyframes sway{from{transform:translateX(-50%) rotateX(calc(-1 * var(--rx))) rotate(-4deg)}to{transform:translateX(-50%) rotateX(calc(-1 * var(--rx))) rotate(4deg)}}
+@keyframes popup{0%{transform:translateX(-50%) rotateX(calc(-1 * var(--rx))) scale(0)}70%{transform:translateX(-50%) rotateX(calc(-1 * var(--rx))) scale(1.4)}100%{transform:translateX(-50%) rotateX(calc(-1 * var(--rx))) scale(1)}}
+@keyframes candp{from{box-shadow:0 0 0 3px #fff}to{box-shadow:0 0 0 9px #2a6fd6,0 0 22px 6px #9cd8f5}}
+@keyframes pulse{0%,100%{transform:none}50%{transform:scale(1.04)}}
+@keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 4px #ffd34d,0 0 14px #ffd34d}}
+@keyframes starpop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes flip{from{transform:rotateY(0) scale(.6)}to{transform:rotateY(180deg) scale(1)}}
+@keyframes tint{0%{opacity:0}15%{opacity:1}75%{opacity:1}100%{opacity:0}}
+@keyframes fallp{from{transform:translateY(-12vh) rotate(0)}to{transform:translateY(112vh) rotate(var(--r,360deg))}}
+@keyframes rainf{from{transform:translate(0,-12vh) rotate(12deg)}to{transform:translate(-18vw,112vh) rotate(12deg)}}
+@keyframes risep{from{transform:translateY(0) scale(.6);opacity:0}20%{opacity:1}to{transform:translateY(-70vh) scale(1.2);opacity:0}}
+@keyframes crawl{from{transform:translateX(-12vw)}to{transform:translateX(112vw)}}
+@keyframes burst{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.2);opacity:0}}
+@keyframes drift{0%{transform:translate(0,0) scale(.5);opacity:0}20%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.1);opacity:0}}
+@keyframes banner{0%{transform:translateX(-110vw) skewX(-12deg)}22%{transform:translateX(0) skewX(0)}75%{transform:translateX(0);opacity:1}100%{transform:translateX(110vw) skewX(12deg);opacity:0}}
+@keyframes hit{0%,100%{transform:none}20%{transform:translate(-10px,4px)}40%{transform:translate(9px,-4px)}60%{transform:translate(-6px,2px)}80%{transform:translate(4px,0)}}
+@keyframes fallc{to{transform:translateY(112vh) rotate(760deg)}}
+@keyframes spinY{0%,100%{transform:rotateY(0)}50%{transform:rotateY(180deg) scale(1.1)}}
+@keyframes floatm{0%{transform:translateY(10px);opacity:0}15%{opacity:1}100%{transform:translateY(-70px);opacity:0}}
+@keyframes charin{0%{transform:scale(0) rotate(-200deg);opacity:0}70%{transform:scale(1.25) rotate(10deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes charout{0%{transform:none}30%{transform:translateY(10px) scale(.9)}100%{transform:translate(60vw,-60vh) rotate(720deg) scale(.2);opacity:0}}
+@keyframes warp{0%{opacity:0;transform:scale(.2)}40%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(2.4)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><h1>⏳ いのちの1万年すごろく 〜縄文から令和へ〜</h1><button class="hbtn" id="snd" type="button">🔇 効果音オフ</button></header>
+<main id="app"></main>
+<div id="tint" class="tint"></div>
+<div id="fxl" class="fxl"></div>
+<div id="rlov" class="rlov hidden"></div>
+<div id="modal" class="ov hidden"><div id="mwrap"></div></div>
+<footer>いのちの1万年すごろく ／ 生物育成の技術 ／ © Irie Kanji</footer>
+<script>
+/* ===== 設定（先生用）：提出先のApps ScriptのURL ===== */
+const GAS_URL='https://script.google.com/a/macros/fuku-c.ed.jp/s/AKfycbz1UhknPTwIbp4X1SKVapY20HcQvc-wqbvM9AIvK74_iN1PgoVwjJ_uuVfBCLwdLgKkLQ/exec';
+
+/* ===== 時代のデータ ===== */
+const ERAS=[
+ {n:'縄文時代',y:'約1万6千年前〜',i:'🏹',veh:'🛶',c1:'#8a5a2b',c2:'#c58b4a',ground:'#c9d99a',ground2:'#a9bf78',sky1:'#f1dcb4',sky2:'#cfa978',base:30,
+  sum:'食料は、狩り・漁・木の実などの採集が中心。集落のまわりでクリなどの木を管理して育て、土器で煮たり保存したりした。',
+  tech:['土器で煮る・保存する','クリなどの木を管理して育てる','弓矢で狩り、丸木舟で漁をする','イヌと一緒に暮らし、狩りをする'],
+  deco:['🛖','🌰','🏹','🐕','🦌','🐗','🌲','🐚','🛶','🔥','🌳','🍄','🐟','🌲','🛖','🦌'],
+  props:[{n:'クリ林の管理',i:'🌰',price:200,inc:40,m:'集落のまわりでクリの木を管理し、実を食料にした（青森県の三内丸山遺跡など）。'},{n:'貝の採集場',i:'🐚',price:150,inc:30,m:'海辺で貝をとった。食べた貝殻が積み重なった跡が「貝塚」として残っている。'},{n:'狩り場',i:'🦌',price:250,inc:45,m:'弓矢や落とし穴で、シカやイノシシをとった。'}],
+  cards:[{n:'丸木舟',i:'🛶',t:'spin2',m:'木をくりぬいた舟で、遠くの漁場へ。次のルーレットを2回回せる。'},{n:'縄文土器',i:'🏺',t:'guard',m:'土器で食べ物を煮たり保存したりして、食料不足に備える。悪いできごとを1回防ぐ。'},{n:'弓矢',i:'🏹',t:'income',m:'弓矢で、すばやい動物もとれるようになった。すぐに収入が入る。'}],
+  good:[{t:'クリがたくさん実った',v:60},{t:'大きなシカがとれた',v:50},{t:'ムラの仲間がふえた',v:20,mate:1},{t:'土器で木の実を煮て、食べられる物がふえた',v:40,dev:3}],
+  bad:[{t:'冬に食べ物が足りなくなった',v:50,fx:'cold'},{t:'嵐で漁に出られない',v:40,fx:'rain'},{t:'木の実が不作だった',v:45,fx:'warn'}],
+  qs:[{q:'縄文時代の人々が、集落のまわりで管理して育てていたと考えられている木は？',a:['クリ','スギ','イチョウ'],k:0,m:'青森県の三内丸山遺跡の調査から、クリの木を管理して育てていたと考えられている。'},
+   {q:'縄文時代の人々が食べた貝の殻などが積み重なった跡を何という？',a:['貝塚','古墳','環濠'],k:0,m:'貝塚から、当時の人々が何を食べていたかが分かる。'},
+   {q:'縄文時代の人々が、食べ物を煮たり保存したりするのに使った道具は？',a:['土器','鉄なべ','陶磁器'],k:0,m:'縄文土器で煮ることで、木の実のあくをぬくなど、食べられる物がふえた。'},
+   {q:'縄文時代の食料の中心は？',a:['狩り・漁・木の実などの採集','水田でつくった米','牧場の牛乳'],k:0,m:'自然の恵みを手に入れる暮らしが中心だった。'},
+   {q:'縄文時代から人と一緒に暮らし、狩りを手伝っていたと考えられる動物は？',a:['イヌ','ウシ','ニワトリ'],k:0,m:'ていねいに埋葬されたイヌの骨も見つかっている。'}]},
+ {n:'弥生時代',y:'約2千4百年前〜',i:'🌾',veh:'🛶',c1:'#8a6a2b',c2:'#d7b25a',ground:'#cfe0a0',ground2:'#b3cf7c',sky1:'#f3e6bf',sky2:'#d8bd85',base:80,
+  sum:'大陸から水田での稲作が伝わり、各地に広がった。人々はムラに定住し、米をたくわえるようになった。',
+  tech:['水田での稲作','石包丁で稲の穂をつみ取る','高床倉庫で米をたくわえる','鉄や青銅の道具が伝わる'],
+  deco:['🌾','🛖','🌾','🐕','🌾','🏯','🌾','💧','🛶','🌾','🌳','🐟','🌾','🐦','🛖','🌾'],
+  props:[{n:'水田',i:'🌾',price:500,inc:90,m:'大陸から伝わった水田での稲作が広がった。'},{n:'高床倉庫',i:'🏚️',price:400,inc:70,m:'ネズミや湿気から稲を守るため、床を高くした倉庫に保存した。'},{n:'田植えの田んぼ',i:'🌱',price:450,inc:80,m:'田下駄をはいて、ぬかるんだ田で作業した。'}],
+  cards:[{n:'田下駄',i:'🩴',t:'spin2',m:'ぬかるむ田でも、しずまずに動ける。次のルーレットを2回回せる。'},{n:'高床倉庫',i:'🏚️',t:'guard',m:'米を湿気やネズミから守る。悪いできごとを1回防ぐ。'},{n:'鉄の農具',i:'⛏️',t:'meter',m:'鉄の道具で、田を耕しやすくなった。班の発展度がアップ。'}],
+  good:[{t:'稲がよく実った（豊作）',v:120},{t:'高床倉庫で米をたくわえられた',v:80},{t:'鉄の農具が伝わった',v:50,dev:4},{t:'となりのムラと米を交換した',v:70}],
+  bad:[{t:'水不足で稲が育たない',v:100,fx:'heat'},{t:'ネズミに米を食べられた',v:80,fx:'bug'},{t:'洪水で田が流された',v:120,fx:'rain'}],
+  qs:[{q:'弥生時代に大陸から伝わり、広がった農業は？',a:['水田での稲作','酪農','植物工場'],k:0,m:'九州北部から、各地に稲作が広がった。'},
+   {q:'稲の穂をつみ取るために使われた石器は？',a:['石包丁','石おの','石やじり'],k:0,m:'石包丁で、実った穂から順につみ取った。'},
+   {q:'収穫した稲を、湿気やネズミから守るために保存した建物は？',a:['高床倉庫','竪穴住居','古墳'],k:0,m:'床を高くし、柱にネズミ返しをつけた。'},
+   {q:'弥生時代に伝わり、道具に使われるようになった金属は？',a:['鉄や青銅','アルミニウム','ステンレス'],k:0,m:'鉄器は農具や武器に、青銅器は祭りの道具などに使われた。'},
+   {q:'稲作が始まって、人々の暮らしはどう変わった？',a:['ムラに定住し、米をたくわえるようになった','移動しながら暮らすようになった','漁をやめた'],k:0,m:'米をたくわえられるようになり、ムラの間で貧富の差も生まれた。'}]},
+ {n:'奈良・平安時代',y:'約1千3百年前〜',i:'⛩️',veh:'🐂',c1:'#8a2b3a',c2:'#d7605a',ground:'#cfe5a6',ground2:'#b4d282',sky1:'#f4e2d0',sky2:'#d9b2a0',base:120,
+  sum:'国が田を分けあたえ、税を集めた。ため池や用水路をつくって田に水を引き、鉄の農具が広がった。国は牧（まき）で馬や牛を育てた。',
+  tech:['ため池・用水路で田に水を引く','鉄の農具が広がる','国の牧で馬や牛を育てる','新しく田を開墾する（墾田永年私財法）'],
+  deco:['⛩️','🌾','🐂','💧','🏯','🌾','🐎','🌸','🌾','⛩️','💧','🌳','🌾','🐂','🎎','🌾'],
+  props:[{n:'ため池と用水路',i:'💧',price:800,inc:130,m:'ため池や用水路で田に水を引いた。香川県の満濃池は、空海が修築したと伝えられる。'},{n:'国の牧（まき）',i:'🐎',price:700,inc:110,m:'国が牧を設けて、馬や牛を育てた。'},{n:'新しく開墾した田',i:'🌾',price:600,inc:100,m:'743年の墾田永年私財法で、開墾した土地を自分のものにできるようになった。'}],
+  cards:[{n:'牧の馬',i:'🐎',t:'spin2',m:'馬に乗って速く移動。次のルーレットを2回回せる。'},{n:'用水路',i:'💧',t:'guard',m:'日照りのときも田に水を引ける。悪いできごとを1回防ぐ。'},{n:'鉄のすき',i:'⛏️',t:'meter',m:'鉄の農具で、田を深く耕せるようになった。班の発展度がアップ。'}],
+  good:[{t:'ため池が完成し、田に水が行きわたった',v:150,dev:3},{t:'新しい田を開墾した',v:120},{t:'牧で育てた馬が都で評判になった',v:130},{t:'都へ特産品を納めて、ほめられた',v:100}],
+  bad:[{t:'日照りで不作になった',v:150,fx:'heat'},{t:'疫病がはやり、働き手が減った',v:130,fx:'germ'},{t:'重い税（租・調・庸）を納めた',v:120,fx:'warn'}],
+  qs:[{q:'田に水を引くためにつくられた、水をためておく池は？',a:['ため池','貝塚','堀'],k:0,m:'雨の少ない地域では、ため池が稲作を支えた。'},
+   {q:'奈良時代に国が人々に分けあたえた田を何という？',a:['口分田','新田','棚田'],k:0,m:'班田収授法で、6歳以上の男女に口分田があたえられた。'},
+   {q:'743年に出された、開墾した土地をずっと自分のものにしてよいという法令は？',a:['墾田永年私財法','武家諸法度','地租改正'],k:0,m:'この法令で、開墾が進んだ。'},
+   {q:'古代に、国が馬や牛を育てるために設けた場所は？',a:['牧（まき）','市','寺'],k:0,m:'育てた馬は、役人の移動や運搬に使われた。'},
+   {q:'この時代に広がり、田を耕しやすくした農具の材料は？',a:['鉄','竹','石'],k:0,m:'鉄の刃をつけたくわやすきが広がった。'}]},
+ {n:'鎌倉・室町時代',y:'約8百年前〜',i:'🐎',veh:'🐎',c1:'#3a5a2b',c2:'#7a9a4a',ground:'#cde8a4',ground2:'#aed37c',sky1:'#e7efd6',sky2:'#b9cfa4',base:160,
+  sum:'米のあとに麦をつくる二毛作が広がり、牛や馬で田を耕すようになった。草木灰などの肥料が使われ、定期市で作物が売り買いされた。',
+  tech:['二毛作（米のあとに麦）','牛や馬に犂（すき）を引かせて耕す','草木灰や刈敷などの肥料','定期市で作物を売り買い'],
+  deco:['🐎','🌾','🐂','🏯','🌾','🌾','⛩️','🏮','🌾','🐎','🌳','🌾','🏯','🐂','🌾','🏮'],
+  props:[{n:'二毛作の田',i:'🌾',price:1000,inc:170,m:'同じ田で、米のあとに麦をつくる二毛作が広がった。'},{n:'牛馬を使う農家',i:'🐂',price:900,inc:150,m:'牛や馬に犂を引かせて、田を深く広く耕した。'},{n:'定期市の店',i:'🏮',price:800,inc:140,m:'月に何回か開かれる定期市で、作物や品物を売り買いした。'}],
+  cards:[{n:'牛馬耕',i:'🐂',t:'spin2',m:'牛や馬の力で、作業がはかどる。次のルーレットを2回回せる。'},{n:'草木灰',i:'🔥',t:'income',m:'草や木を焼いた灰を肥料にして、収穫量アップ。すぐに収入が入る。'},{n:'二毛作',i:'🌾',t:'meter',m:'1年に2回収穫できるようになった。班の発展度がアップ。'}],
+  good:[{t:'二毛作で麦もとれた',v:200,dev:3},{t:'牛に犂を引かせて、広い田を耕せた',v:170},{t:'定期市で作物が高く売れた',v:180},{t:'草木灰をまいて、作物がよく育った',v:150}],
+  bad:[{t:'戦で田畑があらされた',v:180,fx:'warn'},{t:'イナゴが大発生した',v:150,fx:'bug'},{t:'台風で稲が倒れた',v:170,fx:'storm'}],
+  qs:[{q:'同じ田で、米を収穫したあとに麦などをつくることを何という？',a:['二毛作','輪作','抑制栽培'],k:0,m:'鎌倉時代に西日本で始まり、室町時代に広がった。'},
+   {q:'鎌倉時代から、田を耕すのに使われるようになった動物は？',a:['牛や馬','ニワトリ','ブタ'],k:0,m:'牛や馬に犂を引かせる「牛馬耕」が広がった。'},
+   {q:'草や木を焼いた灰を肥料にしたものを何という？',a:['草木灰','干鰯','化学肥料'],k:0,m:'刈った草を田にしきこむ「刈敷」も肥料として使われた。'},
+   {q:'決まった日に開かれ、作物などを売り買いした市を何という？',a:['定期市','楽市楽座','スーパーマーケット'],k:0,m:'鎌倉時代は月3回、室町時代には月6回開かれる市もあった。'},
+   {q:'二毛作が広がると、どうなった？',a:['1年に2回収穫でき、食料がふえた','田が使えなくなった','米がとれなくなった'],k:0,m:'食料がふえ、人々の暮らしが安定した。'}]},
+ {n:'江戸時代',y:'約4百年前〜',i:'🏯',veh:'🚣',c1:'#2b3a8a',c2:'#5a7ad7',ground:'#cbe8a2',ground2:'#a9d378',sky1:'#dbe7f4',sky2:'#9fbbd9',base:220,
+  sum:'新田開発で田が大きく広がった。備中ぐわや千歯こきなどの農具が発達し、干鰯などの買う肥料で収量がふえた。農書で技術が広まり、カキの養殖なども行われた。',
+  tech:['新田開発','備中ぐわ・千歯こきなどの農具','干鰯・油かすなどの肥料（金肥）','農業全書などの農書で技術を学ぶ','カキの養殖'],
+  deco:['🏯','🌾','🐟','🏘️','🌾','🚣','🌾','🎏','🌾','🏯','🦪','🌳','🌾','🏮','🏘️','🌾'],
+  props:[{n:'新田',i:'🌾',price:1300,inc:230,m:'幕府や藩が新田開発を進め、田の面積が大きく広がった。'},{n:'干鰯（ほしか）問屋',i:'🐟',price:1200,inc:210,m:'いわしを干した肥料（干鰯）や油かすを使い、収穫量をふやした。'},{n:'カキの養殖場',i:'🦪',price:1100,inc:200,m:'広島などで、海に立てた竹（ひび）にカキをつけて育てる養殖が行われた。'}],
+  cards:[{n:'千歯こき',i:'🪮',t:'spin2',m:'稲の脱穀が速くなった。次のルーレットを2回回せる。'},{n:'干鰯',i:'🐟',t:'income',m:'買って使う肥料で、収穫量アップ。すぐに収入が入る。'},{n:'農業全書',i:'📕',t:'meter',m:'農書で全国に技術が広まった。班の発展度がアップ。'},{n:'さつまいも',i:'🍠',t:'guard',m:'やせた土地でも育つさつまいもで、ききんに備えた。悪いできごとを1回防ぐ。'}],
+  good:[{t:'新田開発で田が広がった',v:250},{t:'干鰯をまいて収穫量アップ',v:230},{t:'備中ぐわで深く耕せた',v:200},{t:'『農業全書』を読んで、技術を学んだ',v:150,dev:4}],
+  bad:[{t:'冷害でききんになった',v:250,fx:'cold'},{t:'ウンカが大発生した（享保のききん）',v:220,fx:'bug'},{t:'年貢を納めた',v:200,fx:'warn'}],
+  qs:[{q:'江戸時代に広まり、田を深く耕せるようになった農具は？',a:['備中ぐわ','石包丁','トラクター'],k:0,m:'先が分かれたくわで、深く耕せた。'},
+   {q:'江戸時代に広まり、稲の脱穀を速くした農具は？',a:['千歯こき','田下駄','石包丁'],k:0,m:'くしの歯のような鉄の歯で、稲の穂からもみをしごき取った。'},
+   {q:'いわしを干してつくった肥料を何という？',a:['干鰯（ほしか）','草木灰','堆肥'],k:0,m:'お金を出して買う肥料（金肥）として使われた。'},
+   {q:'幕府や藩が田をふやすために進めたことは？',a:['新田開発','二毛作の禁止','牧の廃止'],k:0,m:'海や湖を干拓するなどして、田を広げた。'},
+   {q:'江戸時代に書かれ、農業の技術を広めた本は？',a:['農業全書','古事記','解体新書'],k:0,m:'宮崎安貞が書いた農書で、全国で読まれた。'}]},
+ {n:'明治〜昭和',y:'約150年前〜',i:'🚜',veh:'🚜',c1:'#2b6b8a',c2:'#4aa3c7',ground:'#c4e79a',ground2:'#9fd16e',sky1:'#cfeaff',sky2:'#8fc9f0',base:320,
+  sum:'西洋の農業や酪農が取り入れられ、化学肥料や品種改良で収穫量がふえた。昭和には機械化が進み、ビニールハウスや養殖が広がった。一方で、農薬の使いすぎなどの課題も生まれた。',
+  tech:['西洋式の農業・酪農（北海道の開拓）','化学肥料と品種改良（コシヒカリなど）','耕運機・トラクターによる機械化','ビニールハウス・ハマチやマダイの養殖'],
+  deco:['🚜','🐄','🏭','🌾','🚂','🏠','🐔','🌾','🚚','🐖','🌳','🌾','🏭','🐄','🏠','🚜'],
+  props:[{n:'酪農牧場',i:'🐄',price:1800,inc:330,m:'明治時代の北海道の開拓で、西洋式の農業や酪農が取り入れられた。'},{n:'ビニールハウス',i:'🏠',price:2000,inc:360,m:'昭和の中ごろからビニールハウスが広がり、季節に関係なく野菜をつくれるようになった。'},{n:'養殖いけす',i:'🐟',price:2200,inc:390,m:'昭和になって、ハマチやマダイの養殖が本格的に始まった。'}],
+  cards:[{n:'トラクター',i:'🚜',t:'spin2',m:'機械化で作業時間が大きく短くなった。次のルーレットを2回回せる。'},{n:'化学肥料',i:'🧪',t:'income',m:'化学肥料で収穫量が大きくふえた。すぐに収入が入る。'},{n:'品種改良',i:'🧬',t:'meter',m:'おいしく育てやすい品種が生まれた。班の発展度がアップ。'},{n:'農業共済（保険）',i:'🛡️',t:'guard',m:'災害の損害を補うしくみ。悪いできごとを1回防ぐ。'}],
+  good:[{t:'化学肥料で収穫量が大きくふえた',v:350},{t:'トラクターで作業時間が大幅に短くなった',v:320,dev:3},{t:'品種改良でおいしいお米ができた',v:330},{t:'ビニールハウスで冬でも野菜を出荷できた',v:340}],
+  bad:[{t:'冷夏で米が不作になった',v:300,fx:'cold'},{t:'農薬の使いすぎで、環境に悪い影響が出た',v:280,fx:'germ'},{t:'若い働き手が都市へ出ていった',v:250,fx:'warn'}],
+  qs:[{q:'明治時代、北海道の開拓で取り入れられたのは？',a:['西洋式の農業や酪農','縄文時代の狩り','植物工場'],k:0,m:'札幌農学校などで、西洋の農業技術が教えられた。'},
+   {q:'昭和の中ごろから広がり、季節に関係なく野菜をつくれるようになった施設は？',a:['ビニールハウス','高床倉庫','ため池'],k:0,m:'促成栽培や抑制栽培で、出荷の時期を調整できるようになった。'},
+   {q:'昭和の高度経済成長期に広がり、農作業を楽にした機械は？',a:['耕運機やトラクター','千歯こき','石包丁'],k:0,m:'機械化で、少ない人数で広い田畑を管理できるようになった。'},
+   {q:'1956年に品種改良で生まれ、今も人気のお米の品種は？',a:['コシヒカリ','あまおう','ふじ'],k:0,m:'おいしいお米として全国に広がった。'},
+   {q:'化学肥料や農薬を大量に使うようになって、問題になったことは？',a:['環境や健康への影響','収穫量がゼロになった','雨が降らなくなった'],k:0,m:'その後、使い方のルールが整えられ、環境に配慮した農業が進められている。'}]},
+ {n:'平成・令和',y:'約35年前〜現在',i:'🤖',veh:'🚙',c1:'#5a2b8a',c2:'#2a9fc9',ground:'#c9eda5',ground2:'#a6db78',sky1:'#d8f0ff',sky2:'#7fc2f5',base:450,
+  sum:'ドローンや自動運転トラクター、センサーを使うスマート農業、植物工場、完全養殖、ゲノム編集などの新しい技術が生まれた。アニマルウェルフェアや地球温暖化への対応も大切になっている。',
+  tech:['スマート農業（ドローン・自動運転・センサー）','植物工場（LED）','完全養殖（クロマグロなど）','ゲノム編集・アニマルウェルフェア・温暖化への適応'],
+  deco:['🏢','🚁','🤖','🌾','📡','🏭','🐟','🌾','🚙','🐄','🌳','🌾','🏢','🔬','🐔','📱'],
+  props:[{n:'植物工場',i:'🏭',price:3000,inc:540,m:'LEDの光と温度・養分を管理し、天候に関係なく野菜を育てる。'},{n:'スマート農場',i:'🚁',price:2800,inc:510,m:'ドローンや自動運転トラクター、センサーで作業を効率化する。'},{n:'完全養殖の養殖場',i:'🐟',price:3200,inc:570,m:'卵から育てた親が卵を産む完全養殖。近畿大学は2002年にクロマグロの完全養殖に成功した。'}],
+  cards:[{n:'ドローン',i:'🚁',t:'spin2',m:'空から農薬散布や生育の確認。次のルーレットを2回回せる。'},{n:'センサー見守り',i:'📡',t:'guard',m:'温度や病気の兆しをセンサーで早く発見。悪いできごとを1回防ぐ。'},{n:'ゲノム編集',i:'🧬',t:'meter',m:'新しい品種を短い期間でつくれる技術。班の発展度がアップ。'},{n:'海外輸出',i:'✈️',t:'income',m:'日本の農産物や水産物を海外へ。すぐに収入が入る。'}],
+  good:[{t:'ドローンで農薬散布を効率化できた',v:500},{t:'植物工場の野菜が人気になった',v:450},{t:'海外への輸出が決まった',v:520},{t:'完全養殖の魚が評判になった',v:480,dev:3}],
+  bad:[{t:'猛暑で作物の品質が下がった（温暖化）',v:450,fx:'heat'},{t:'えさや肥料が値上がりした',v:400,fx:'warn'},{t:'担い手の高齢化で人手が足りない',v:380,fx:'warn'}],
+  qs:[{q:'ドローンやセンサー、自動運転トラクターなどを使う農業を何という？',a:['スマート農業','焼畑農業','二毛作'],k:0,m:'人手不足を補い、作業を効率よくする。'},
+   {q:'LEDの光などで、天候に関係なく野菜を育てる施設は？',a:['植物工場','高床倉庫','ため池'],k:0,m:'都市の中でも野菜をつくれる。'},
+   {q:'近畿大学が2002年に世界で初めて成功した、クロマグロの養殖は？',a:['完全養殖','天然養殖','放流'],k:0,m:'天然の稚魚をとらずにすみ、海の資源を守ることにつながる。'},
+   {q:'家畜の健康や快適さに配慮した飼い方の考え方は？',a:['アニマルウェルフェア','スマート農業','地産地消'],k:0,m:'国も、アニマルウェルフェアに関する指針を示している。'},
+   {q:'生物がもともと持つ遺伝子の決まった場所を変えて、品種をつくる技術は？',a:['ゲノム編集','二毛作','接ぎ木'],k:0,m:'食べられる部分が多いマダイなどが生まれている。'}]}];
+const ETH=[0,12,26,40,55,70,85];
+const CHARS={gaichu:{n:'ガイチュウ',i:'👾',from:0,say:'葉っぱも実も、いただき〜！',m:'害虫は作物の汁を吸ったり、葉や実を食べたりする。昔はイナゴやウンカの大発生で、ききんになることもあった。'},
+ juugai:{n:'ジュウガイ',i:'🐗',from:0,say:'ブヒッ！畑はごちそうだ〜！',m:'イノシシやシカなどによる被害（獣害）は、縄文時代から今まで続く課題。今は電気柵などで防ぐ。'},
+ gaibyo:{n:'ガイビョウ',i:'🦠',from:2,say:'ゴホゴホ…病気をひろめちゃうぞ〜',m:'人や家畜、作物の病気は、昔から大きな被害をもたらしてきた。今はワクチンや消毒で予防する。'},
+ ondanka:{n:'オンダンカ神様',i:'🌡️',from:5,say:'ふはは…地球をあたためてやろう…',m:'地球温暖化で、猛暑、豪雨、海水温の上昇が起きている。暑さに強い品種などで被害を減らす「適応」と、温室効果ガスを減らす「緩和」の両方が大切。'}};
+const WARM=[{q:'夏の高温で品質が下がるのを防ぐため、開発が進められているのは？',a:['暑さに強い品種','寒さに強い品種','苦い品種'],k:0,m:'高温に強いお米などの品種が、各地で開発されている（適応）。'},
+ {q:'温室効果ガスを減らす取り組みとして正しいのは？',a:['省エネの設備や再生可能エネルギーを使う','照明を一日中つけっぱなしにする','燃料をたくさん燃やす'],k:0,m:'原因を減らす取り組みを「緩和」という。'},
+ {q:'地元でとれたものを地元で食べる「地産地消」が温暖化対策になる理由は？',a:['運ぶ距離が短く、燃料が少なくてすむ','必ず値段が高くなる','冷蔵しなくてよい'],k:0,m:'輸送で出る二酸化炭素を減らせる。'},
+ {q:'暑さから家畜を守る技術は？',a:['換気扇やミスト（細霧）','暖房','照明を消す'],k:0,m:'風と細かい霧で、家畜の体温を下げる。'},
+ {q:'海水温が上がると、養殖で心配されることは？',a:['赤潮や病気がふえる','魚が太りすぎる','海が凍る'],k:0,m:'水温の変化に合わせた管理が進められている。'}];
+const TYPE={S:['🚩','スタート'],E:['🏆','ゴール'],G:['😊','いいこと'],B:['😣','ピンチ'],Q:['❓','クイズ'],K:['🃏','カード'],C:['👾','キャラ'],H:['🌾','収穫日'],P:['🛑','チャンス']};
+const COLORS=['#e74c3c','#2e86de','#27ae60','#f39c12','#8e44ad','#16a085','#d35400'];
+const HAND=3,START=300,MATE=300;
+
+/* ===== 盤面（1本道＋分かれ道） ===== */
+const NODES=[],NX=[];
+function nd(x,y,t){NODES.push({x,y,t,i:NODES.length});NX.push([]);return NODES.length-1;}
+const X0=210,ST=(1610-210)/10,cx=c=>X0+c*ST,R=[160,430,720,990];
+const MT='S G Q B G H K C G P B Q G H K B G B Q B H G K C G P Q B G H K B Q C G H B Q G B C B Q B P H G E'.split(' ');
+const ALT='G H K G Q G K'.split(' ');
+const MAIN=[];let mi=0;const mk=(x,y)=>{const id=nd(x,y,MT[mi++]);MAIN.push(id);return id;};
+for(let c=0;c<=10;c++)mk(cx(c),R[0]);mk(1745,295);
+const r1=[];for(let c=10;c>=0;c--)r1.push(mk(cx(c),R[1]));mk(70,575);
+for(let c=0;c<=10;c++)mk(cx(c),R[2]);mk(1745,855);
+const r3=[];for(let c=10;c>=0;c--)r3.push(mk(cx(c),R[3]));mk(70,1135);
+for(let k=0;k<MAIN.length-1;k++)NX[MAIN[k]].push(MAIN[k+1]);
+const FORKS=[];
+function alt(from,to,y){const a=NODES[from],b=NODES[to],ids=[];for(let j=1;j<=7;j++){const t=j/8;ids.push(nd(a.x+(b.x-a.x)*t,y+Math.sin(t*Math.PI)*40,ALT[j-1]));}
+ NX[from].push(ids[0]);for(let j=0;j<6;j++)NX[ids[j]].push(ids[j+1]);NX[ids[6]].push(to);FORKS.push({at:from,short:NX[from][0],long:ids[0]});return ids;}
+const A1=alt(r1[2],r1[8],R[1]+120),A2=alt(r3[2],r3[8],R[3]+115);
+const SHORT_START=MAIN.indexOf(r1[10])+12;
+
+/* ===== 共通 ===== */
+const $=id=>document.getElementById(id),app=$('app');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const rand=n=>Math.floor(Math.random()*n);
+const pick=a=>a[rand(a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fmt(v){const neg=v<0;v=Math.abs(Math.round(v));const o=Math.floor(v/10000),m=v%10000;return(neg?'−':'')+(o?o+'億':'')+(m||!o?m.toLocaleString()+'万':'')+'円';}
+
+/* ===== 効果音・演出 ===== */
+let SND=false;try{SND=localStorage.getItem('jn_snd')==='1';}catch(e){}
+function sndLabel(){$('snd').textContent=SND?'🔊 効果音オン':'🔇 効果音オフ';}
+$('snd').onclick=()=>{SND=!SND;try{localStorage.setItem('jn_snd',SND?'1':'0');}catch(e){}sndLabel();sfx('good');};sndLabel();
+function sfx(k){if(!SND)return;try{const ac=sfx.ac||(sfx.ac=new(window.AudioContext||window.webkitAudioContext)());const t=ac.currentTime;
+ const tone=(f,d,len,type,vol)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type||'triangle';o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(vol||.07,t+d);g.gain.exponentialRampToValueAtTime(.001,t+d+len);o.start(t+d);o.stop(t+d+len+.02);};
+ ({tick:()=>tone(1200,0,.03,'square',.03),hop:()=>tone(660,0,.07),good:()=>[523,659,784].forEach((f,i)=>tone(f,i*.09,.18)),
+  bad:()=>{tone(220,0,.25,'sawtooth',.05);tone(165,.15,.3,'sawtooth',.05);},card:()=>[880,1175].forEach((f,i)=>tone(f,i*.07,.12)),coin:()=>[1319,1568].forEach((f,i)=>tone(f,i*.06,.1,'square',.04)),
+  fan:()=>[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,.22)),era:()=>[392,523,659,784,1047,1319].forEach((f,i)=>tone(f,i*.15,.4)),boss:()=>[110,98,87].forEach((f,i)=>tone(f,i*.2,.35,'sawtooth',.07)),thunder:()=>tone(80,0,.6,'sawtooth',.08)}[k]||(()=>{}))();}catch(e){}}
+function tint(color,d=1600){const e=$('tint');e.style.background=color;e.style.setProperty('--d',d+'ms');e.classList.remove('on');void e.offsetWidth;e.classList.add('on');}
+function particles(o){if(RM)return;const L=$('fxl');const n=o.n||20;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='pt '+o.kind;
+ const d=(o.d||2)*(0.7+Math.random()*.6),dl=Math.random()*(o.spread||1);s.style.setProperty('--d',d+'s');s.style.setProperty('--dl',dl+'s');
+ if(o.kind!=='rain')s.textContent=pick(o.e);s.style.fontSize=(o.fs||28)*(0.7+Math.random()*.6)+'px';
+ if(o.kind==='fall'||o.kind==='rain'){s.style.left=Math.random()*115+'vw';s.style.top='0';s.style.setProperty('--r',(Math.random()*720-360)+'deg');}
+ else if(o.kind==='rise'){s.style.left=Math.random()*100+'vw';s.style.bottom='-5vh';}
+ else if(o.kind==='crawl'){s.style.left='0';s.style.top=(20+Math.random()*65)+'vh';}
+ else if(o.kind==='burst'||o.kind==='fw'){const a=Math.random()*Math.PI*2,r=120+Math.random()*260;s.style.setProperty('--dx',Math.cos(a)*r+'px');s.style.setProperty('--dy',Math.sin(a)*r+'px');if(o.kind==='fw'){s.style.left=(o.cx||50)+'vw';s.style.top=(o.cy||40)+'vh';}}
+ else if(o.kind==='drift'){s.style.left=(10+Math.random()*80)+'vw';s.style.top=(15+Math.random()*65)+'vh';s.style.setProperty('--dx',(Math.random()*160-80)+'px');s.style.setProperty('--dy',(Math.random()*-120)+'px');}
+ L.appendChild(s);setTimeout(()=>s.remove(),(d+dl)*1000+200);}}
+function fireworks(times=4){for(let k=0;k<times;k++)setTimeout(()=>particles({kind:'fw',e:['✨','🎆','⭐','🎇','💥'],n:18,d:1.3,fs:30,spread:.15,cx:15+Math.random()*70,cy:15+Math.random()*40}),k*350);}
+function shake(){const s=$('stage');if(!s)return;s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake');}
+function banner(big,small,color,ms=1500){const b=document.createElement('div');b.className='banner';b.innerHTML=`<div style="--c:${color||'#23905c'};--bd:${ms}ms"><b>${big}</b>${small?`<small>${small}</small>`:''}</div>`;document.body.appendChild(b);setTimeout(()=>b.remove(),ms+50);return sleep(RM?200:ms*.85);}
+function confetti(n=60){if(RM)return;const cs=['#ffd34d','#ff7a59','#4cc38a','#4aa3df','#b06ad9','#ff9fc4'];for(let i=0;i<n;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=cs[i%cs.length];d.style.animationDuration=(2+Math.random()*2)+'s';d.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),5000);}}
+function floatMoney(v){const el=$('pmoney');if(!el)return;const r=el.getBoundingClientRect(),f=document.createElement('div');f.className='floatm';f.style.left=(r.left+20)+'px';f.style.top=(r.top-10)+'px';f.style.color=v>=0?'#1a8a4d':'#c0392b';f.textContent=(v>=0?'+':'')+fmt(v);document.body.appendChild(f);setTimeout(()=>f.remove(),1700);}
+async function eventFx(k){shake();
+ if(k==='storm'){sfx('thunder');tint('rgba(255,255,255,.95)',300);setTimeout(()=>tint('rgba(20,30,50,.45)',2000),450);particles({kind:'rain',n:60,d:.8,spread:1.6});particles({kind:'fall',e:['🍃','🌀'],n:10,d:1.6,fs:30});}
+ else if(k==='rain'){tint('rgba(30,50,80,.38)',2200);particles({kind:'rain',n:55,d:.9,spread:1.8});}
+ else if(k==='heat'){tint('rgba(255,120,20,.35)',2000);particles({kind:'rise',e:['🔥','♨️','☀️'],n:14,d:2.2,fs:34});}
+ else if(k==='cold'){tint('rgba(150,190,255,.38)',2200);particles({kind:'fall',e:['❄️','❅','❆'],n:30,d:2.6,spread:1.4,fs:26});}
+ else if(k==='bug'){tint('rgba(80,140,40,.25)',1800);particles({kind:'crawl',e:['🐛','🦗','🐀'],n:14,d:2.4,fs:30,spread:1});}
+ else if(k==='germ'){tint('rgba(120,40,160,.3)',2200);particles({kind:'drift',e:['🦠'],n:16,d:2.2,fs:34});}
+ else{tint('rgba(240,140,40,.3)',1400);particles({kind:'burst',e:['⚠️','💥'],n:10,d:1.1,fs:30});}
+ sfx('bad');await sleep(RM?100:800);}
+
+/* ===== ルーレット ===== */
+const SEGC=['#e74c3c','#f39c12','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e84393','#e67e22','#16a085'];
+function wheelSvg(){let g='';for(let i=0;i<10;i++){const a0=(i*36-18-90)*Math.PI/180,a1=((i+1)*36-18-90)*Math.PI/180,x0=150+140*Math.cos(a0),y0=150+140*Math.sin(a0),x1=150+140*Math.cos(a1),y1=150+140*Math.sin(a1),am=(i*36-90)*Math.PI/180;
+ g+=`<path d="M150 150 L${x0} ${y0} A140 140 0 0 1 ${x1} ${y1} Z" fill="${SEGC[i]}" stroke="#fff" stroke-width="3"/><text x="${150+102*Math.cos(am)}" y="${150+102*Math.sin(am)+11}" text-anchor="middle" font-size="32" font-weight="800" fill="#fff" stroke="rgba(0,0,0,.25)" stroke-width="1">${i+1}</text>`;}
+ return`<svg viewBox="0 0 300 300"><circle cx="150" cy="150" r="148" fill="#fff"/><g id="wg">${g}<circle cx="150" cy="150" r="26" fill="#fff" stroke="#22313a" stroke-width="5"/><text x="150" y="158" text-anchor="middle" font-size="22">🌾</text></g></svg>`;}
+async function spinWheel(){const n=1+rand(10),ov=$('rlov');ov.innerHTML=`<div class="rlwrap"><div class="ptr">▼</div>${wheelSvg()}</div>`;ov.classList.remove('hidden');
+ const g=$('wg');g.style.transformOrigin='150px 150px';g.style.transform='rotate(0deg)';void g.getBoundingClientRect();
+ const target=1800+360-(n-1)*36+(Math.random()*20-10);g.style.transition=RM?'none':'transform 2.3s cubic-bezier(.15,.75,.2,1)';g.style.transform=`rotate(${target}deg)`;
+ if(SND&&!RM)for(let k=0;k<16;k++)setTimeout(()=>sfx('tick'),k*k*9);
+ await sleep(RM?100:2450);const r=document.createElement('div');r.className='rlres';r.innerHTML=`<span>${n}</span>`;document.body.appendChild(r);sfx('hop');
+ await sleep(RM?100:650);r.remove();ov.classList.add('hidden');return n;}
+
+/* ===== モーダル・問題 ===== */
+function modal({icon,title,body,cls,buttons,choices,raw}){return new Promise(res=>{const ov=$('modal');
+ $('mwrap').innerHTML=raw?`<div class="mbox ${cls||''}">${raw}<div class="mbtns">${buttons.map((b,i)=>`<button data-b="${i}" class="${b.cls||''}" ${b.dis?'disabled':''}>${b.label}</button>`).join('')}</div></div>`
+  :`<div class="mbox ${cls||''}">${icon?`<div class="micon">${icon}</div>`:''}<h2>${title}</h2><div class="mbody">${body||''}</div><div class="mbtns ${choices?'choices':''}">${buttons.map((b,i)=>`<button data-b="${i}" class="${b.cls||''}" ${b.dis?'disabled':''}>${b.label}</button>`).join('')}</div></div>`;
+ ov.classList.remove('hidden');
+ $('mwrap').querySelectorAll('[data-b]').forEach(el=>el.onclick=()=>{ov.classList.add('hidden');res(buttons[+el.dataset.b].v);});});}
+const OK={label:'OK ▶',v:1};
+async function askQ(q,head){const idx=shuffle(q.a.map((a,i)=>i));
+ const v=await modal({icon:'❓',cls:'quiz',choices:true,title:q.q,body:`${head||''}<span class="small">班のみんなで相談してOK！</span>`,buttons:idx.map(i=>({label:q.a[i],v:i}))});
+ const ok=v===q.k;sfx(ok?'good':'bad');if(ok)particles({kind:'burst',e:['⭕','✨'],n:10,d:1,fs:28});else shake();
+ await modal({icon:ok?'⭕':'❌',cls:ok?'good':'quiz',title:ok?'正解！':'ざんねん…',body:`答え：<b>${q.a[q.k]}</b><p class="memo">${q.m}</p>`,buttons:[{label:'次へ ▶',v:1}]});return ok;}
+async function test3(qs,title){let n=0;const res=[];
+ for(let i=0;i<qs.length;i++){const head=`<div class="qprog">${qs.map((_,j)=>`<span style="background:${j<i?(res[j]?'#c8f0d6':'#f8d3cf'):j===i?'#ffe48a':'#eee'}">${j<i?(res[j]?'⭕':'❌'):j+1}</span>`).join('')}</div><b>${title} ${i+1}問目</b><br>`;
+  const ok=await askQ(qs[i],head);res.push(ok);if(ok)n++;}
+ return n;}
+
+/* ===== 状態 ===== */
+let setup={n:4,course:'normal',kumi:'',han:'',pl:Array.from({length:7},()=>({name:''}))};
+let G=null;
+const CP=()=>G.P[G.cur];
+const E=()=>ERAS[G.era];
+const devPct=()=>Math.min(100,Math.round(G.dev/G.devMax*100));
+const assets=p=>p.money+p.props.reduce((a,x)=>a+x.price,0)+p.mates*MATE;
+function cardsUpTo(){const L=[];ERAS.forEach((e,ei)=>{if(ei<=G.era)e.cards.forEach(c=>{for(let k=0;k<(ei===G.era?4:1);k++)L.push({...c,era:ei});});});return L;}
+
+/* ===== 準備画面 ===== */
+function renderSetup(){
+ const opt=(n,v)=>`<option value="">選択</option>`+Array.from({length:n},(_,i)=>`<option ${String(i+1)===String(v)?'selected':''}>${i+1}</option>`).join('');
+ app.innerHTML=`<div class="card hero"><div class="icons">${ERAS.map(e=>`<span>${e.i}</span>`).join('')}</div><h2>いのちの1万年すごろく</h2>
+ <p>縄文時代のムラから出発！ 生き物を育てて暮らしながら、<b>班みんなで第1次産業を発展させ、令和の時代をめざそう！</b></p>
+ <div class="etl">${ERAS.map(e=>`<span>${e.i} ${e.n}</span>`).join('<span>→</span>')}</div></div>
+ <div class="card"><h2>① 組と班</h2><div class="row"><label>組 <select id="kumi">${opt(8,setup.kumi)}</select></label><label>班 <select id="han">${opt(10,setup.han)}</select></label></div></div>
+ <div class="card"><h2>② 人数と名前</h2><div class="row" style="margin-bottom:8px">${[2,3,4,5,6,7].map(n=>`<button class="nbtn ${n===setup.n?'sel':''}" data-n="${n}">${n}人</button>`).join('')}</div>
+ ${setup.pl.slice(0,setup.n).map((p,i)=>`<div class="prow"><span class="dot" style="background:${COLORS[i]}">${i+1}</span><input data-i="${i}" value="${esc(p.name)}" placeholder="プレイヤー${i+1}" maxlength="10"></div>`).join('')}</div>
+ <div class="card"><h2>③ コース</h2><div class="row">${[['normal','ノーマル（約50マス・約30分）'],['short','ショート（約30マス・約15分）']].map(([k,l])=>`<button class="nbtn ${k===setup.course?'sel':''}" data-co="${k}">${l}</button>`).join('')}</div>
+ <div style="margin-top:14px"><button id="start" class="big">⏳ 縄文時代へ出発！</button></div></div>
+ <div class="card"><h2>📖 ルール</h2><ul class="rules">
+  <li>🎡 順番に<b>ルーレット（1〜10）</b>を回して、1本道を進みます。分かれ道では「近道」か「遠回り」かを選びます。</li>
+  <li>🛑 <b>チャンスマス（止まれ）</b>では全員が止まり、その時代の施設を手に入れるチャンス！<b>3問中2問正解</b>で買えます（班で相談OK）。</li>
+  <li>📈 施設を買ったりクイズに正解したりすると、<b>班の「発展度」</b>が上がり、<b>時代が進みます</b>。時代が進むと、技術が発達して収入もふえます。</li>
+  <li>🌾 <b>収穫日マス</b>を通ると、時代の基本収入＋持っている施設の収入が入ります。</li>
+  <li>😊いいこと　😣ピンチ　❓クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）</li>
+  <li>全員がゴールしたら表彰式。個人の総資産と、<b>班の得点（どの時代まで発展できたか）</b>でクラスで競います。</li></ul></div>`;
+ const keep=()=>{setup.kumi=$('kumi').value;setup.han=$('han').value;};
+ app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{keep();setup.n=+b.dataset.n;renderSetup();});
+ app.querySelectorAll('[data-co]').forEach(b=>b.onclick=()=>{keep();setup.course=b.dataset.co;renderSetup();});
+ app.querySelectorAll('input[data-i]').forEach(el=>el.oninput=()=>{setup.pl[+el.dataset.i].name=el.value.trim();});
+ $('start').onclick=()=>{keep();if(!setup.kumi||!setup.han){alert('組と班を選んでください。');return;}startGame();};window.scrollTo(0,0);}
+
+/* ===== ゲーム ===== */
+async function startGame(){const short=setup.course==='short',start=short?MAIN[SHORT_START]:MAIN[0];
+ G={P:setup.pl.slice(0,setup.n).map((p,i)=>({name:p.name||`プレイヤー${i+1}`,color:COLORS[i],node:start,money:START,props:[],cards:[],mates:0,done:false,rank:0,spin2:false,tp:0,tf:0})),
+  cur:0,era:0,dev:0,devMax:setup.n*(short?9:30),chars:[],busy:false,finished:0,start,short};
+ G.P.forEach(p=>p.cards.push(pick(ERAS[0].cards)));
+ applyEra();renderGame();
+ await eraModal(true);await turnStart();}
+function applyEra(){const e=E(),r=document.documentElement.style;r.setProperty('--ground',e.ground);r.setProperty('--ground2',e.ground2);r.setProperty('--sky1',e.sky1);r.setProperty('--sky2',e.sky2);}
+const DPOS=[[350,300],[700,290],[1050,300],[1400,290],[1650,560],[1300,575],[900,560],[500,590],[300,850],[700,845],[1100,855],[1500,850],[1650,1120],[1250,1120],[850,1115],[450,1120]];
+function renderGame(){
+ app.innerHTML=`<div class="game"><div class="stage" id="stage"><div class="cam"><div class="tilt" id="tilt"><div class="map" id="map"></div></div></div><div class="hud" id="hud"></div></div><div class="side" id="side"></div></div>`;
+ buildMap();fit();renderPawns();renderHud();renderSide();window.scrollTo(0,0);}
+function pathPts(ids){return ids.map(i=>`${NODES[i].x},${NODES[i].y}`).join(' ');}
+function buildMap(){const m=$('map');
+ const a1=[r1[2],...A1,r1[8]],a2=[r3[2],...A2,r3[8]];
+ m.innerHTML=`<div class="board-base"></div><svg width="1820" height="1220" viewBox="0 0 1820 1220">
+ <defs><pattern id="gp" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" style="fill:var(--ground)"/><circle cx="12" cy="14" r="5" style="fill:var(--ground2)"/><circle cx="30" cy="30" r="4" style="fill:var(--ground2)"/></pattern></defs>
+ <rect width="1820" height="1220" rx="34" fill="url(#gp)"/>
+ ${[MAIN,a1,a2].map(ids=>`<polyline points="${pathPts(ids)}" fill="none" stroke="#e9d3a6" stroke-width="86" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
+ ${[MAIN,a1,a2].map(ids=>`<polyline points="${pathPts(ids)}" fill="none" stroke="#fff6e0" stroke-width="6" stroke-dasharray="14 12" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`+
+ DPOS.map((d,i)=>`<div class="bb deco ${i%3?'sway':''}" id="dc${i}" style="left:${d[0]}px;top:${d[1]}px;--fs:${38+(i%3)*6}px"><div class="up"></div></div>`).join('')+
+ NODES.map(n=>`<div class="nd" id="nd${n.i}" style="left:${n.x}px;top:${n.y}px"><div class="sq ${n.t}"><span class="si">${TYPE[n.t][0]}</span><span class="sl">${TYPE[n.t][1]}</span></div></div>`).join('')+
+ NODES.filter(n=>n.t==='P').map(n=>`<div class="bb stopsign" style="left:${n.x}px;top:${n.y-40}px"><div class="up">止まれ！</div></div>`).join('')+
+ FORKS.map(f=>`<div class="bb fork" style="left:${NODES[f.at].x}px;top:${NODES[f.at].y-40}px"><div class="up">分かれ道</div></div>`).join('')+
+ (G.short?`<div class="bb stopsign" style="left:${NODES[G.start].x}px;top:${NODES[G.start].y-44}px"><div class="up" style="background:#2a6fd6">スタート</div></div>`:'')+`<div id="pawns"></div>`;
+ setDeco(false);}
+function setDeco(anim){const set=E().deco;DPOS.forEach((d,i)=>{const el=$('dc'+i);if(!el)return;el.querySelector('.up').textContent=set[i%set.length];if(anim){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');}});}
+function fit(){const st=$('stage'),t=$('tilt');if(!st||!t)return;const z=Math.max(.6,Math.min(1.05,st.clientWidth/1080,st.clientHeight/640));t.style.setProperty('--z',z);}
+addEventListener('resize',fit);
+function focus(i){const n=NODES[i],m=$('map');if(m)m.style.transform=`translate(${-n.x}px,${-n.y}px)`;}
+function renderPawns(hop){const box=$('pawns');if(!box)return;const at={};
+ box.innerHTML=G.P.map((p,i)=>{const n=NODES[p.node],k=at[p.node]=(at[p.node]||0)+1,ox=[0,-26,26,-13,13,-32,32][k-1],oy=[0,10,10,26,26,-12,-12][k-1];
+  const ch=G.chars.filter(c=>c.h===i).map(c=>CHARS[c.k].i).join('');
+  return`<div class="pawn ${i===G.cur&&!p.done?'cur':''} ${hop===i?'hop':''} ${p.done?'done':''}" style="left:${n.x+ox}px;top:${n.y+oy+8}px;--c:${p.color}"><div class="psh"></div><div class="pst"><div class="phop">${ch?`<span class="pchar">${ch}</span>`:''}<div class="pbody">${E().veh}<b>${i+1}</b></div><div class="pegs">${'<i></i>'.repeat(Math.min(6,p.mates))}</div><div class="pbase"></div></div></div></div>`;}).join('');}
+function renderHud(){if(!$('hud'))return;const pct=devPct(),e=E();
+ const chips=G.chars.map(c=>`<span>${CHARS[c.k].i}${CHARS[c.k].n}${c.h>=0?'→'+esc(G.P[c.h].name):'（班全体）'}</span>`).join('');
+ $('hud').innerHTML=`<div class="box"><div class="hrow"><span>${e.i} いまは <b style="font-size:1.05rem">${e.n}</b> <span class="small">${e.y}</span></span><span>📈 班の発展度 ${pct}%${G.era<6?`<span class="small">（次の時代まで あと${ETH[G.era+1]-pct}%）</span>`:'<span class="small">（現代に到達！）</span>'}</span>${chips?`<span class="chips">${chips}</span>`:''}</div>
+ <div class="eras">${ERAS.map((x,i)=>`<span class="${i<G.era?'past':i===G.era?'now':''}">${x.i}${x.n.replace('時代','')}</span>`).join('')}</div>
+ <div class="mbar"><i style="width:${pct}%"></i>${ETH.slice(1).map(x=>`<span style="left:${x}%"></span>`).join('')}</div></div>`;}
+function renderSide(newCard){const p=CP(),e=E();
+ $('side').innerHTML=`<div class="turn" style="border-color:${p.color}"><div class="tname"><span class="dot" style="background:${p.color}">${G.cur+1}</span>${e.veh} ${esc(p.name)}さんの番</div>
+ <div class="money ${p.money<0?'neg':''}" id="pmoney">💰 ${fmt(p.money)}</div><div class="tsub">施設 ${p.props.map(x=>x.i).join('')||'なし'} ・ 仲間 ${p.mates}人</div>
+ <div id="act">${G.busy?'':`<button id="spin">🎡 ルーレットを回す${p.spin2?'（2回）':''}</button>`}</div>
+ <div class="branch" id="branch"></div>
+ <div class="hand"><b>🃏 技術カード（${p.cards.length}/${HAND}）</b>${p.cards.map((c,i)=>`<button class="cardc ${newCard&&i===p.cards.length-1?'new':''}" data-c="${i}"><span>${c.i}</span>${c.n}</button>`).join('')||'<div class="small">まだありません</div>'}</div></div>
+ <div class="plist">${G.P.map((q,i)=>`<div class="pr ${i===G.cur?'now':''}"><span class="dot" style="background:${q.color}">${i+1}</span><span class="pn">${esc(q.name)}${q.done?' 🏁':''}</span><span class="pm ${q.money<0?'neg':''}">${fmt(q.money)}</span><span>🏠${q.props.length} 👤${q.mates}</span><span>${G.chars.filter(c=>c.h===i).map(c=>CHARS[c.k].i).join('')}</span></div>`).join('')}</div>
+ <div class="eracard">${e.i} <b>${e.n}の生物育成</b><br>${e.sum}</div>`;
+ if($('spin'))$('spin').onclick=spin;
+ $('side').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>useCard(+b.dataset.c));}
+document.addEventListener('keydown',ev=>{if((ev.key==='Enter'||ev.key===' ')&&$('spin')&&$('modal').classList.contains('hidden')){ev.preventDefault();spin();}});
+
+/* ===== 発展度と時代 ===== */
+async function addDev(v,why){G.dev=Math.max(0,G.dev+v);renderHud();
+ while(G.era<6&&devPct()>=ETH[G.era+1]){G.era++;await eraUp(why);}}
+async function eraUp(why){const e=E();sfx('era');
+ const w=document.createElement('div');w.className='warp';document.body.appendChild(w);setTimeout(()=>w.remove(),1700);
+ await sleep(RM?50:700);applyEra();setDeco(true);renderPawns();renderHud();renderSide();fireworks(5);confetti(60);
+ G.P.forEach(p=>{const c=pick(e.cards);if(p.cards.length<HAND)p.cards.push({...c,era:G.era});});
+ await eraModal(false,why);renderSide();}
+async function eraModal(first,why){const e=E();
+ await modal({cls:'era',raw:`<div class="eratop" style="--ec1:${e.c1};--ec2:${e.c2}"><div class="ei">${e.i}</div><small>${first?'ここから物語が始まる…':'時代が進んだ！'}</small><h2>${e.n}</h2><small>${e.y}</small></div>
+  <div class="erabody">${why&&!first?`<p><b>${why}</b></p>`:''}<p><b>🌱 この時代の生物育成</b><br>${e.sum}</p><b>🔧 この時代の技術</b><ul>${e.tech.map(t=>`<li>${t}</li>`).join('')}</ul>
+  ${first?'<p class="small">施設を買ったりクイズに正解したりして「発展度」を上げると、次の時代へ進みます。</p>':`<p class="okc">全員に「${e.n}」の技術カードを1枚配りました！ 収穫日の収入もアップ！</p>`}</div>`,buttons:[{label:first?'⏳ 出発！':'この時代を生きよう！ ▶',v:1}]});}
+
+/* ===== カード ===== */
+async function useCard(i){if(G.busy)return;const p=CP(),c=p.cards[i];
+ const ch=G.chars.find(x=>x.h===G.cur);const can=c.t!=='guard'||!!ch;
+ const v=await modal({icon:c.i,title:`${c.n}（${ERAS[c.era].n}）`,body:`<p class="memo">${c.m}</p>${can?'':'<p class="small">このカードは、ピンチやキャラクターが現れたときに使えます。</p>'}`,buttons:can?[{label:'使う',v:1},{label:'やめる',v:0,cls:'sub'}]:[{label:'とじる',v:0,cls:'sub'}]});
+ if(!v)return;p.cards.splice(i,1);
+ if(c.t==='spin2'){p.spin2=true;sfx('card');await banner(`${c.i} ルーレット2回！`,'',p.color,1100);}
+ else if(c.t==='income'){const g=E().base*3;p.money+=g;sfx('coin');renderSide();floatMoney(g);await modal({icon:c.i,cls:'good',title:`${c.n}で +${fmt(g)}`,body:c.m,buttons:[OK]});}
+ else if(c.t==='meter'){sfx('good');particles({kind:'burst',e:[c.i,'✨'],n:14,d:1.2,fs:30});await modal({icon:c.i,cls:'good',title:`${c.n}で班の発展度アップ！`,body:c.m,buttons:[OK]});await addDev(6,`${esc(p.name)}さんの「${c.n}」で技術が進んだ！`);}
+ else if(c.t==='guard'&&ch)await repelChar(ch,c);
+ renderSide();}
+async function getCard(p,title,icon){const c=pick(cardsUpTo());sfx('card');
+ const big=`<div class="bigcard"><div class="in"><div class="bk">🃏</div><div class="fr"><div class="ct">${ERAS[c.era].n}の技術</div><div class="ci">${c.i}</div><div class="cn">${c.n}</div></div></div></div><p class="memo">${c.m}</p>`;
+ if(p.cards.length<HAND){await modal({icon,title,body:big,buttons:[{label:'手札に加える ▶',v:1}]});p.cards.push(c);renderSide(true);return;}
+ const all=[...p.cards,c];const v=await modal({icon,title,body:`${big}カードは${HAND}枚までです。<b>1枚すてる</b>カードを選ぼう。`,buttons:all.map((x,i)=>({label:`${x.i} ${x.n}をすてる${i===all.length-1?'（新しいカード）':''}`,v:i,cls:'sub'}))});
+ all.splice(v,1);p.cards=all;renderSide();}
+
+/* ===== ターン ===== */
+async function turnStart(){const p=CP();G.busy=false;focus(p.node);renderPawns();renderSide();renderHud();
+ await banner(`${E().veh} ${esc(p.name)}さんの番！`,`💰 ${fmt(p.money)} ・ ${E().n}`,p.color,1200);}
+async function spin(){if(G.busy)return;G.busy=true;renderSide();const p=CP();
+ let n=await spinWheel();if(p.spin2){p.spin2=false;const n2=await spinWheel();n+=n2;await banner(`合計 ${n}マス！`,'',p.color,900);}
+ const r=await move(p,n);
+ if(!p.done){$('nd'+p.node).classList.add('lit');await sleep(250);await land(p,NODES[p.node]);$('nd'+p.node).classList.remove('lit');await charTurn(p);}
+ await endTurn();}
+async function move(p,steps){let moved=false;
+ for(let s=steps;s>0;s--){const opts=NX[p.node];if(!opts.length)break;
+  let nx=opts[0];if(opts.length>1)nx=await chooseFork(p,s);
+  p.node=nx;focus(nx);renderPawns(G.cur);sfx('hop');await sleep(RM?60:280);
+  const t=NODES[nx].t;
+  if(t==='H'&&s>1)await harvest(p,true);
+  const ch=G.chars.find(c=>c.h===G.cur);const other=G.P.findIndex((q,i)=>i!==G.cur&&!q.done&&q.node===nx);
+  if(ch&&other>=0&&!moved){moved=true;ch.h=other;renderPawns();renderHud();sfx('boss');await banner(`${CHARS[ch.k].i} ${CHARS[ch.k].n}が ${esc(G.P[other].name)}さんに うつった！`,'追いこすと、キャラクターがうつります',G.P[other].color,1400);renderSide();}
+  if(t==='E'){await goal(p);return'goal';}
+  if(t==='P'&&s>1){await banner('🛑 止まれ！','チャンスマスでは必ず止まります','#e2483a',1100);break;}}
+ return'';}
+function chooseFork(p,left){const f=FORKS.find(x=>x.at===p.node);return new Promise(res=>{const br=$('branch');
+ [f.short,f.long].forEach(o=>$('nd'+o).classList.add('cand'));
+ const done=v=>{[f.short,f.long].forEach(o=>$('nd'+o).classList.remove('cand'));br.innerHTML='';res(v);};
+ br.innerHTML=`<b>🔀 分かれ道！ のこり${left}マス</b><button id="fs">⚡ 近道<br><span class="small">早く進めるけど、ピンチが多め</span></button><button id="fl">🌈 遠回り<br><span class="small">長いけど、収穫日やカードが多め</span></button>`;
+ $('fs').onclick=()=>done(f.short);$('fl').onclick=()=>done(f.long);});}
+
+/* ===== マスの出来事 ===== */
+async function land(p,nd){const t=nd.t;
+ if(t==='H')return harvest(p,false);if(t==='G')return good(p);if(t==='B')return bad(p);if(t==='Q')return quizSq(p);if(t==='K')return getCard(p,'技術カードを手に入れた！','🃏');if(t==='C')return charSq(p);if(t==='P')return chance(p);}
+async function harvest(p,pass){const e=E(),inc=e.base+p.props.reduce((a,x)=>a+x.inc,0);p.money+=inc;sfx('coin');renderSide();floatMoney(inc);
+ particles({kind:'rise',e:['🌾','💰','✨'],n:12,d:1.5,fs:30});tint('rgba(255,210,80,.25)',1000);
+ if(pass){await banner(`🌾 収穫日！ +${fmt(inc)}`,'通りすぎても収入が入ります','#d49a00',1100);}
+ else await modal({icon:'🌾',cls:'gold',title:`収穫日！ +${fmt(inc)}`,body:`${e.n}の基本収入 ${fmt(e.base)}＋施設の収入 ${fmt(inc-e.base)}<p class="memo">時代が進むと技術が発達し、同じ広さからとれる量がふえていきます。</p>`,buttons:[OK]});
+ await addDev(1);}
+async function good(p){const e=E(),ev=pick(e.good);p.money+=ev.v;if(ev.mate)p.mates+=ev.mate;sfx('good');renderSide();renderPawns();floatMoney(ev.v);
+ particles({kind:'burst',e:['✨','🌟','😊'],n:16,d:1.2,fs:30});tint('rgba(80,220,140,.22)',1100);
+ await modal({icon:'😊',cls:'good',title:ev.t,body:`<b class="okc" style="font-size:1.3rem">+${fmt(ev.v)}</b>${ev.mate?'<br>👤 仲間が1人ふえた！（ゴールで1人300万円）':''}${ev.dev?'<br>📈 班の発展度アップ！':''}<p class="small">${e.i} ${e.n}のできごと</p>`,buttons:[OK]});
+ if(ev.dev)await addDev(ev.dev,`「${ev.t}」で技術が進んだ！`);}
+async function bad(p){const e=E(),ev=pick(e.bad);let d=ev.v;await eventFx(ev.fx);
+ const gi=p.cards.findIndex(c=>c.t==='guard');let note='';
+ if(gi>=0){const g=p.cards[gi];const v=await modal({icon:'😣',cls:'warn',title:ev.t,body:`このままだと <b class="ng">−${fmt(d)}</b><br>${g.i} ${g.n}で防げます！ 使いますか？`,buttons:[{label:`${g.i} ${g.n}を使う`,v:1},{label:'使わない',v:0,cls:'sub'}]});
+  if(v){p.cards.splice(gi,1);d=0;note=`${g.i} ${g.n}で防いだ！`;sfx('good');particles({kind:'burst',e:['🛡️','✨'],n:14,d:1,fs:30});}}
+ p.money-=d;renderSide();if(d)floatMoney(-d);
+ await modal({icon:'😣',cls:'warn',title:ev.t,body:`${note?`<b class="okc">${note}</b><br>`:''}${d?`<b class="ng" style="font-size:1.3rem">−${fmt(d)}</b>`:'<b class="okc">損害なし！</b>'}<p class="small">${e.i} ${e.n}のできごと</p>`,buttons:[OK]});}
+async function quizSq(p){const ok=await askQ(pick(E().qs),`<b>❓ ${E().n}クイズ</b><br>`);
+ if(ok){const g=E().base*2;p.money+=g;renderSide();floatMoney(g);sfx('coin');await addDev(3,'クイズに正解して、知識が広まった！');}}
+async function chance(p){const e=E(),opts=e.props.filter(x=>!p.props.some(y=>y.n===x.n));
+ const list=opts.map(x=>`<div class="pcard"><span class="pi">${x.i}</span><div><b>${x.n}</b><br>価格 ${fmt(x.price)}・収穫日の収入 +${fmt(x.inc)}<br><span class="small">${x.m}</span></div></div>`).join('');
+ if(!opts.length)return modal({icon:'🛑',title:'チャンスマス',body:`${e.n}の施設はすべて持っています！ ボーナス +${fmt(e.base*2)}`,buttons:[OK]}).then(()=>{p.money+=e.base*2;renderSide();});
+ const v=await modal({icon:'🛑',cls:'gold',title:`チャンス！ ${e.n}の施設を手に入れよう`,body:`${list}<b>産地テスト（3問中2問正解）に合格すると買えます。全問正解なら1割引！</b>`,
+  buttons:[...opts.map((x,i)=>({label:`${x.i} ${x.n}（${fmt(x.price)}）に挑戦`,v:i+1,dis:p.money<x.price*.9})),{label:'今回は見送る',v:0,cls:'sub'}]});
+ if(!v)return;const x=opts[v-1];
+ const n=await test3(shuffle(e.qs).slice(0,3),`${e.n}テスト`);
+ if(n>=2){const perfect=n===3,price=Math.round(x.price*(perfect?.9:1));p.money-=price;p.props.push({...x,era:G.era});if(perfect)p.tp++;
+  sfx('fan');fireworks(3);confetti(50);renderSide();floatMoney(-price);
+  await modal({icon:x.i,cls:'gold',title:`合格！「${x.n}」を手に入れた！`,body:`${n}問正解${perfect?'（全問正解で1割引！）':''}<br>支払い <b>${fmt(price)}</b><p class="memo">${x.m}<br>収穫日のたびに +${fmt(x.inc)} の収入があります。</p>`,buttons:[OK]});
+  await addDev(perfect?14:10,`${esc(p.name)}さんが「${x.n}」をつくり、ムラが発展した！`);}
+ else{p.tf++;sfx('bad');await modal({icon:'📚',title:`不合格…（${n}問正解）`,body:'今回は手に入りませんでした。解説を思い出して、次のチャンスで挑戦しよう！',buttons:[OK]});}}
+
+/* ===== キャラクター ===== */
+async function charSq(p){const ks=Object.keys(CHARS).filter(k=>CHARS[k].from<=G.era&&!G.chars.some(c=>c.k===k));
+ if(!ks.length){return good(p);}
+ let k=ks.includes('ondanka')&&Math.random()<.45?'ondanka':pick(ks.filter(x=>x!=='ondanka').length?ks.filter(x=>x!=='ondanka'):ks);
+ const C=CHARS[k];sfx('boss');tint('rgba(40,0,60,.55)',2200);shake();
+ if(k==='ondanka'){G.chars.push({k,h:-1,left:3});particles({kind:'rise',e:['🔥','🌡️','☀️'],n:18,d:2,fs:34});
+  await modal({cls:'dark',title:'オンダンカ神様 が あらわれた！',body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>いる間は、だれかの番が来るたびに<b>班の発展度</b>が下がってしまう！<p class="memo">${C.m}</p>`,buttons:[{label:'みんなで立ち向かおう！ ▶',v:1}]});
+  renderHud();return ondankaChallenge();}
+ G.chars.push({k,h:G.cur,left:3});
+ await modal({cls:'dark',title:`${C.n} が あらわれた！`,body:`<div class="charbig">${C.i}</div><br><span class="say">「${C.say}」</span><br>${esc(p.name)}さんに とりついた！<p class="memo">${C.m}<br>追い払うには：守りの技術カード（${E().cards.filter(c=>c.t==='guard').map(c=>c.i+c.n).join('、')||'時代の守りのカード'}など）。ほかの人を追いこすと、うつることも。</p>`,buttons:[{label:'負けないぞ！ ▶',v:1}]});
+ renderPawns();renderHud();renderSide();}
+async function repelChar(ch,card){const C=CHARS[ch.k];G.chars=G.chars.filter(c=>c!==ch);sfx('good');particles({kind:'burst',e:['✨','💥',card.i],n:18,d:1.2,fs:32});
+ await modal({cls:'good',title:`${C.n}を 追い払った！`,body:`<div class="charfly">${C.i}</div><br>${card.i} <b>${card.n}</b>の技術で撃退！<p class="memo">${C.m}</p>`,buttons:[{label:'やったー！ ▶',v:1}]});
+ await addDev(3);renderPawns();renderHud();}
+async function charTurn(p){const od=G.chars.find(c=>c.k==='ondanka');
+ if(od){od.left-=1/G.P.length;await addDev(-1);if(od.left<=0){G.chars=G.chars.filter(c=>c!==od);await banner('🌡️ オンダンカ神様は去っていった','',' #6a4a8a',1200);}renderHud();}
+ const ch=G.chars.find(c=>c.h===G.cur);if(!ch)return;const C=CHARS[ch.k];
+ const gi=p.cards.findIndex(c=>c.t==='guard');
+ if(gi>=0){const g=p.cards[gi];const v=await modal({cls:'dark',title:`${C.i} ${C.n}が いたずらしようとしている！`,body:`<span class="say">「${C.say}」</span><br>${g.i} ${g.n}で追い払える！`,buttons:[{label:`${g.i} 使って追い払う`,v:1},{label:'使わない',v:0,cls:'sub'}]});
+  if(v){p.cards.splice(gi,1);return repelChar(ch,g);}}
+ const d=Math.round(E().base*1.5+p.props.length*E().base*.3);p.money-=d;ch.left--;
+ sfx('bad');shake();tint('rgba(60,0,80,.35)',1400);particles({kind:'drift',e:[C.i],n:8,d:1.4,fs:34});renderSide();floatMoney(-d);
+ await modal({cls:'dark',title:`${C.i} ${C.n}の いたずら！`,body:`<span class="say">「${C.say}」</span><br><b style="color:#ff9a8a;font-size:1.3rem">−${fmt(d)}</b><p class="memo">${C.m}</p>`,buttons:[OK]});
+ if(ch.left<=0){G.chars=G.chars.filter(c=>c!==ch);await banner(`${C.i} ${C.n}は去っていった`,'',' #6a4a8a',1200);renderPawns();renderHud();}}
+async function ondankaChallenge(){const C=CHARS.ondanka;
+ const v=await modal({cls:'dark',title:'🌡️ 班のみんなで温暖化対策チャレンジ！',body:`<div class="charbig" style="font-size:80px">${C.i}</div><br>3問中2問正解で、オンダンカ神様をしずめられる！<br>成功すると、<b>発展度アップ＋全員に${fmt(E().base*2)}</b>！`,buttons:[{label:'🔥 班で挑戦する！',v:1},{label:'今回はやめておく',v:0,cls:'sub'}]});
+ if(!v)return;const n=await test3(shuffle(WARM).slice(0,3),'温暖化対策チャレンジ');
+ if(n>=2){G.chars=G.chars.filter(c=>c.k!=='ondanka');G.P.forEach(q=>q.money+=E().base*2);sfx('fan');fireworks(4);
+  await modal({cls:'good',title:'オンダンカ神様が しずまった！',body:`<div class="charfly">${C.i}</div><br>班の全員に <b>+${fmt(E().base*2)}</b>！<p class="memo">${C.m}</p>`,buttons:[{label:'やったー！ ▶',v:1}]});await addDev(10,'みんなで温暖化に立ち向かった！');}
+ else await modal({cls:'dark',title:`失敗…（${n}問正解）`,body:'オンダンカ神様はまだいる…。キャラクターマスに止まると、また挑戦できます。',buttons:[OK]});
+ renderHud();renderSide();}
+
+/* ===== ゴールと進行 ===== */
+const RANKB=[1000,700,500,300,200,100,0];
+async function goal(p){p.done=true;G.finished++;p.rank=G.finished;const b=Math.round(RANKB[p.rank-1]*(1+G.era*.5));p.money+=b;
+ G.chars.filter(c=>c.h===G.cur).forEach(c=>{G.chars=G.chars.filter(x=>x!==c);});
+ sfx('fan');fireworks(4);confetti(70);renderPawns();renderSide();floatMoney(b);
+ await modal({icon:'<span class="trophy">🏆</span>',cls:'gold',title:`${esc(p.name)}さん、${p.rank}番目にゴール！`,body:`ゴールボーナス <b class="okc">+${fmt(b)}</b><br>仲間 ${p.mates}人・施設 ${p.props.length}件<p class="small">ほかの人がゴールするまで、応援しよう！ 班の発展度は、まだ上げられます。</p>`,buttons:[OK]});}
+async function endTurn(){G.busy=false;
+ if(G.P.every(q=>q.done))return finish();
+ do{G.cur=(G.cur+1)%G.P.length;}while(G.P[G.cur].done);
+ await turnStart();}
+
+/* ===== 結果 ===== */
+function postForm(url,data){const f=document.createElement('form');f.method='POST';f.action=url;f.target='_blank';f.acceptCharset='UTF-8';f.style.display='none';const i=document.createElement('input');i.type='hidden';i.name='payload';i.value=JSON.stringify(data);f.appendChild(i);document.body.appendChild(f);f.submit();setTimeout(()=>f.remove(),1500);}
+function finish(){const ranked=[...G.P].sort((a,b)=>assets(b)-assets(a)),avg=Math.round(G.P.reduce((a,p)=>a+assets(p),0)/G.P.length),bonus=G.era*1500+(G.era>=6?3000:0),score=avg+bonus,props=G.P.reduce((a,p)=>a+p.props.length,0);
+ const payload={kind:'すごろく',kumi:setup.kumi,han:setup.han,count:G.P.length,months:G.short?'ショート':'ノーマル',level:E().n,avgAssets:avg,groupScore:score,props,members:ranked.map((p,i)=>`${i+1}位 ${p.name}（${fmt(assets(p))}）`).join(' ／ ')};
+ app.innerHTML=`<div class="card hero"><div class="trophy">🏆</div><h2>表彰式</h2><p>${setup.kumi}組 ${setup.han}班 ・ たどり着いた時代：<b>${E().i} ${E().n}</b></p>
+ <div class="etl">${ERAS.map((e,i)=>`<span style="${i<=G.era?'background:#ffe48a':''}">${e.i} ${e.n}</span>`).join('')}</div></div>
+ <div class="card"><h2>👑 個人の順位（総資産＝お金＋施設の価値＋仲間）</h2><table><tr><th>順位</th><th>名前</th><th>総資産</th><th>お金</th><th>施設</th><th>仲間</th><th>ゴール</th></tr>
+ ${ranked.map((p,i)=>`<tr><td><b>${['🥇','🥈','🥉'][i]||''} ${i+1}位</b></td><td>${esc(p.name)}</td><td><b>${fmt(assets(p))}</b></td><td>${fmt(p.money)}</td><td>${p.props.map(x=>`<span title="${esc(ERAS[x.era].n+'・'+x.n)}">${x.i}</span>`).join('')||'—'}</td><td>${p.mates}人</td><td>${p.rank}番目</td></tr>`).join('')}</table></div>
+ <div class="card" style="text-align:center"><h2>🤝 班の得点</h2><div class="score">${fmt(score)}</div>
+ <p>班員の平均資産 ${fmt(avg)} ＋ 時代ボーナス ${fmt(bonus)}（${E().n}まで発展${G.era>=6?'・現代到達ボーナス込み':''}）</p>
+ <p>${G.era>=6?'🏆 <b>班の目標「令和の時代まで発展させる」を達成！</b>':`班の目標（平成・令和）まで、あと${6-G.era}つの時代でした。`}</p>
+ <div class="row" style="justify-content:center"><button id="send" class="big">📮 班の結果を提出する</button><button class="sub" id="rank">🏅 クラスの班ランキングを見る</button></div><p id="smsg" class="small"></p></div>
+ <div class="card"><h2>⏳ 生物育成の歩み</h2><table><tr><th>時代</th><th>生物育成のようす</th></tr>${ERAS.map((e,i)=>`<tr style="${i>G.era?'opacity:.5':''}"><td>${e.i} <b>${e.n}</b><br><span class="small">${e.y}</span></td><td>${e.sum}</td></tr>`).join('')}</table></div>
+ <div class="card qcard"><h2>✏️ ふりかえろう</h2><ol><li>時代が進むにつれて、生物を育てる技術はどのように変わってきた？ 特に大きく変わったと思う時代と、その理由は？</li><li>技術が発達して、よくなったことと、新しく生まれた課題（環境・人手不足・温暖化など）は何だろう？</li><li>これからの時代、生物育成の技術はどうなっていくべきだろう？ 気になったことを「問い」にして付箋に書こう。</li></ol></div>
+ <div class="row" style="justify-content:center;margin-bottom:20px"><button id="again" class="sub">⏳ 同じメンバーでもう一度</button><button class="sub" id="reset">設定にもどる</button></div>`;
+ sfx('fan');confetti(100);fireworks(6);
+ $('send').onclick=()=>{postForm(GAS_URL,payload);$('send').disabled=true;$('smsg').textContent='新しいタブで「✅ 提出できました」と出たら完了です。ログイン画面が出たら、学校のアカウントでログインしてからもう一度押してください。';setTimeout(()=>$('send').disabled=false,4000);};
+ $('rank').onclick=()=>window.open(`${GAS_URL}?page=ranking&kumi=${encodeURIComponent(setup.kumi)}`,'_blank');
+ $('again').onclick=startGame;$('reset').onclick=renderSetup;window.scrollTo(0,0);}
+
+renderSetup();
+</script>
+</body>
+</html>
