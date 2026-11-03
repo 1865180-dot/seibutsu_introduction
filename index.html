@@ -456,14 +456,26 @@ const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function fmt(v){const neg=v<0;v=Math.abs(Math.round(v));const o=Math.floor(v/10000),m=v%10000;return(neg?'−':'')+(o?o+'億':'')+(m||!o?m.toLocaleString()+'万':'')+'円';}
 
 /* ===== 効果音・演出 ===== */
-let SND=false;try{SND=localStorage.getItem('jn_snd')==='1';}catch(e){}
+let SND=true;try{SND=localStorage.getItem('jn_snd2')!=='0';}catch(e){}
 function sndLabel(){$('snd').textContent=SND?'🔊 効果音オン':'🔇 効果音オフ';}
-$('snd').onclick=()=>{SND=!SND;try{localStorage.setItem('jn_snd',SND?'1':'0');}catch(e){}sndLabel();sfx('good');};sndLabel();
-function sfx(k){if(!SND)return;try{const ac=sfx.ac||(sfx.ac=new(window.AudioContext||window.webkitAudioContext)());const t=ac.currentTime;
- const tone=(f,d,len,type,vol)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type||'triangle';o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(vol||.07,t+d);g.gain.exponentialRampToValueAtTime(.001,t+d+len);o.start(t+d);o.stop(t+d+len+.02);};
- ({tick:()=>tone(1200,0,.03,'square',.03),hop:()=>tone(660,0,.07),good:()=>[523,659,784].forEach((f,i)=>tone(f,i*.09,.18)),
-  bad:()=>{tone(220,0,.25,'sawtooth',.05);tone(165,.15,.3,'sawtooth',.05);},card:()=>[880,1175].forEach((f,i)=>tone(f,i*.07,.12)),coin:()=>[1319,1568].forEach((f,i)=>tone(f,i*.06,.1,'square',.04)),
-  fan:()=>[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,.22)),era:()=>[392,523,659,784,1047,1319].forEach((f,i)=>tone(f,i*.15,.4)),boss:()=>[110,98,87].forEach((f,i)=>tone(f,i*.2,.35,'sawtooth',.07)),thunder:()=>tone(80,0,.6,'sawtooth',.08)}[k]||(()=>{}))();}catch(e){}}
+$('snd').onclick=()=>{SND=!SND;try{localStorage.setItem('jn_snd2',SND?'1':'0');}catch(e){}sndLabel();sfx('good');};sndLabel();
+function sfx(k){if(!SND)return;try{const ac=sfx.ac||(sfx.ac=new(window.AudioContext||window.webkitAudioContext)());if(ac.state==='suspended')ac.resume();const t=ac.currentTime;
+ const tone=(f,d,len,type,vol,f2)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type||'triangle';o.frequency.setValueAtTime(f,t+d);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d+len);o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.0001,t+d);g.gain.linearRampToValueAtTime(vol||.13,t+d+.01);g.gain.exponentialRampToValueAtTime(.001,t+d+len);o.start(t+d);o.stop(t+d+len+.03);};
+ const noise=(d,len,vol,hp)=>{const b=ac.createBuffer(1,ac.sampleRate*len,ac.sampleRate),x=b.getChannelData(0);for(let i=0;i<x.length;i++)x[i]=(Math.random()*2-1)*(1-i/x.length);const s=ac.createBufferSource(),g=ac.createGain(),f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=hp||800;s.buffer=b;s.connect(f);f.connect(g);g.connect(ac.destination);g.gain.value=vol||.15;s.start(t+d);};
+ const arp=(fs,step,len,type,vol)=>fs.forEach((f,i)=>tone(f,i*step,len,type,vol));
+ ({click:()=>tone(900,0,.05,'square',.05),tick:()=>tone(1500,0,.025,'square',.06),hop:()=>tone(500,0,.09,'triangle',.12,900),
+  good:()=>arp([523,659,784,1047],.08,.22),bad:()=>{tone(330,0,.3,'sawtooth',.09,200);tone(247,.2,.45,'sawtooth',.09,140);},
+  ok:()=>{arp([784,1047],.1,.25,'square',.08);tone(1568,.2,.35,'triangle',.1);},ng:()=>{tone(200,0,.18,'square',.1);tone(150,.2,.35,'square',.1);},
+  card:()=>arp([880,1175,1568],.06,.15,'square',.07),coin:()=>{tone(988,0,.08,'square',.08);tone(1319,.08,.3,'square',.08);},
+  fan:()=>{arp([523,659,784,1047,784,1047,1319],.11,.25,'square',.07);arp([262,330,392,523],.22,.4,'triangle',.08);},
+  era:()=>{arp([392,523,659,784,1047,1319,1568],.13,.5,'triangle',.12);arp([196,262,330,392],.26,.8,'sine',.1);},
+  boss:()=>{[110,104,98,92].forEach((f,i)=>tone(f,i*.18,.4,'sawtooth',.12));noise(0,.6,.06,200);},thunder:()=>{noise(0,1.2,.35,60);tone(70,0,.8,'sawtooth',.12,40);},
+  spin:()=>noise(0,.25,.08,2000),news:()=>arp([659,523,659,784],.12,.25,'square',.08),vote:()=>arp([784,988],.1,.18,'triangle',.1),
+  gturn:()=>{for(let i=0;i<6;i++)tone(300+i*40,i*.12,.06,'square',.08);},gdrop:()=>{tone(700,0,.25,'triangle',.12,250);tone(260,.25,.12,'sine',.15);tone(240,.42,.1,'sine',.1);},
+  gopen:()=>{noise(0,.15,.12,3000);arp([1047,1319,1568],.05,.2,'triangle',.1);},
+  gsr:()=>{arp([784,988,1175,1568,1976],.07,.3,'square',.08);noise(.3,.4,.05,5000);},
+  glr:()=>{arp([523,659,784,1047,1319,1568,2093],.09,.6,'square',.08);arp([262,330,392,523,659],.18,1,'triangle',.1);noise(.5,1,.08,6000);}}[k]||(()=>{}))();}catch(e){}}
+document.addEventListener('pointerdown',ev=>{if(ev.target.closest('button'))sfx('click');},true);
 function tint(color,d=1600){const e=$('tint');e.style.background=color;e.style.setProperty('--d',d+'ms');e.classList.remove('on');void e.offsetWidth;e.classList.add('on');}
 function particles(o){if(RM)return;const L=$('fxl');const n=o.n||20;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='pt '+o.kind;
  const d=(o.d||2)*(0.7+Math.random()*.6),dl=Math.random()*(o.spread||1);s.style.setProperty('--d',d+'s');s.style.setProperty('--dl',dl+'s');
@@ -510,7 +522,7 @@ function modal({icon,title,body,cls,buttons,choices,raw}){return new Promise(res
 const OK={label:'OK ▶',v:1};
 async function askQ(q,head){const idx=shuffle(q.a.map((a,i)=>i));
  const v=await modal({icon:'❓',cls:'quiz',choices:true,title:q.q,body:`${head||''}<span class="small">班のみんなで相談してOK！</span>`,buttons:idx.map(i=>({label:q.a[i],v:i}))});
- const ok=v===q.k;sfx(ok?'good':'bad');if(ok)particles({kind:'burst',e:['⭕','✨'],n:10,d:1,fs:28});else shake();
+ const ok=v===q.k;sfx(ok?'ok':'ng');if(ok)particles({kind:'burst',e:['⭕','✨'],n:10,d:1,fs:28});else shake();
  await modal({icon:ok?'⭕':'❌',cls:ok?'good':'quiz',title:ok?'正解！':'ざんねん…',body:`答え：<b>${q.a[q.k]}</b><p class="memo">${q.m}</p>`,buttons:[{label:'次へ ▶',v:1}]});return ok;}
 async function test3(qs,title){let n=0;const res=[];
  for(let i=0;i<qs.length;i++){const head=`<div class="qprog">${qs.map((_,j)=>`<span style="background:${j<i?(res[j]?'#c8f0d6':'#f8d3cf'):j===i?'#ffe48a':'#eee'}">${j<i?(res[j]?'⭕':'❌'):j+1}</span>`).join('')}</div><b>${title} ${i+1}問目</b><br>`;
@@ -566,7 +578,7 @@ function renderSetup(){
  <div class="card"><h2>📖 ルール</h2><ul class="rules">
   <li>🎡 順番に<b>ルーレット（1〜10）</b>を回して、ぐるぐる回るコースを進みます。ゴールはありません。</li>
   <li>🎉 <b>収穫祭</b>（スタート地点）を通るたびに、時代の基本収入＋持っている施設の収入が入ります。</li>
-  <li>🏗️ <b>施設マス</b>では、その時代の施設を買うチャンス！ <b>3問中2問正解</b>で買えます。<b>大規模</b>にすると収入2.5倍、でも災害の被害も2倍！</li>
+  <li>🏗️ <b>施設マス</b>では、その時代の施設を買うチャンス！ <b>技術クイズ1問に正解</b>で買えます。<b>大規模</b>にすると収入2.5倍、でも災害の被害も2倍！</li>
   <li>🎲 <b>大勝負マス</b>：安全にいくか、大きく勝負するか。ハイリスク・ハイリターン！</li>
   <li>📰 1年ごとに<b>ニュース</b>が起き、班の全員に影響します。洪水や台風は農地・漁場に被害、豊作や関税の緩和はプラスに！</li>
   <li>🗳️ 2年ごとに<b>村の会議</b>。全員で多数決をして、村の進め方を決めます。</li>
@@ -662,15 +674,15 @@ async function useCard(i){if(G.busy)return;const p=CP(),c=p.cards[i];if(!c)retur
   await modal({icon:c.i,cls:'gold',title:`🌈 ${c.n} 発動！`,body:`<p style="font-size:1.15rem">${msg}</p><p class="memo">${c.m}</p>`,buttons:[{label:'すごすぎる…！ ▶',v:1}]});
   if(c.t==='invent'&&G.era<6){G.dev=Math.max(G.dev,Math.ceil(ETH[G.era+1]*G.devMax/100));await addDev(0,`${esc(p.name)}さんの大発明で、時代が進んだ！`);}}
  renderSide();}
-async function legendFx(c){sfx('era');const w=document.createElement('div');w.className='warp rb';document.body.appendChild(w);setTimeout(()=>w.remove(),1700);fireworks(6);confetti(120);particles({kind:'burst',e:['🌈','✨','💎',c.i],n:30,d:1.6,fs:36});await sleep(RM?50:900);}
+async function legendFx(c){sfx('glr');const w=document.createElement('div');w.className='warp rb';document.body.appendChild(w);setTimeout(()=>w.remove(),1700);fireworks(6);confetti(120);particles({kind:'burst',e:['🌈','✨','💎',c.i],n:30,d:1.6,fs:36});await sleep(RM?50:900);}
 async function gacha(rar){return new Promise(res=>{const ov=$('modal'),R=RAR[rar];
  $('mwrap').innerHTML=`<div class="mbox gacha-box"><h2>🎰 技術カードガチャ！</h2><div class="gm"><div class="gm-dome"><i style="--x:20%;--y:55%;--c:#c9d1d9"></i><i style="--x:45%;--y:65%;--c:#ffd34d"></i><i style="--x:68%;--y:52%;--c:#c9d1d9"></i><i style="--x:33%;--y:35%;--c:#ff8ad8"></i><i style="--x:58%;--y:30%;--c:#c9d1d9"></i><i style="--x:75%;--y:70%;--c:#ffd34d"></i></div><div class="gm-body"><div class="gm-handle" id="gh">✚</div><div class="gm-out"></div></div><div class="cap" id="cap"><div class="ct2"></div><div class="cb2"></div></div></div>
  <p class="small">シルバー＝レア（60%）／ゴールド＝スーパーレア（35%）／レインボー＝レジェンドレア（5%）</p><div class="mbtns"><button id="gturn" class="big">ハンドルを回す！</button></div></div>`;
  ov.classList.remove('hidden');
- $('gturn').onclick=async()=>{$('gturn').disabled=true;sfx('tick');$('gh').classList.add('turn');await sleep(RM?50:900);
-  const cap=$('cap');cap.classList.add('drop','c-'+R.cap);sfx('hop');await sleep(RM?50:1000);
-  cap.classList.add('shake');if(rar!=='R'){sfx('card');}await sleep(RM?50:rar==='LR'?1800:1100);
-  if(rar==='LR'){tint('rgba(255,255,255,.95)',600);legendFx({i:'🌈'});}else if(rar==='SR'){particles({kind:'burst',e:['✨','⭐'],n:18,d:1.2,fs:30});sfx('fan');}else sfx('good');
+ $('gturn').onclick=async()=>{$('gturn').disabled=true;sfx('gturn');$('gh').classList.add('turn');await sleep(RM?50:900);
+  const cap=$('cap');cap.classList.add('drop','c-'+R.cap);sfx('gdrop');await sleep(RM?50:1000);
+  cap.classList.add('shake');if(rar!=='R'){const iv=setInterval(()=>sfx('tick'),150);setTimeout(()=>clearInterval(iv),rar==='LR'?1700:1000);}await sleep(RM?50:rar==='LR'?1800:1100);
+  if(rar==='LR'){tint('rgba(255,255,255,.95)',600);sfx('glr');legendFx({i:'🌈'});}else if(rar==='SR'){particles({kind:'burst',e:['✨','⭐'],n:18,d:1.2,fs:30});sfx('gsr');}else sfx('gopen');
   cap.classList.add('open');await sleep(RM?50:700);ov.classList.add('hidden');res();};});}
 async function getCard(p,title,icon){const rar=rollRar(),c=makeCard(rar);
  await gacha(rar);const R=RAR[rar];
@@ -723,20 +735,21 @@ async function bad(p){const e=E(),ev=pick(e.bad);let d=ev.v;await eventFx(ev.fx)
 async function quizSq(p){const ok=await askQ(pick(quizPool()),`<b>❓ 生物育成クイズ</b> 正解で +${fmt(E().base*2)}<br>`);
  if(ok){const g=E().base*2;p.money+=g;renderSide();floatMoney(g);sfx('coin');await addDev(3,'クイズに正解して、技術が広まった！');}}
 async function chance(p){const e=E(),opts=e.props;
- const list=opts.map(x=>`<div class="pcard"><span class="pi">${x.i}</span><div><b>${x.n}</b> <span class="small">${CATN[x.cat]}${x.noWx?'・天候の被害なし':''}</span><br>通常：${fmt(x.price)}・収入 +${fmt(x.inc)} ／ <b style="color:#c0392b">大規模：${fmt(x.price*BIG.price)}・収入 +${fmt(Math.round(x.inc*BIG.inc))}</b><br><span class="small">${x.m}</span></div></div>`).join('');
- const btns=[];opts.forEach((x,i)=>{btns.push({label:`${x.i} ${x.n}（${fmt(x.price)}）`,v:{i,big:false},dis:p.money<x.price*.9});btns.push({label:`🔥 ${x.n}を大規模に（${fmt(x.price*BIG.price)}）`,v:{i,big:true},cls:'risky',dis:p.money<x.price*BIG.price*.9});});
- btns.push({label:'今回は見送る',v:0,cls:'sub'});
- const v=await modal({icon:'🏗️',cls:'gold',title:`施設マス！ ${e.n}の施設を手に入れよう`,body:`${list}<b>テスト（3問中2問正解）に合格すると買えます。全問正解なら1割引！</b><br><span class="small">🔥大規模：収入2.5倍。でも、災害のニュースの被害も2倍になります。<br>🤝 ちがう種類の施設を組み合わせると収入アップ（農地＋畜産＝循環型農業×1.3、3種類そろうと×1.5）</span>`,buttons:btns});
- if(!v)return;const x=opts[v.i];
- const n=await test3(shuffle(e.qs).slice(0,3),`${e.n}の技術テスト`);
- if(n>=2){const perfect=n===3,price=Math.round(x.price*(v.big?BIG.price:1)*(perfect?.9:1));p.money-=price;
-  p.props.push({...x,era:G.era,big:v.big,price:x.price*(v.big?BIG.price:1),inc:Math.round(x.inc*(v.big?BIG.inc:1))});
+ const list=opts.map(x=>`<div class="pcard"><span class="pi">${x.i}</span><div><b>${x.n}</b> <span class="small">${CATN[x.cat]}${x.noWx?'・天候の被害なし':''}</span><br>${fmt(x.price)}　収穫祭の収入 <b class="okc">+${fmt(x.inc)}</b></div></div>`).join('');
+ const i=await modal({icon:'🏗️',cls:'gold',title:`施設マス！ ${e.n}の施設を選ぼう`,body:`${list}<span class="small">技術クイズ1問に正解すると買えます。</span>`,
+  buttons:[...opts.map((x,i)=>({label:`${x.i} ${x.n}`,v:i+1,dis:p.money<x.price})),{label:'今回は見送る',v:0,cls:'sub'}]});
+ if(!i)return;const x=opts[i-1],bp=x.price*BIG.price,bi=Math.round(x.inc*BIG.inc);
+ const big=await modal({icon:x.i,cls:'gold',title:`「${x.n}」をどの規模でつくる？`,body:`<div class="riskbox" style="grid-template-columns:1fr 1fr"><div><b>🏠 ふつう</b><br>${fmt(x.price)}<br>収入 <b class="okc">+${fmt(x.inc)}</b></div><div style="border-color:#e2483a;background:#fff0ec"><b>🔥 大規模</b><br>${fmt(bp)}<br>収入 <b class="okc">+${fmt(bi)}</b>（2.5倍）<br><b class="ng">災害の被害も2倍</b></div></div><p class="memo">${x.m}</p>`,
+  buttons:[{label:'🏠 ふつうでつくる',v:1},{label:'🔥 大規模でつくる',v:2,cls:'risky',dis:p.money<bp},{label:'やめる',v:0,cls:'sub'}]});
+ if(!big)return;const isBig=big===2,price=isBig?bp:x.price,inc=isBig?bi:x.inc;
+ const ok=await askQ(pick(e.qs),`<b>🏗️ 技術クイズ（正解で「${x.n}」が買える）</b><br>`);
+ if(ok){p.money-=price;p.props.push({...x,era:G.era,big:isBig,price,inc});
   sfx('fan');fireworks(3);confetti(50);renderSide();floatMoney(-price);
-  await modal({icon:x.i,cls:'gold',title:`合格！「${x.n}」${v.big?'を大規模に':''}手に入れた！`,body:`${n}問正解${perfect?'（全問正解で1割引！）':''}<br>支払い <b>${fmt(price)}</b><p class="memo">${x.m}<br>収穫祭のたびに +${fmt(Math.round(x.inc*(v.big?BIG.inc:1)))} の収入があります。</p>`,buttons:[OK]});
+  await modal({icon:x.i,cls:'gold',title:`「${x.n}」${isBig?'を大規模に':'を'}手に入れた！`,body:`支払い <b>${fmt(price)}</b><br>収穫祭のたびに <b class="okc">+${fmt(inc)}</b> の収入！`,buttons:[OK]});
   const before=combo({props:p.props.slice(0,-1)}),after=combo(p);
   if(after.m>before.m){sfx('fan');confetti(40);await modal({icon:after.i,cls:'good',title:`組み合わせボーナス！ ${after.n}`,body:after.m===1.3?'家畜のふんを堆肥にして畑に使い、畑でとれた作物の一部を家畜のえさにする。資源がめぐる「循環型農業」で、収入がアップ！':after.m===1.5?'農業・畜産・水産の3つをそろえた！ 技術や資源をつなげて、収入が大きくアップ！':'ちがう種類の生物を育てると、リスクが分散され、収入もアップ！',buttons:[OK]});}
-  await addDev(perfect?14:10,`${esc(p.name)}さんが「${x.n}」をつくり、産業が発展した！`);}
- else{sfx('bad');await modal({icon:'📚',title:`不合格…（${n}問正解）`,body:'今回は手に入りませんでした。解説を思い出して、次のチャンスで挑戦しよう！',buttons:[OK]});}}
+  await addDev(10,`${esc(p.name)}さんが「${x.n}」をつくり、産業が発展した！`);}
+ else await modal({icon:'📚',title:'今回は買えませんでした',body:'解説を思い出して、次のチャンスで挑戦しよう！',buttons:[OK]});}
 async function risk(p){const e=E(),r=pick(RISKS),win=e.base*8,lose=e.base*6,safe=e.base;
  const v=await modal({icon:'🎲',cls:'gold',title:`大勝負マス！ ${r.i} ${r.t}`,body:`<div class="riskbox"><div><b>🛡️ 安全にいく</b><br>確実に <b class="okc">+${fmt(safe)}</b></div><div><b>🔥 勝負する</b><br>ルーレットで <b>6〜10</b> なら <b class="okc">+${fmt(win)}</b><br>1〜5 なら <b class="ng">−${fmt(lose)}</b></div><div><b>🧠 難問で勝負</b><br>次の時代の技術クイズに正解で <b class="okc">+${fmt(win)}</b><br>まちがえたら <b class="ng">−${fmt(lose)}</b></div></div>`,
   buttons:[{label:'🛡️ 安全にいく',v:1,cls:'sub'},{label:'🔥 ルーレットで勝負！',v:2,cls:'risky'},{label:'🧠 難問で勝負！',v:3,cls:'risky'}]});
@@ -750,7 +763,7 @@ async function risk(p){const e=E(),r=pick(RISKS),win=e.base*8,lose=e.base*6,safe
   await modal({icon:'💥',cls:'warn',title:`失敗… −${fmt(lose)}`,body:`今回はうまくいかなかった…。<p class="memo">大きな挑戦にはリスクがある。生産者は、計画を立て、試験的に小さく始めるなどしてリスクを減らしている。</p>`,buttons:[OK]});}}
 
 /* ===== 毎年のニュース（班全体） ===== */
-async function yearNews(){const e=E(),goodNews=Math.random()<.5;
+async function yearNews(){const e=E(),goodNews=Math.random()<.5;sfx('news');await sleep(RM?50:500);
  const pool=(goodNews?NEWS_GOOD:NEWS_BAD).filter(x=>x.from<=G.era),ev=pick(pool.length?pool:(goodNews?NEWS_GOOD:NEWS_BAD).slice(0,1));
  const rows=G.P.map(p=>{const hit=ev.cats?p.props.filter(x=>ev.cats.includes(x.cat)&&!(ev.wx&&x.noWx)):[];
   let amt=hit.reduce((a,x)=>a+Math.round(x.inc*(ev.m||1)*(x.big&&!goodNews?BIG.dmg/BIG.inc:1)),0)+(ev.all?e.base*ev.all:0);
@@ -784,10 +797,10 @@ function voteModal(v){return new Promise(res=>{const ov=$('modal'),sel={};
   <table class="vt">${G.P.map((p,i)=>`<tr><td><span class="dot" style="background:${p.color}">${i+1}</span> ${esc(p.name)}</td><td><button class="vb ${sel[i]==='a'?'on':''}" data-p="${i}" data-v="a">Ａ</button> <button class="vb ${sel[i]==='b'?'on':''}" data-p="${i}" data-v="b">Ｂ</button></td></tr>`).join('')}</table>
   <p><b>Ａ ${a}票 ／ Ｂ ${b}票</b>${all?'':'　<span class="small">（全員が選ぶと決定できます）</span>'}</p>
   <div class="mbtns"><button id="vdone" ${all?'':'disabled'}>決定する ▶</button></div></div>`;
-  $('mwrap').querySelectorAll('.vb').forEach(el=>el.onclick=()=>{sel[el.dataset.p]=el.dataset.v;sfx('tick');draw();});
+  $('mwrap').querySelectorAll('.vb').forEach(el=>el.onclick=()=>{sel[el.dataset.p]=el.dataset.v;sfx('vote');draw();});
   $('vdone').onclick=()=>{ov.classList.add('hidden');res({a,b});};};
  draw();ov.classList.remove('hidden');});}
-async function villageVote(){const e=E(),v=pick(VOTES);sfx('card');
+async function villageVote(){const e=E(),v=pick(VOTES);sfx('vote');
  const r=await voteModal(v);let win=r.a>r.b?'a':r.b>r.a?'b':null;
  if(!win){await banner('同じ票数！ ルーレットで決めよう','偶数ならＡ、奇数ならＢ','#2a6fd6',1200);const n=await spinWheel();win=n%2===0?'a':'b';}
  const o=v[win];let m=o.m||0,msg='';
@@ -823,11 +836,11 @@ async function charTurn(p){const od=G.chars.find(c=>c.k==='ondanka');
  await modal({cls:'dark',title:`${C.i} ${C.n}の いたずら！`,body:`<span class="say">「${C.say}」</span><br><b style="color:#ff9a8a;font-size:1.3rem">−${fmt(d)}</b><p class="memo">${C.m}</p>`,buttons:[OK]});
  if(ch.left<=0){G.chars=G.chars.filter(c=>c!==ch);await banner(`${C.i} ${C.n}は去っていった`,'','#6a4a8a',1200);renderPawns();renderHud();}}
 async function ondankaChallenge(){const C=CHARS.ondanka;
- const v=await modal({cls:'dark',title:'🌡️ 班のみんなで温暖化対策チャレンジ！',body:`<div class="charbig" style="font-size:80px">${C.i}</div><br>3問中2問正解で、オンダンカ神様をしずめられる！<br>成功すると、<b>発展度アップ＋全員に${fmt(E().base*2)}</b>！`,buttons:[{label:'🔥 班で挑戦する！',v:1},{label:'今回はやめておく',v:0,cls:'sub'}]});
- if(!v)return;const n=await test3(shuffle(WARM).slice(0,3),'温暖化対策チャレンジ');
- if(n>=2){G.chars=G.chars.filter(c=>c.k!=='ondanka');G.P.forEach(q=>q.money+=E().base*2);sfx('fan');fireworks(4);
+ const v=await modal({cls:'dark',title:'🌡️ 班のみんなで温暖化対策チャレンジ！',body:`<div class="charbig" style="font-size:80px">${C.i}</div><br>クイズ1問に正解すると、オンダンカ神様をしずめられる！<br>成功すると、<b>発展度アップ＋全員に${fmt(E().base*2)}</b>！`,buttons:[{label:'🔥 班で挑戦する！',v:1},{label:'今回はやめておく',v:0,cls:'sub'}]});
+ if(!v)return;const n=await askQ(pick(WARM),'<b>🌡️ 温暖化対策チャレンジ</b><br>')?1:0;
+ if(n>=1){G.chars=G.chars.filter(c=>c.k!=='ondanka');G.P.forEach(q=>q.money+=E().base*2);sfx('fan');fireworks(4);
   await modal({cls:'good',title:'オンダンカ神様が しずまった！',body:`<div class="charfly">${C.i}</div><br>班の全員に <b>+${fmt(E().base*2)}</b>！<p class="memo">${C.m}</p>`,buttons:[{label:'やったー！ ▶',v:1}]});await addDev(10,'みんなで温暖化に立ち向かった！');}
- else await modal({cls:'dark',title:`失敗…（${n}問正解）`,body:'オンダンカ神様はまだいる…。キャラクターマスに止まると、また挑戦できます。',buttons:[OK]});
+ else await modal({cls:'dark',title:'失敗…',body:'オンダンカ神様はまだいる…。キャラクターマスに止まると、また挑戦できます。',buttons:[OK]});
  renderHud();renderSide();}
 
 /* ===== 進行 ===== */
