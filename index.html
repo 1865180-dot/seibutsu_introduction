@@ -559,7 +559,8 @@ const LEGEND=[
  {n:'時代を切りひらく大発明',i:'💡',t:'invent',m:'歴史を変える大発明！ 班の時代が1つ進み、自分は基本収入×20を手に入れる。'}];
 const SRTXT={spin2:'ルーレットを3回回せる！',income:'すぐに基本収入×8の収入！',meter:'班の発展度が大きく（+15）アップ！',guard:'悪いできごとを防ぎ、さらに基本収入×5がもらえる！'};
 function rollRar(){const r=Math.random();return r<.05?'LR':r<.40?'SR':'R';}
-function makeCard(rar){if(rar==='LR')return{...pick(LEGEND),era:G.era,rar};const c=pick(cardsUpTo());return{...c,rar,m:rar==='SR'?c.m.replace(/次のルーレットを2回回せる。|すぐに収入が入る。|班の発展度がアップ。|悪いできごとを1回防ぐ。/,'')+'【SR】'+SRTXT[c.t]:c.m};}
+const STEAL={n:'技術ぬすみ',i:'🕵️',t:'steal',m:'ほかの人の技術カードを、ランダムで1枚ぬすむ！ だれの、どのカードかはランダム。'};
+function makeCard(rar){if(rar==='LR')return{...pick(LEGEND),era:G.era,rar};if(rar==='SR'&&Math.random()<.3)return{...STEAL,era:G.era,rar};const c=pick(cardsUpTo());return{...c,rar,m:rar==='SR'?c.m.replace(/次のルーレットを2回回せる。|すぐに収入が入る。|班の発展度がアップ。|悪いできごとを1回防ぐ。/,'')+'【SR】'+SRTXT[c.t]:c.m};}
 function rarTag(c){const r=RAR[c.rar||'R'];return`<span class="rtag r${c.rar||'R'}">${c.rar||'R'}</span>`;}
 function guardBonus(p,g){if(g.rar!=='SR')return'';const b=E().base*5;p.money+=b;return`（SRボーナス +${fmt(b)}）`;}
 function cardsUpTo(){const L=[];ERAS.forEach((e,ei)=>{if(ei<=G.era)e.cards.forEach(c=>{for(let k=0;k<(ei===G.era?4:1);k++)L.push({...c,era:ei});});});return L;}
@@ -664,6 +665,12 @@ async function useCard(i){if(G.busy)return;const p=CP(),c=p.cards[i];if(!c)retur
  else if(c.t==='income'){const g=e.base*(sr?8:3);p.money+=g;sfx('coin');renderSide();floatMoney(g);await modal({icon:c.i,cls:'good',title:`${c.n}で +${fmt(g)}`,body:c.m,buttons:[OK]});}
  else if(c.t==='meter'){sfx('good');particles({kind:'burst',e:[c.i,'✨'],n:14,d:1.2,fs:30});await modal({icon:c.i,cls:'good',title:`${c.n}で班の発展度アップ！`,body:c.m,buttons:[OK]});await addDev(sr?15:6,`${esc(p.name)}さんの「${c.n}」で技術が進んだ！`);}
  else if(c.t==='guard'&&ch)await repelChar(ch,c);
+ else if(c.t==='steal'){const vs=G.P.filter(q=>q!==p&&q.cards.length);
+  if(!vs.length){const g=e.base*5;p.money+=g;sfx('coin');renderSide();floatMoney(g);await modal({icon:c.i,cls:'good',title:'ぬすめるカードがなかった…',body:`だれも技術カードを持っていない！ かわりに <b class="okc">+${fmt(g)}</b>`,buttons:[OK]});}
+  else{const q=pick(vs),k=rand(q.cards.length),got=q.cards.splice(k,1)[0];sfx('boss');shake();particles({kind:'burst',e:['🕵️','💨',got.i],n:16,d:1.2,fs:32});
+   let note='';if(p.cards.length>=HAND){const drop=p.cards.shift();note=`<br><span class="small">手札がいっぱいなので「${drop.n}」をすてた</span>`;}
+   p.cards.push(got);renderSide(true);
+   await modal({icon:'🕵️',cls:'gold',title:`${esc(q.name)}さんから カードをぬすんだ！`,body:`<div class="pcard"><span class="pi">${got.i}</span><div><b>${got.n}</b> ${rarTag(got)}<br><span class="small">${got.m}</span></div></div>${note}`,buttons:[{label:'しめしめ… ▶',v:1}]});}}
  else if(c.rar==='LR'){await legendFx(c);let msg='';
   if(c.t==='double'){const before=p.money;p.money=Math.max(p.money*2,p.money+e.base*20);msg=`お金 ${fmt(before)} → <b class="okc">${fmt(p.money)}</b>`;}
   else if(c.t==='goldbig'){if(p.props.length){p.props.forEach(x=>{if(!x.big){x.big=true;x.inc=Math.round(x.inc*BIG.inc);x.price*=BIG.price;}});msg=`施設 ${p.props.map(x=>x.i).join('')} がすべて大規模に！`;}
