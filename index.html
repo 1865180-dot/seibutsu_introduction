@@ -205,6 +205,7 @@ footer{text-align:center;color:#eaf6ff;font-size:.78rem;padding:6px}
 @keyframes charout{0%{transform:none}30%{transform:translateY(10px) scale(.9)}100%{transform:translate(60vw,-60vh) rotate(720deg) scale(.2);opacity:0}}
 @keyframes warp{0%{opacity:0;transform:scale(.2)}40%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(2.4)}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+.keybox{background:#fff3c4;border:3px solid #f0c64a;border-radius:12px;padding:6px 12px;margin:6px 0 10px;font-size:1.15rem;font-weight:700}.keybox b{color:#c0392b;font-size:1.25em;border-bottom:3px solid #c0392b}.keybox.sm{font-size:.95rem;padding:3px 8px;margin:4px 0}.kcell b{color:#c0392b}
 .riskbox{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0;text-align:center}.riskbox>div{background:#fff7e6;border:3px solid #f0c64a;border-radius:14px;padding:8px;font-size:.92rem}
 @media(max-width:600px){.riskbox{grid-template-columns:1fr}}
 button.risky{background:linear-gradient(#ff6a3d,#d9381e);box-shadow:0 5px 0 #9a2412}
@@ -408,6 +409,12 @@ const TQ=[
   {q:'アニマルウェルフェアの説明として正しいものは？',a:['家畜が快適に、健康に暮らせるよう配慮した飼い方','家畜をできるだけせまい所で飼う方法','家畜を野生にもどす方法'],k:0,m:'平飼いなど、家畜が本来の行動をとれる飼い方も広がっている。'},
   {q:'天敵の昆虫などを利用して、害虫を減らす方法を何という？',a:['生物的防除','化学的防除','物理的防除'],k:0,m:'農薬は化学的防除、防虫ネットは物理的防除。'}]];
 TQ.forEach((q,i)=>ERAS[i].qs=q);
+/* ワークシート（板書）と同じキーワード・トレードオフ */
+const KEY=['<b>狩り</b>が中心','<b>稲作</b>が中心','<b>牛</b>や<b>馬</b>を育てる','<b>牛</b>や<b>馬</b>で田を耕す','<b>肥料</b>が普及','<b>化学肥料</b>と<b>品種改良</b>が発展','<b>スマート農業</b>が始まる'];
+const TRADE=[[],[],[],[['牛や馬で効率よく耕せる','えさや世話の手間がかかる']],[['肥料で生産量がふえた','肥料を買うお金（コスト）がかかる']],[['化学肥料・農薬で生産量がふえた','環境問題・健康への影響'],['機械で効率よくできる','機械を買うお金（コスト）がかかる']],[['ロボットで人の手がかからない','人の仕事がへる'],['植物工場で生産量がふえた','電気代などのコスト'],['効率よくたくさん育てる','家畜の健康（アニマルウェルフェア）']]];
+ERAS.forEach((e,i)=>{e.key=KEY[i];e.trade=TRADE[i];});
+ERAS[5].qs.push({q:'化学肥料や農薬で生産量がふえた一方、環境問題が起きたように、よくなる面と悪くなる面を同時に満たしにくい関係を何という？',a:['トレードオフ','リサイクル','フードロス'],k:0,m:'技術を使うときは、よい面とマイナスの面の両方を考えて、バランスをとることが大切。'});
+ERAS[6].qs.push({q:'ロボットで人の手がかからなくなると、どんなマイナスの面が考えられる？',a:['人の仕事がへる','作物がまったく育たなくなる','雨が降らなくなる'],k:0,m:'人の手がかからない⇔仕事がへる、のように、技術にはトレードオフがある。'});
 /* お金の動きを大きく：増えるときも減るときも大きい */
 ERAS.forEach(e=>{e.base*=3;e.props.forEach(x=>x.inc=Math.round(x.inc*2.5));e.good.forEach(g=>g.v*=3);e.bad.forEach(b=>b.v*=4);});
 
@@ -531,12 +538,12 @@ async function test3(qs,title){let n=0;const res=[];
 
 
 
-const TYPE={S:['🎉','収穫祭'],G:['😊','いいこと'],B:['😣','ピンチ'],Q:['❓','クイズ'],K:['🃏','カード'],C:['👾','キャラ'],H:['🛒','市場の日'],P:['🏗️','施設'],R:['🎲','大勝負']};
+const TYPE={S:['🎉','収穫祭'],G:['😊','いいこと'],B:['😣','ピンチ'],Q:['❓','クイズ'],K:['🎰','ガチャ'],C:['👾','キャラ'],H:['🛒','市場の日'],P:['🏗️','施設'],R:['🎲','大勝負']};
 const COLORS=['#e74c3c','#2e86de','#27ae60','#f39c12','#8e44ad','#16a085','#d35400'];
 const HAND=3,START=1000,MATE=300,BIG={price:2,inc:2.5,dmg:2};
 
 /* ===== 盤面（ぐるぐる回る周回コース・30マス） ===== */
-const LOOP='S G Q P B K R Q H C P Q G B K P G Q B R C K Q H G P Q B R K'.split(' ');
+const LOOP='S P K Q B P R K H G P Q K C B P Q K R G P C Q K B P Q G R K'.split(' ');
 const NODES=LOOP.map((t,i)=>{let x,y;if(i<=8){x=170+i*185;y=170;}else if(i<=14){x=1650;y=170+(i-8)*126;}else if(i<=23){x=1650-(i-15)*185;y=1052;}else{x=170;y=1052-(i-23)*126;}return{x,y,t,i};});
 const NN=NODES.length;
 
@@ -596,7 +603,7 @@ function renderSetup(){
 /* ===== ゲーム ===== */
 async function startGame(){
  G={P:setup.pl.slice(0,setup.n).map((p,i)=>({name:p.name||`プレイヤー${i+1}`,color:COLORS[i],node:0,money:START,props:[],cards:[],mates:0,spinN:0,laps:0})),
-  cur:0,era:0,dev:0,shield:0,devMax:setup.n*setup.years*2.3,chars:[],busy:false,year:1,years:setup.years,ended:false};
+  cur:0,era:0,dev:0,shield:0,devMax:setup.n*setup.years*3.3,chars:[],busy:false,year:1,years:setup.years,ended:false};
  G.P.forEach(p=>p.cards.push({...pick(ERAS[0].cards),era:0,rar:'R'}));
  applyEra();renderGame();
  await eraModal(true);await turnStart();}
@@ -636,7 +643,7 @@ function renderSide(newCard){const p=CP(),e=E();
  <div id="act">${G.busy?'':`<button id="spin">🎡 ルーレットを回す${p.spinN>1?`（${p.spinN}回）`:''}</button>`}</div>
  <div class="hand"><b>🃏 技術カード（${p.cards.length}/${HAND}）</b>${p.cards.map((c,i)=>`<button class="cardc ${newCard&&i===p.cards.length-1?'new':''} c${c.rar||'R'}" data-c="${i}"><span>${c.i}</span>${c.n} ${rarTag(c)}</button>`).join('')||'<div class="small">まだありません</div>'}</div></div>
  <div class="plist">${G.P.map((q,i)=>`<div class="pr ${i===G.cur?'now':''}"><span class="dot" style="background:${q.color}">${i+1}</span><span class="pn">${esc(q.name)}</span><span class="pm ${q.money<0?'neg':''}">${fmt(q.money)}</span><span>🏗️${q.props.length} 👤${q.mates}</span><span>${G.chars.filter(c=>c.h===i).map(c=>CHARS[c.k].i).join('')}</span></div>`).join('')}</div>
- <div class="eracard">${e.i} <b>${e.n}の生物育成</b><br>${e.sum}</div>
+ <div class="eracard">${e.i} <b>${e.n}の生物育成</b><div class="keybox sm">📝 ${e.key}</div>${e.sum}</div>
  <div style="text-align:right;margin-top:8px"><button class="sub" id="endg" style="font-size:.8rem;padding:4px 12px">⏹ ゲームを終える</button></div>`;
  if($('spin'))$('spin').onclick=spin;
  $('endg').onclick=async()=>{if(G.busy)return;const v=await modal({icon:'⏹',title:'ゲームを終えて表彰式にしますか？',body:'先生の合図があったときに押してください。',buttons:[{label:'表彰式へ',v:1},{label:'続ける',v:0,cls:'sub'}]});if(v)finish();};
@@ -653,7 +660,7 @@ async function eraUp(why){const e=E();sfx('era');
  await eraModal(false,why);renderSide();}
 async function eraModal(first,why){const e=E();
  await modal({cls:'era',raw:`<div class="eratop" style="--ec1:${e.c1};--ec2:${e.c2}"><div class="ei">${e.i}</div><small>${first?'ここから物語が始まる…':'時代が進んだ！'}</small><h2>${e.n}</h2><small>${e.y}</small></div>
-  <div class="erabody">${why&&!first?`<p><b>${why}</b></p>`:''}<p><b>🌱 この時代の生物育成</b><br>${e.sum}</p><b>🔧 この時代の技術</b><ul>${e.tech.map(t=>`<li>${t}</li>`).join('')}</ul>
+  <div class="erabody">${why&&!first?`<p><b>${why}</b></p>`:''}<div class="keybox">📝 ワークシート：${e.n.replace('時代','')}は ${e.key}</div><p><b>🌱 この時代の生物育成</b><br>${e.sum}</p><b>🔧 この時代の技術</b><ul>${e.tech.map(t=>`<li>${t}</li>`).join('')}</ul>${e.trade.length?`<b>⚖️ トレードオフ（よい面 ⇔ マイナスの面）</b><ul>${e.trade.map(x=>`<li>${x[0]} <b>⇔</b> <span class="ng">${x[1]}</span></li>`).join('')}</ul>`:''}
   ${first?'<p class="small">施設を買ったりクイズに正解したりして「発展度」を上げると、次の時代へ進みます。</p>':`<p class="okc">全員に「${e.n}」の技術カードを配りました！ 収穫祭の収入もアップ！ 施設マスで新しい施設が買えます。</p>`}</div>`,buttons:[{label:first?'⏳ 出発！':'この時代を生きよう！ ▶',v:1}]});}
 
 /* ===== カード ===== */
@@ -872,7 +879,8 @@ function finish(){G.ended=true;const ranked=[...G.P].sort((a,b)=>assets(b)-asset
  <p>班員の平均資産 ${fmt(avg)} ＋ 時代ボーナス ${fmt(bonus)}（${E().n}まで発展${G.era>=6?'・現代到達ボーナス込み':''}）</p>
  <p>${G.era>=6?'🏆 <b>班の目標「令和の時代まで発展させる」を達成！</b>':`班の目標（平成・令和）まで、あと${6-G.era}つの時代でした。`}</p>
 </div>
- <div class="card"><h2>⏳ 生物育成の歩み</h2><table><tr><th>時代</th><th>生物育成のようす</th></tr>${ERAS.map((e,i)=>`<tr style="${i>G.era?'opacity:.5':''}"><td>${e.i} <b>${e.n}</b><br><span class="small">${e.y}</span></td><td>${e.sum}</td></tr>`).join('')}</table></div>
+ <div class="card"><h2>⏳ 生物育成の歩み</h2><table><tr><th>時代</th><th>ワークシート</th><th>生物育成のようす</th></tr>${ERAS.map((e,i)=>`<tr style="${i>G.era?'opacity:.5':''}"><td>${e.i} <b>${e.n}</b><br><span class="small">${e.y}</span></td><td class="kcell">${e.key}</td><td>${e.sum}</td></tr>`).join('')}</table></div>
+ <div class="card"><h2>⚖️ 技術のトレードオフ（よい面 ⇔ マイナスの面）</h2><table><tr><th>よい面</th><th></th><th>マイナスの面</th></tr><tr><td>人の手がかからない</td><td>⇔</td><td>仕事がへる</td></tr><tr><td>生産量がふえた</td><td>⇔</td><td>コスト・環境問題</td></tr><tr><td>効率よくできる</td><td>⇔</td><td>健康（人や家畜）</td></tr></table><p class="small">すごろくで起きたニュースや「大規模」の体験を思い出して、ワークシートの3を書こう。</p></div>
  <div class="row" style="justify-content:center;margin-bottom:20px"><button id="again" class="sub">⏳ 同じメンバーでもう一度</button><button class="sub" id="reset">設定にもどる</button></div>`;
  sfx('fan');confetti(100);fireworks(6);
  $('again').onclick=startGame;$('reset').onclick=renderSetup;window.scrollTo(0,0);}
