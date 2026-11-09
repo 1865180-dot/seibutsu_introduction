@@ -595,7 +595,7 @@ function renderSetup(){
   <li>🗳️ 2年ごとに<b>村の会議</b>。全員で多数決をして、村の進め方を決めます。</li>
   <li>🤝 ちがう種類の施設を組み合わせると<b>収入アップ</b>（農地＋畜産＝循環型農業）。🔥 <b>最後の2年は収入2倍</b>！</li>
   <li>📈 施設を買ったりクイズに正解したりすると<b>班の「発展度」</b>が上がり、<b>時代が進みます</b>。</li>
-  <li>🃏 <b>技術カードはガチャ</b>で入手！ シルバー＝レア、ゴールド＝スーパーレア、レインボー＝レジェンドレア（一発逆転のすごい効果！）。<b>後半の年ほど当たりやすくなる！</b></li>
+  <li>🃏 <b>技術カードはガチャ</b>で入手！ シルバー＝レア、ゴールド＝スーパーレア、レインボー＝レジェンドレア（一発逆転のすごい効果！）</li>
   <li>😊いいこと　😣ピンチ　❓生物育成クイズ　🃏技術カード　👾キャラクター（ガイチュウ・ジュウガイ・ガイビョウ・オンダンカ神様）。キャラクターは、<b>すれちがった人にうつります</b>。</li>
   <li>決めた年数が終わったら表彰式。個人の総資産の順位と、<b>班の得点（どの時代まで発展できたか）</b>を確かめよう。</li></ul></div>`;
  app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{setup.n=+b.dataset.n;renderSetup();});
@@ -694,7 +694,7 @@ async function useCard(i){if(G.busy)return;const p=CP(),c=p.cards[i];if(!c)retur
 async function legendFx(c){sfx('glr');const w=document.createElement('div');w.className='warp rb';document.body.appendChild(w);setTimeout(()=>w.remove(),1700);fireworks(6);confetti(120);particles({kind:'burst',e:['🌈','✨','💎',c.i],n:30,d:1.6,fs:36});await sleep(RM?50:900);}
 async function gacha(rar){return new Promise(res=>{const ov=$('modal'),R=RAR[rar];
  $('mwrap').innerHTML=`<div class="mbox gacha-box"><h2>🎰 技術カードガチャ！</h2><div class="gm"><div class="gm-dome"><i style="--x:20%;--y:55%;--c:#c9d1d9"></i><i style="--x:45%;--y:65%;--c:#ffd34d"></i><i style="--x:68%;--y:52%;--c:#c9d1d9"></i><i style="--x:33%;--y:35%;--c:#ff8ad8"></i><i style="--x:58%;--y:30%;--c:#c9d1d9"></i><i style="--x:75%;--y:70%;--c:#ffd34d"></i></div><div class="gm-body"><div class="gm-handle" id="gh">✚</div><div class="gm-out"></div></div><div class="cap" id="cap"><div class="ct2"></div><div class="cb2"></div></div></div>
- <p class="small">シルバー＝レア（${pc(gachaOdds().r)}）／ゴールド＝スーパーレア（${pc(gachaOdds().sr)}）／レインボー＝レジェンドレア（${pc(gachaOdds().lr)}）</p>${gachaOdds().f>0?`<p class="okc">🔥 ${G.year}年目ボーナス：後半ほど当たりやすくなる！</p>`:''}<div class="mbtns"><button id="gturn" class="big">ハンドルを回す！</button></div></div>`;
+ <p class="small">シルバー＝レア（60%）／ゴールド＝スーパーレア（35%）／レインボー＝レジェンドレア（5%）</p><div class="mbtns"><button id="gturn" class="big">ハンドルを回す！</button></div></div>`;
  ov.classList.remove('hidden');
  $('gturn').onclick=async()=>{$('gturn').disabled=true;sfx('gturn');$('gh').classList.add('turn');await sleep(RM?50:900);
   const cap=$('cap');cap.classList.add('drop','c-'+R.cap);sfx('gdrop');await sleep(RM?50:1000);
